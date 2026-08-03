@@ -1,0 +1,191 @@
+:root {
+  --bg0: #eef1f4;
+  --bg1: #dfe4ea;
+  --ink: #1b1f24;
+  --muted: #4f5966;
+  --card: rgba(255, 255, 255, 0.92);
+  --line: rgba(26, 32, 44, 0.14);
+  --brand: #1e3a5f;
+  --brand-dark: #12263f;
+  --focus: #0f6bd8;
+  --shadow: 0 14px 30px rgba(19, 27, 38, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 18% 22%, #f5f7fa 0%, rgba(245, 247, 250, 0) 42%),
+    linear-gradient(145deg, var(--bg0), var(--bg1));
+  position: relative;
+  overflow-x: hidden;
+}
+
+.bg-orb {
+  display: none;
+}
+
+.bg-orb-a {
+  width: 300px;
+  height: 300px;
+  top: -80px;
+  right: -90px;
+  background: rgba(176, 70, 39, 0.23);
+}
+
+.bg-orb-b {
+  width: 250px;
+  height: 250px;
+  bottom: -70px;
+  left: -70px;
+  background: rgba(15, 107, 216, 0.15);
+}
+
+.layout {
+  position: relative;
+  z-index: 1;
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+}
+
+.hero {
+  margin-bottom: 1.6rem;
+  text-align: center;
+  animation: slideIn 420ms ease-out both;
+}
+
+.eyebrow {
+  display: none;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2.1rem, 5vw, 3rem);
+  line-height: 1.08;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  margin: 0.45rem auto 0;
+  color: var(--muted);
+  max-width: 28ch;
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  gap: 0.95rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.card {
+  border: 1px solid var(--line);
+  background: var(--card);
+  backdrop-filter: blur(2px);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  animation: cardIn 420ms cubic-bezier(.2, .7, .2, 1) both;
+  animation-delay: var(--delay);
+}
+
+.card h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.12rem;
+}
+
+.card p {
+  margin: 0 0 0.9rem;
+  color: var(--muted);
+  min-height: 2.6em;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 0.56rem 0.9rem;
+  font-weight: 650;
+  color: #fff;
+  background: linear-gradient(180deg, #2f4d70, #203853);
+  border: 1px solid rgba(16, 28, 43, 0.24);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(20, 36, 54, 0.2);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.btn-secondary {
+  background: linear-gradient(180deg, #404a57, #2f3742);
+}
+
+.note {
+  margin-top: 1.2rem;
+  display: grid;
+  gap: 0.2rem;
+  border: 1px dashed var(--line);
+  background: rgba(255, 255, 255, 0.52);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+.note code {
+  padding: 0 0.28rem;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 560px) {
+  .layout {
+    padding: 1.2rem 0.8rem 2rem;
+  }
+
+  .card {
+    border-radius: 14px;
+  }
+}

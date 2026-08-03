@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SRSEII Portal</title>
+  <meta name="description" content="SRSEII Portal" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="layout">
+    <header class="hero">
+      <h1>SRSEII</h1>
+      <p class="subtitle">Gleisbox als Zentrale</p>
+    </header>
+
+    <section class="grid" aria-label="Portal Anwendungen">
+      <article class="card" style="--delay: 0ms;">
+        <h2>Mobile Station Web App</h2>
+        <p>Loks und Weichen steuern.</p>
+        <a class="btn" href="/mswebapp/">Oeffnen</a>
+      </article>
+
+      <article class="card" style="--delay: 90ms;">
+        <h2>RailControl</h2>
+        <p>Modellbahnsteuerung im Browser.</p>
+        <a class="btn" id="railcontrol-link" href="http://gleisbox:8082/">Oeffnen</a>
+      </article>
+
+      <article class="card" style="--delay: 180ms;">
+        <h2>LuCI (Expertenmodus)</h2>
+        <p>Erweiterte OpenWrt-Einstellungen.</p>
+        <a class="btn btn-secondary" href="/cgi-bin/luci/">Oeffnen</a>
+      </article>
+    </section>
+
+    <section class="note" aria-live="polite">
+      <strong>Hinweis v0.1:</strong>
+      <span>Diese Version startet unter <code>/srseii/</code>. Die Root-Seite bleibt vorerst unveraendert.</span>
+      <span id="host-hint"></span>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>

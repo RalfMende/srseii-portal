@@ -1,0 +1,19 @@
+#!/bin/sh
+set -eu
+
+ROOT_INDEX="/www/index.html"
+TEMPLATE="/usr/share/srseii/root-index.html"
+BACKUP="/www/index.luci.backup.html"
+
+if [ ! -f "$TEMPLATE" ]; then
+  echo "Template not found: $TEMPLATE" >&2
+  exit 1
+fi
+
+if [ ! -f "$BACKUP" ] && [ -f "$ROOT_INDEX" ]; then
+  cp "$ROOT_INDEX" "$BACKUP"
+  echo "Backup created: $BACKUP"
+fi
+
+cp "$TEMPLATE" "$ROOT_INDEX"
+echo "Root page switched to SRSEII portal start page."
