@@ -13,83 +13,83 @@
 <body>
   <main class="layout">
     <header class="hero">
-      <h1>SRSEII</h1>
-      <p class="subtitle">Gleisbox als Zentrale</p>
+      <h1 data-i18n="siteTitle">SRSEII</h1>
+      <p class="subtitle" data-i18n="heroSubtitle">Gleisbox als Zentrale</p>
     </header>
 
     <section class="grid" aria-label="Portal Anwendungen">
       <article class="card" style="--delay: 0ms;">
-        <h2>Mobile Station Web App</h2>
-        <p>Loks und Weichen steuern.</p>
-        <a class="btn" href="/mswebapp/">Oeffnen</a>
+        <h2 data-i18n="mswebappTitle">Mobile Station Web App</h2>
+        <p data-i18n="mswebappDesc">Loks und Weichen steuern.</p>
+        <a class="btn" href="/mswebapp/" data-i18n="open">Öffnen</a>
       </article>
 
       <article class="card" style="--delay: 90ms;">
-        <h2>RailControl</h2>
-        <p>Modellbahnsteuerung im Browser.</p>
-        <a class="btn" id="railcontrol-link" href="http://gleisbox:8082/">Oeffnen</a>
+        <h2 data-i18n="railcontrolTitle">RailControl</h2>
+        <p data-i18n="railcontrolDesc">Modellbahnsteuerung im Browser.</p>
+        <a class="btn" id="railcontrol-link" href="http://gleisbox:8082/" data-i18n="open">Öffnen</a>
       </article>
 
       <article class="card" style="--delay: 180ms;">
-        <h2>LuCI (Expertenmodus)</h2>
-        <p>Erweiterte OpenWrt-Einstellungen.</p>
-        <a class="btn btn-secondary" href="/cgi-bin/luci/">Oeffnen</a>
+        <h2 data-i18n="luciTitle">LuCI (Expertenmodus)</h2>
+        <p data-i18n="luciDesc">Erweiterte OpenWrt-Einstellungen.</p>
+        <a class="btn btn-secondary" href="/cgi-bin/luci/" data-i18n="open">Öffnen</a>
       </article>
     </section>
 
     <section class="status" aria-label="Systemstatus">
       <div class="status-header">
-        <h2>Status</h2>
-        <button class="btn btn-secondary" id="refresh-status" type="button">Aktualisieren</button>
+        <h2 data-i18n="statusTitle">Status</h2>
+        <button class="btn btn-secondary" id="refresh-status" type="button" data-i18n="refresh">Aktualisieren</button>
       </div>
 
       <div class="status-grid">
         <article class="status-card">
-          <h3>System</h3>
+          <h3 data-i18n="systemTitle">System</h3>
           <ul>
-            <li><span class="label">Hostname</span><span id="st-hostname">-</span></li>
-            <li><span class="label">Modell</span><span id="st-model">-</span></li>
+            <li><span class="label" data-i18n="hostnameLabel">Hostname</span><span id="st-hostname">-</span></li>
+            <li><span class="label" data-i18n="modelLabel">Modell</span><span id="st-model">-</span></li>
           </ul>
         </article>
 
         <article class="status-card">
-          <h3>Netzwerk</h3>
+          <h3 data-i18n="networkTitle">Netzwerk</h3>
           <ul>
-            <li><span class="label">LAN</span><span id="st-lan" class="pill pending">wird geladen</span></li>
-            <li><span class="label">WLAN</span><span id="st-wifi" class="pill pending">wird geladen</span></li>
-            <li><span class="label">SSID</span><span id="st-ssid">-</span></li>
-            <li><span class="label">IP</span><span id="st-ip">-</span></li>
+            <li><span class="label" data-i18n="lanLabel">LAN</span><span id="st-lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label" data-i18n="wifiLabel">WLAN</span><span id="st-wifi" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label" data-i18n="ssidLabel">SSID</span><span id="st-ssid">-</span></li>
+            <li><span class="label" data-i18n="ipLabel">IP</span><span id="st-ip">-</span></li>
           </ul>
         </article>
 
         <article class="status-card">
-          <h3>Apps</h3>
+          <h3 data-i18n="appsTitle">Apps</h3>
           <ul>
-            <li><span class="label">MSWebApp</span><span id="st-mswebapp" class="pill pending">wird geladen</span></li>
-            <li><span class="label">RailControl</span><span id="st-railcontrol-app" class="pill pending">wird geladen</span></li>
+            <li><span class="label">MSWebApp</span><span id="st-mswebapp" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">RailControl</span><span id="st-railcontrol-app" class="pill pending" data-i18n="loading">wird geladen</span></li>
           </ul>
         </article>
 
         <article class="status-card">
-          <h3>Dienste</h3>
+          <h3 data-i18n="servicesTitle">Dienste</h3>
           <ul>
-            <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending">wird geladen</span></li>
-            <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending">wird geladen</span></li>
-            <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending">wird geladen</span></li>
-            <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending">wird geladen</span></li>
-            <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending">wird geladen</span></li>
-            <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending">wird geladen</span></li>
-            <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending">wird geladen</span></li>
+            <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending" data-i18n="loading">wird geladen</span></li>
           </ul>
         </article>
       </div>
 
-      <p class="status-note" id="st-note">Status wird geladen...</p>
+      <p class="status-note" id="st-note" data-i18n="statusLoading">Status wird geladen...</p>
     </section>
 
     <section class="note" aria-live="polite">
-      <strong>Hinweis:</strong>
-      <span>Diese Version startet unter <code>/srseii/</code>. Die Root-Seite bleibt vorerst unveraendert.</span>
+      <strong data-i18n="noteLabel">Hinweis:</strong>
+      <span data-i18n="noteText">Diese Version startet unter <code>/srseii/</code>. Die Root-Seite bleibt vorerst unverändert.</span>
       <span id="host-hint"></span>
     </section>
   </main>
