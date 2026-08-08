@@ -194,8 +194,7 @@ body {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 0.45rem;
+  display: block;
 }
 
 .status-card li {
@@ -203,6 +202,12 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.7rem;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid rgba(26, 32, 44, 0.06);
+}
+
+.status-card li:last-child {
+  border-bottom: none;
 }
 
 .label {
@@ -225,9 +230,9 @@ body {
 }
 
 .pill.err {
-  color: #7a1820;
-  background: #f8dde1;
-  border-color: #efb7bf;
+  color: #47505a;
+  background: #eceff3;
+  border-color: #cfd6de;
 }
 
 .pill.pending {

@@ -3,9 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="./style.css?v=0.3.1" />
 </head>
 <body>
   <main class="layout">
@@ -54,6 +57,8 @@
           <ul>
             <li><span class="label">LAN</span><span id="st-lan" class="pill pending">wird geladen</span></li>
             <li><span class="label">WLAN</span><span id="st-wifi" class="pill pending">wird geladen</span></li>
+            <li><span class="label">SSID</span><span id="st-ssid">-</span></li>
+            <li><span class="label">IP</span><span id="st-ip">-</span></li>
           </ul>
         </article>
 
@@ -71,6 +76,10 @@
             <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending">wird geladen</span></li>
             <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending">wird geladen</span></li>
             <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending">wird geladen</span></li>
+            <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending">wird geladen</span></li>
+            <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending">wird geladen</span></li>
+            <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending">wird geladen</span></li>
+            <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending">wird geladen</span></li>
           </ul>
         </article>
       </div>
@@ -85,6 +94,6 @@
     </section>
   </main>
 
-  <script src="./app.js"></script>
+  <script src="./app.js?v=0.3.1"></script>
 </body>
 </html>

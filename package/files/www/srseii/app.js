@@ -60,8 +60,11 @@
         setText("st-hostname", data.hostname || "unknown");
         setText("st-model", data.model || "unknown");
 
-        setPill("st-lan", !!(data.network && data.network.lan));
-        setPill("st-wifi", !!(data.network && data.network.wifi));
+        var network = data.network || {};
+        setPill("st-lan", !!network.lan);
+        setPill("st-wifi", !!network.wifi);
+        setText("st-ssid", network.ssid || "unbekannt");
+        setText("st-ip", network.ip || "nicht verfügbar");
 
         setPill("st-mswebapp", !!(data.apps && data.apps.mswebapp));
         setPill("st-railcontrol-app", !!(data.apps && data.apps.railcontrol));
@@ -69,8 +72,12 @@
         setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));
         setPill("st-z21emu", !!(data.services && data.services.z21emu));
         setPill("st-can2lan", !!(data.services && data.services.can2lan));
+        setPill("st-clone-ms2-loco", !!(data.services && data.services["clone-ms2-loco"]));
+        setPill("st-maecanserver", !!(data.services && data.services.maecanserver));
+        setPill("st-ms2-loco-list", !!(data.services && data.services["ms2-loco-list"]));
+        setPill("st-wake-up-links88", !!(data.services && data.services["wake-up-links88"]));
 
-        setStatusNote("Status erfolgreich aktualisiert.");
+        setStatusNote(network.message || "Status erfolgreich aktualisiert.");
       })
       .catch(function (error) {
         setStatusNote("Status konnte nicht geladen werden: " + error.message);

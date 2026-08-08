@@ -2,6 +2,8 @@
 
 # Minimal CGI endpoint for portal status data.
 
+set -eu
+
 echo "Content-Type: application/json"
 echo "Cache-Control: no-store"
 echo ""
@@ -22,41 +24,104 @@ is_pkg_installed() {
 	opkg status "$1" 2>/dev/null | grep -q '^Status: .* installed$'
 }
 
-is_service_running() {
-	if [ -x "/etc/init.d/$1" ]; then
-		/etc/init.d/"$1" running >/dev/null 2>&1
-		return $?
+service_process_running() {
+	service_name="$1"
+
+	if command -v pgrep >/dev/null 2>&1; then
+		if pgrep -f "$service_name" >/dev/null 2>&1; then
+			return 0
+		fi
 	fi
+
+	if command -v ps >/dev/null 2>&1; then
+		if ps 2>/dev/null | grep -E "[${service_name%${service_name#?}}]${service_name#?}" >/dev/null 2>&1; then
+			return 0
+		fi
+	fi
+
 	return 1
 }
 
-hostname_value="$(uci -q get system.@system[0].hostname 2>/dev/null)"
-if [ -z "$hostname_value" ]; then
-	hostname_value="$(uname -n 2>/dev/null)"
-fi
-if [ -z "$hostname_value" ]; then
-	hostname_value="unknown"
-fi
+service_status_from_ubus() {
+	service_name="$1"
 
-model_value=""
-if [ -r /tmp/sysinfo/model ]; then
-	model_value="$(cat /tmp/sysinfo/model 2>/dev/null)"
-fi
+	if ! command -v ubus >/dev/null 2>&1; then
+		return 2
+	fi
+
+	service_list="$(ubus call service list 2>/dev/null || true)"
+	[ -n "$service_list" ] || return 2
+
+	if printf '%s' "$service_list" | grep -q "\"$service_name\""; then
+		if printf '%s' "$service_list" | grep -Eiq "\"$service_name\".*\"running\"[[:space:]]*:[[:space:]]*true|\"running\"[[:space:]]*:[[:space:]]*true.*\"$service_name\""; then
+			return 0
+		fi
+		if printf '%s' "$service_list" | grep -Eiq "\"$service_name\".*\"running\"[[:space:]]*:[[:space:]]*false|\"running\"[[:space:]]*:[[:space:]]*false.*\"$service_name\""; then
+			return 1
+		fi
+		if printf '%s' "$service_list" | grep -Eiq "\"$service_name\".*\"enabled\"[[:space:]]*:[[:space:]]*true|\"enabled\"[[:space:]]*:[[:space:]]*true.*\"$service_name\""; then
+			return 0
+		fi
+	fi
+
+	return 2
+}
+
+is_service_running() {
+	service_name="$1"
+
+	if service_process_running "$service_name"; then
+		return 0
+	fi
+
+	if [ -x "/etc/init.d/$service_name" ]; then
+		output="$('/etc/init.d/$service_name' running 2>&1 || true)"
+		if printf '%s' "$output" | grep -Eiq 'running|started|active|pid'; then
+			return 0
+		fi
+		if printf '%s' "$output" | grep -Eiq 'not running|stopped|inactive|failed|disabled'; then
+			return 1
+		fi
+
+		output="$('/etc/init.d/$service_name' status 2>&1 || true)"
+		if printf '%s' "$output" | grep -Eiq 'running|started|active|pid'; then
+			return 0
+		fi
+		if printf '%s' "$output" | grep -Eiq 'not running|stopped|inactive|failed|disabled'; then
+			return 1
+		fi
+	fi
+
+	service_status_from_ubus "$service_name"
+	status_rc=$?
+	if [ "$status_rc" -eq 0 ]; then
+		return 0
+	fi
+	if [ "$status_rc" -eq 1 ]; then
+		return 1
+	fi
+
+	return 1
+}
+
+hostname_value="$(uci -q get system.@system[0].hostname 2>/dev/null || true)"
+[ -n "$hostname_value" ] || hostname_value="$(uname -n 2>/dev/null || true)"
+[ -n "$hostname_value" ] || hostname_value="unknown"
+
+model_value="$(cat /tmp/sysinfo/model 2>/dev/null || true)"
 if [ -z "$model_value" ] && command -v ubus >/dev/null 2>&1 && command -v jsonfilter >/dev/null 2>&1; then
-	board_json="$(ubus call system board 2>/dev/null)"
+	board_json="$(ubus call system board 2>/dev/null || true)"
 	if [ -n "$board_json" ]; then
-		model_value="$(printf '%s' "$board_json" | jsonfilter -e '@.model' 2>/dev/null)"
+		model_value="$(printf '%s' "$board_json" | jsonfilter -e '@.model' 2>/dev/null || true)"
 	fi
 fi
-if [ -z "$model_value" ]; then
-	model_value="unknown"
-fi
+[ -n "$model_value" ] || model_value="unknown"
 
 lan_up=false
 if command -v ubus >/dev/null 2>&1 && command -v jsonfilter >/dev/null 2>&1; then
-	if_dump="$(ubus call network.interface dump 2>/dev/null)"
+	if_dump="$(ubus call network.interface dump 2>/dev/null || true)"
 	if [ -n "$if_dump" ]; then
-		lan_flag="$(printf '%s' "$if_dump" | jsonfilter -e '@.interface[@.interface="lan"].up' 2>/dev/null)"
+		lan_flag="$(printf '%s' "$if_dump" | jsonfilter -e '@.interface[@.interface="lan"].up' 2>/dev/null || true)"
 		if [ "$lan_flag" = "true" ]; then
 			lan_up=true
 		fi
@@ -67,36 +132,98 @@ if [ "$lan_up" = false ]; then
 fi
 
 wifi_up=false
-if command -v ubus >/dev/null 2>&1; then
-	ubus call network.wireless status 2>/dev/null | grep -q '"up": true' && wifi_up=true
+ssid_value=""
+
+if command -v iw >/dev/null 2>&1; then
+	interfaces="$(iw dev 2>/dev/null | awk '/^\s*Interface /{print $2}' || true)"
+	for iface in $interfaces; do
+		if iw dev "$iface" link 2>/dev/null | grep -q 'Connected to'; then
+			wifi_up=true
+			ssid_value="$(iw dev "$iface" link 2>/dev/null | awk -F': ' '/SSID:/ {print $2; exit}')"
+			break
+		fi
+	done
 fi
 
-is_pkg_installed mswebapp
-mswebapp_rc=$?
-is_pkg_installed railcontrol
-railcontrol_pkg_rc=$?
+if [ -z "$ssid_value" ] && command -v ubus >/dev/null 2>&1; then
+	wifi_json="$(ubus call network.wireless status 2>/dev/null || true)"
+	if [ -n "$wifi_json" ]; then
+		if printf '%s' "$wifi_json" | grep -q '"up": true'; then
+			wifi_up=true
+		fi
+		ssid_value="$(printf '%s' "$wifi_json" | sed -n 's/.*"ssid":"\([^"]*\)".*/\1/p' | head -n 1)"
+	fi
+fi
+[ -n "$ssid_value" ] || ssid_value="$(uci -q get wireless.@wifi-iface[0].ssid 2>/dev/null || true)"
+[ -n "$ssid_value" ] || ssid_value="unbekannt"
 
-is_service_running railcontrol
-railcontrol_service_rc=$?
-is_service_running z21emu
-z21emu_service_rc=$?
-is_service_running can2lan
-can2lan_service_rc=$?
+ip_value="$(ip -o -4 addr show scope global 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n 1 || true)"
+[ -n "$ip_value" ] || ip_value="nicht verfügbar"
 
-printf '{'
-printf '"hostname":"%s",' "$(json_escape "$hostname_value")"
-printf '"model":"%s",' "$(json_escape "$model_value")"
-printf '"network":{' 
-printf '"lan":%s,' "$lan_up"
-printf '"wifi":%s' "$wifi_up"
-printf '},'
-printf '"apps":{'
-printf '"mswebapp":%s,' "$(bool_from_rc "$mswebapp_rc")"
-printf '"railcontrol":%s' "$(bool_from_rc "$railcontrol_pkg_rc")"
-printf '},'
-printf '"services":{'
-printf '"railcontrol":%s,' "$(bool_from_rc "$railcontrol_service_rc")"
-printf '"z21emu":%s,' "$(bool_from_rc "$z21emu_service_rc")"
-printf '"can2lan":%s' "$(bool_from_rc "$can2lan_service_rc")"
-printf '}'
-printf '}'
+status_message="Keine aktive Netzwerkverbindung."
+if [ "$lan_up" = true ] || [ "$wifi_up" = true ]; then
+	if [ "$ip_value" = "nicht verfügbar" ]; then
+		status_message="Verbindung vorhanden, aber keine IP-Adresse gefunden."
+	else
+		status_message="Netzwerkverbindung verfügbar."
+	fi
+fi
+
+mswebapp_rc=1
+if is_pkg_installed mswebapp; then
+	mswebapp_rc=0
+fi
+
+railcontrol_pkg_rc=1
+if is_pkg_installed railcontrol; then
+	railcontrol_pkg_rc=0
+fi
+
+railcontrol_service_rc=1
+if is_service_running railcontrol; then
+	railcontrol_service_rc=0
+fi
+
+z21emu_service_rc=1
+if is_service_running z21emu; then
+	z21emu_service_rc=0
+fi
+
+can2lan_service_rc=1
+if is_service_running can2lan; then
+	can2lan_service_rc=0
+fi
+
+clone_ms2_loco_service_rc=1
+if is_service_running clone-ms2-loco; then
+	clone_ms2_loco_service_rc=0
+fi
+
+maecanserver_service_rc=1
+if is_service_running maecanserver; then
+	maecanserver_service_rc=0
+fi
+
+ms2_loco_list_service_rc=1
+if is_service_running ms2-loco-list; then
+	ms2_loco_list_service_rc=0
+fi
+
+wake_up_links88_service_rc=1
+if is_service_running wake-up-links88; then
+	wake_up_links88_service_rc=0
+fi
+
+mswebapp_value="$(bool_from_rc "$mswebapp_rc")"
+railcontrol_pkg_value="$(bool_from_rc "$railcontrol_pkg_rc")"
+railcontrol_service_value="$(bool_from_rc "$railcontrol_service_rc")"
+z21emu_service_value="$(bool_from_rc "$z21emu_service_rc")"
+can2lan_service_value="$(bool_from_rc "$can2lan_service_rc")"
+clone_ms2_loco_service_value="$(bool_from_rc "$clone_ms2_loco_service_rc")"
+maecanserver_service_value="$(bool_from_rc "$maecanserver_service_rc")"
+ms2_loco_list_service_value="$(bool_from_rc "$ms2_loco_list_service_rc")"
+wake_up_links88_service_value="$(bool_from_rc "$wake_up_links88_service_rc")"
+
+cat <<EOF
+{"hostname":"$(json_escape "$hostname_value")","model":"$(json_escape "$model_value")","network":{"lan":$lan_up,"wifi":$wifi_up,"ssid":"$(json_escape "$ssid_value")","ip":"$(json_escape "$ip_value")","message":"$(json_escape "$status_message")"},"apps":{"mswebapp":$mswebapp_value,"railcontrol":$railcontrol_pkg_value},"services":{"railcontrol":$railcontrol_service_value,"z21emu":$z21emu_service_value,"can2lan":$can2lan_service_value,"clone-ms2-loco":$clone_ms2_loco_service_value,"maecanserver":$maecanserver_service_value,"ms2-loco-list":$ms2_loco_list_service_value,"wake-up-links88":$wake_up_links88_service_value}}
+EOF
