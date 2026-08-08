@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=srseii-portal
-PKG_VERSION:=0.1.0
+PKG_VERSION:=0.2.0
 PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
@@ -23,6 +23,8 @@ endef
 define Package/srseii-portal/install
 	$(INSTALL_DIR) $(1)/www/srseii
 	$(CP) ./files/www/srseii/* $(1)/www/srseii/
+  $(INSTALL_DIR) $(1)/www/cgi-bin/srseii
+  $(INSTALL_BIN) ./files/www/cgi-bin/srseii/status $(1)/www/cgi-bin/srseii/status
   $(INSTALL_DIR) $(1)/usr/share/srseii
   $(INSTALL_DATA) ./files/usr/share/srseii/root-index.html $(1)/usr/share/srseii/root-index.html
   $(INSTALL_DIR) $(1)/usr/sbin

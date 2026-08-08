@@ -34,8 +34,52 @@
       </article>
     </section>
 
+    <section class="status" aria-label="Systemstatus">
+      <div class="status-header">
+        <h2>Status</h2>
+        <button class="btn btn-secondary" id="refresh-status" type="button">Aktualisieren</button>
+      </div>
+
+      <div class="status-grid">
+        <article class="status-card">
+          <h3>System</h3>
+          <ul>
+            <li><span class="label">Hostname</span><span id="st-hostname">-</span></li>
+            <li><span class="label">Modell</span><span id="st-model">-</span></li>
+          </ul>
+        </article>
+
+        <article class="status-card">
+          <h3>Netzwerk</h3>
+          <ul>
+            <li><span class="label">LAN</span><span id="st-lan" class="pill pending">wird geladen</span></li>
+            <li><span class="label">WLAN</span><span id="st-wifi" class="pill pending">wird geladen</span></li>
+          </ul>
+        </article>
+
+        <article class="status-card">
+          <h3>Apps</h3>
+          <ul>
+            <li><span class="label">MSWebApp</span><span id="st-mswebapp" class="pill pending">wird geladen</span></li>
+            <li><span class="label">RailControl</span><span id="st-railcontrol-app" class="pill pending">wird geladen</span></li>
+          </ul>
+        </article>
+
+        <article class="status-card">
+          <h3>Dienste</h3>
+          <ul>
+            <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending">wird geladen</span></li>
+            <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending">wird geladen</span></li>
+            <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending">wird geladen</span></li>
+          </ul>
+        </article>
+      </div>
+
+      <p class="status-note" id="st-note">Status wird geladen...</p>
+    </section>
+
     <section class="note" aria-live="polite">
-      <strong>Hinweis v0.1:</strong>
+      <strong>Hinweis:</strong>
       <span>Diese Version startet unter <code>/srseii/</code>. Die Root-Seite bleibt vorerst unveraendert.</span>
       <span id="host-hint"></span>
     </section>

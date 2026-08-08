@@ -1,0 +1,102 @@
+#!/bin/sh
+
+# Minimal CGI endpoint for portal status data.
+
+echo "Content-Type: application/json"
+echo "Cache-Control: no-store"
+echo ""
+
+json_escape() {
+	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+bool_from_rc() {
+	if [ "$1" -eq 0 ]; then
+		printf 'true'
+	else
+		printf 'false'
+	fi
+}
+
+is_pkg_installed() {
+	opkg status "$1" 2>/dev/null | grep -q '^Status: .* installed$'
+}
+
+is_service_running() {
+	if [ -x "/etc/init.d/$1" ]; then
+		/etc/init.d/"$1" running >/dev/null 2>&1
+		return $?
+	fi
+	return 1
+}
+
+hostname_value="$(uci -q get system.@system[0].hostname 2>/dev/null)"
+if [ -z "$hostname_value" ]; then
+	hostname_value="$(uname -n 2>/dev/null)"
+fi
+if [ -z "$hostname_value" ]; then
+	hostname_value="unknown"
+fi
+
+model_value=""
+if [ -r /tmp/sysinfo/model ]; then
+	model_value="$(cat /tmp/sysinfo/model 2>/dev/null)"
+fi
+if [ -z "$model_value" ] && command -v ubus >/dev/null 2>&1 && command -v jsonfilter >/dev/null 2>&1; then
+	board_json="$(ubus call system board 2>/dev/null)"
+	if [ -n "$board_json" ]; then
+		model_value="$(printf '%s' "$board_json" | jsonfilter -e '@.model' 2>/dev/null)"
+	fi
+fi
+if [ -z "$model_value" ]; then
+	model_value="unknown"
+fi
+
+lan_up=false
+if command -v ubus >/dev/null 2>&1 && command -v jsonfilter >/dev/null 2>&1; then
+	if_dump="$(ubus call network.interface dump 2>/dev/null)"
+	if [ -n "$if_dump" ]; then
+		lan_flag="$(printf '%s' "$if_dump" | jsonfilter -e '@.interface[@.interface="lan"].up' 2>/dev/null)"
+		if [ "$lan_flag" = "true" ]; then
+			lan_up=true
+		fi
+	fi
+fi
+if [ "$lan_up" = false ]; then
+	ip -4 addr show br-lan 2>/dev/null | grep -q 'inet ' && lan_up=true
+fi
+
+wifi_up=false
+if command -v ubus >/dev/null 2>&1; then
+	ubus call network.wireless status 2>/dev/null | grep -q '"up": true' && wifi_up=true
+fi
+
+is_pkg_installed mswebapp
+mswebapp_rc=$?
+is_pkg_installed railcontrol
+railcontrol_pkg_rc=$?
+
+is_service_running railcontrol
+railcontrol_service_rc=$?
+is_service_running z21emu
+z21emu_service_rc=$?
+is_service_running can2lan
+can2lan_service_rc=$?
+
+printf '{'
+printf '"hostname":"%s",' "$(json_escape "$hostname_value")"
+printf '"model":"%s",' "$(json_escape "$model_value")"
+printf '"network":{' 
+printf '"lan":%s,' "$lan_up"
+printf '"wifi":%s' "$wifi_up"
+printf '},'
+printf '"apps":{'
+printf '"mswebapp":%s,' "$(bool_from_rc "$mswebapp_rc")"
+printf '"railcontrol":%s' "$(bool_from_rc "$railcontrol_pkg_rc")"
+printf '},'
+printf '"services":{'
+printf '"railcontrol":%s,' "$(bool_from_rc "$railcontrol_service_rc")"
+printf '"z21emu":%s,' "$(bool_from_rc "$z21emu_service_rc")"
+printf '"can2lan":%s' "$(bool_from_rc "$can2lan_service_rc")"
+printf '}'
+printf '}'
