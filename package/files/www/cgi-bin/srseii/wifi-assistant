@@ -11,7 +11,7 @@ set -eu
 STATE_FILE="/tmp/srseii-wifi-assistant.state"
 WIRELESS_BAK="/tmp/srseii-wireless.bak"
 NETWORK_BAK="/tmp/srseii-network.bak"
-CLIENT_SECTION="srseii_wlan_client"
+CLIENT_PREFIX="srseii_sta_"
 
 echo "Content-Type: application/json"
 echo "Cache-Control: no-store"
@@ -105,33 +105,63 @@ NETWORK_BAK='$NETWORK_BAK'
 EOF
 }
 
-ensure_client_section() {
-	if ! uci -q get wireless."$CLIENT_SECTION" >/dev/null 2>&1; then
-		uci set wireless."$CLIENT_SECTION"='wifi-iface'
+ssid_key() {
+	ssid_raw="$1"
+	if command -v cksum >/dev/null 2>&1; then
+		printf '%s' "$ssid_raw" | cksum | awk '{print $1}'
+		return
 	fi
-	uci set wireless."$CLIENT_SECTION".srseii_managed='1'
-	printf '%s' "$CLIENT_SECTION"
+
+	# Fallback if cksum is missing.
+	printf '%s' "$ssid_raw" | sed 's/[^A-Za-z0-9]/_/g' | tr 'A-Z' 'a-z' | cut -c1-24
 }
 
-cleanup_duplicate_client_sections() {
+ensure_client_section_for_ssid() {
 	target_ssid="$1"
+	section_id="$(ssid_key "$target_ssid")"
+	[ -n "$section_id" ] || section_id="manual"
+	section_name="${CLIENT_PREFIX}${section_id}"
+
+	if ! uci -q get wireless."$section_name" >/dev/null 2>&1; then
+		uci set wireless."$section_name"='wifi-iface'
+	fi
+
+	uci set wireless."$section_name".srseii_managed='1'
+	uci set wireless."$section_name".srseii_profile_id="$section_id"
+	printf '%s' "$section_name"
+}
+
+disable_other_managed_sta_profiles() {
+	active_section="$1"
 
 	for section in $(uci show wireless 2>/dev/null | sed -n 's/^wireless\.\([^.=]*\)=wifi-iface$/\1/p'); do
-		if [ "$section" = "$CLIENT_SECTION" ]; then
+		if [ "$section" = "$active_section" ]; then
+			continue
+		fi
+
+		managed_value="$(uci -q get wireless."$section".srseii_managed 2>/dev/null || true)"
+		mode_value="$(uci -q get wireless."$section".mode 2>/dev/null || true)"
+
+		if [ "$managed_value" = "1" ] && [ "$mode_value" = "sta" ]; then
+			uci set wireless."$section".disabled='1'
+		fi
+	done
+}
+
+disable_other_sta_on_same_device() {
+	active_section="$1"
+	active_device="$2"
+
+	for section in $(uci show wireless 2>/dev/null | sed -n 's/^wireless\.\([^.=]*\)=wifi-iface$/\1/p'); do
+		if [ "$section" = "$active_section" ]; then
 			continue
 		fi
 
 		mode_value="$(uci -q get wireless."$section".mode 2>/dev/null || true)"
-		ssid_value="$(uci -q get wireless."$section".ssid 2>/dev/null || true)"
-		managed_value="$(uci -q get wireless."$section".srseii_managed 2>/dev/null || true)"
+		device_value="$(uci -q get wireless."$section".device 2>/dev/null || true)"
 
-		if [ "$mode_value" = "sta" ] && [ "$ssid_value" = "$target_ssid" ]; then
-			uci -q delete wireless."$section"
-			continue
-		fi
-
-		if [ "$managed_value" = "1" ] && [ "$ssid_value" = "$target_ssid" ]; then
-			uci -q delete wireless."$section"
+		if [ "$mode_value" = "sta" ] && [ "$device_value" = "$active_device" ]; then
+			uci set wireless."$section".disabled='1'
 		fi
 	done
 }
@@ -292,9 +322,7 @@ connect_network() {
 	fi
 
 	prepare_backup
-	cleanup_duplicate_client_sections "$ssid"
-
-	sta_section="$(ensure_client_section)"
+	sta_section="$(ensure_client_section_for_ssid "$ssid")"
 
 	radio_section="$(uci show wireless 2>/dev/null | sed -n 's/^wireless\.\([^.=]*\)=wifi-device$/\1/p' | head -n 1 || true)"
 	if [ -z "$radio_section" ]; then
@@ -306,7 +334,10 @@ connect_network() {
 	uci set wireless."$sta_section".network='wwan'
 	uci set wireless."$sta_section".ssid="$ssid"
 	uci set wireless."$sta_section".disabled='0'
- 	uci set wireless."$sta_section".srseii_managed='1'
+	uci set wireless."$sta_section".srseii_managed='1'
+	uci set wireless."$radio_section".disabled='0'
+	disable_other_managed_sta_profiles "$sta_section"
+	disable_other_sta_on_same_device "$sta_section" "$radio_section"
 
 	if [ -n "$password" ]; then
 		uci set wireless."$sta_section".encryption='psk2'
@@ -324,12 +355,23 @@ connect_network() {
 	uci commit wireless
 	uci commit network
 
+	written_mode="$(uci -q get wireless."$sta_section".mode 2>/dev/null || true)"
+	written_ssid="$(uci -q get wireless."$sta_section".ssid 2>/dev/null || true)"
+	written_network="$(uci -q get wireless."$sta_section".network 2>/dev/null || true)"
+	written_disabled="$(uci -q get wireless."$sta_section".disabled 2>/dev/null || true)"
+	radio_disabled="$(uci -q get wireless."$radio_section".disabled 2>/dev/null || true)"
+
+	if [ "$written_mode" != "sta" ] || [ "$written_ssid" != "$ssid" ] || [ "$written_network" != "wwan" ] || [ "$written_disabled" != "0" ] || [ "$radio_disabled" != "0" ]; then
+		json_error "Configuration write verification failed for section $sta_section."
+	fi
+
 	if command -v wifi >/dev/null 2>&1; then
 		wifi reload >/dev/null 2>&1 || true
+		wifi up >/dev/null 2>&1 || true
 	fi
 	/etc/init.d/network reload >/dev/null 2>&1 || true
 
-	printf '{"ok":true,"message":"Configuration applied. Run connection test.","requiresTest":true}\n'
+	printf '{"ok":true,"message":"Configuration applied in section %s for SSID %s. Run connection test.","requiresTest":true,"section":"%s","ssid":"%s"}\n' "$(json_escape "$sta_section")" "$(json_escape "$ssid")" "$(json_escape "$sta_section")" "$(json_escape "$ssid")"
 	exit 0
 }
 
