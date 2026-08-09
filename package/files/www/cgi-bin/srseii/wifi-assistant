@@ -158,69 +158,99 @@ rollback_config() {
 }
 
 scan_networks() {
-	iface="$(get_wifi_iface)"
-
-	if command -v iwinfo >/dev/null 2>&1; then
-		scan_json="$(iwinfo "$iface" scan 2>/dev/null | awk '
-		function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
-		function emit() {
-			if (ssid == "") return
-			if (!first) printf ","
-			first = 0
-			if (enc == "") enc = "unknown"
-			if (sig == "") sig = 0
-			if (qual == "") qual = 0
-			printf "{\"ssid\":\"%s\",\"security\":\"%s\",\"signal\":%s,\"quality\":%s}", esc(ssid), esc(enc), sig, qual
-		}
-		BEGIN { first = 1; ssid = ""; enc = ""; sig = ""; qual = ""; printf "[" }
-		/^Cell / { emit(); ssid = ""; enc = ""; sig = ""; qual = "" }
-		/ESSID:/ {
-			ssid = $0
-			sub(/^.*ESSID:[[:space:]]*"?/, "", ssid)
-			sub(/"?[[:space:]]*$/, "", ssid)
-			gsub(/^[[:space:]]+/, "", ssid)
-		}
-		/Signal:/ {
-			signal_line = $0
-			if (match(signal_line, /Signal:[[:space:]]*(-?[0-9]+)(\.[0-9]+)?/, m)) {
-				sig = m[1]
-			}
-		}
-		/Quality:/ {
-			quality_line = $0
-			if (match(quality_line, /Quality:[[:space:]]*([0-9]+)\/[[:space:]]*([0-9]+)/, q)) {
-				if (q[2] > 0) qual = int((q[1] * 100) / q[2])
-			}
-		}
-		$1 == "Encryption:" {
-			enc = substr($0, index($0, $2))
-		}
-		END { emit(); printf "]" }
-		')"
-		printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
-		exit 0
+	# Ensure wireless stack is initialized before scan on factory-like states.
+	if command -v wifi >/dev/null 2>&1; then
+		wifi up >/dev/null 2>&1 || true
 	fi
 
+	interfaces=""
 	if command -v iw >/dev/null 2>&1; then
-		scan_json="$(iw dev "$iface" scan 2>/dev/null | awk '
-		function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
-		BEGIN { first = 1; printf "[" }
-		/SSID: / {
-			ssid = $0
-			sub(/^[[:space:]]*SSID:[[:space:]]*/, "", ssid)
-			if (ssid != "") {
-				if (!first) printf ","
-				first = 0
-				printf "{\"ssid\":\"%s\",\"security\":\"unknown\",\"signal\":0,\"quality\":0}", esc(ssid)
-			}
-		}
-		END { printf "]" }
-		')"
-		printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
-		exit 0
+		interfaces="$(iw dev 2>/dev/null | awk '/^\s*Interface / {print $2}' || true)"
 	fi
 
-	json_error "No scan tool available (iwinfo/iw missing)."
+	if [ -z "$interfaces" ] && command -v iwinfo >/dev/null 2>&1; then
+		interfaces="$(iwinfo 2>/dev/null | awk 'NF > 0 {print $1}' | sed 's/[[:space:]]*$//' | sed '/^$/d' || true)"
+	fi
+
+	if [ -z "$interfaces" ]; then
+		interfaces="$(uci show wireless 2>/dev/null | sed -n 's/^wireless\.\([^.=]*\)=wifi-device$/\1/p' || true)"
+	fi
+
+	if [ -z "$interfaces" ]; then
+		interfaces="$(get_wifi_iface)"
+	fi
+
+	for iface in $interfaces; do
+		if command -v iwinfo >/dev/null 2>&1; then
+			scan_output="$(iwinfo "$iface" scan 2>/dev/null || true)"
+			if [ -n "$scan_output" ] && printf '%s' "$scan_output" | grep -q 'ESSID:'; then
+				scan_json="$(printf '%s' "$scan_output" | awk '
+				function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
+				function emit() {
+					if (ssid == "") return
+					if (!first) printf ","
+					first = 0
+					if (enc == "") enc = "unknown"
+					if (sig == "") sig = 0
+					if (qual == "") qual = 0
+					printf "{\"ssid\":\"%s\",\"security\":\"%s\",\"signal\":%s,\"quality\":%s}", esc(ssid), esc(enc), sig, qual
+				}
+				BEGIN { first = 1; ssid = ""; enc = ""; sig = ""; qual = ""; printf "[" }
+				/^Cell / { emit(); ssid = ""; enc = ""; sig = ""; qual = "" }
+				/ESSID:/ {
+					ssid = $0
+					sub(/^.*ESSID:[[:space:]]*"?/, "", ssid)
+					sub(/"?[[:space:]]*$/, "", ssid)
+					gsub(/^[[:space:]]+/, "", ssid)
+				}
+				/Signal:/ {
+					signal_line = $0
+					if (match(signal_line, /Signal:[[:space:]]*(-?[0-9]+)(\.[0-9]+)?/, m)) {
+						sig = m[1]
+					}
+				}
+				/Quality:/ {
+					quality_line = $0
+					if (match(quality_line, /Quality:[[:space:]]*([0-9]+)\/[[:space:]]*([0-9]+)/, q)) {
+						if (q[2] > 0) qual = int((q[1] * 100) / q[2])
+					}
+				}
+				$1 == "Encryption:" {
+					enc = substr($0, index($0, $2))
+				}
+				END { emit(); printf "]" }
+				')"
+				printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
+				exit 0
+			fi
+		fi
+
+		if command -v iw >/dev/null 2>&1; then
+			scan_output="$(iw dev "$iface" scan 2>/dev/null || true)"
+			if [ -n "$scan_output" ] && printf '%s' "$scan_output" | grep -q 'SSID:'; then
+				scan_json="$(printf '%s' "$scan_output" | awk '
+				function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
+				BEGIN { first = 1; printf "[" }
+				/SSID: / {
+					ssid = $0
+					sub(/^[[:space:]]*SSID:[[:space:]]*/, "", ssid)
+					if (ssid != "") {
+						if (!first) printf ","
+						first = 0
+						printf "{\"ssid\":\"%s\",\"security\":\"unknown\",\"signal\":0,\"quality\":0}", esc(ssid)
+					}
+				}
+				END { printf "]" }
+				')"
+				printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
+				exit 0
+			fi
+		fi
+	done
+
+	iface_list="$(printf '%s' "$interfaces" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//')"
+	[ -n "$iface_list" ] || iface_list="none"
+	json_error "No WLAN networks found. Checked interfaces: $iface_list"
 }
 
 wireless_connected_and_ip() {
