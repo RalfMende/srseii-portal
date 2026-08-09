@@ -247,6 +247,75 @@ body {
   font-size: 0.9rem;
 }
 
+.status-note.err {
+  color: #8a1e2b;
+}
+
+.wifi {
+  margin-top: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.wifi-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-bottom: 0.85rem;
+}
+
+.wifi-header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+}
+
+.wifi-grid {
+  display: grid;
+  grid-template-columns: minmax(90px, 180px) 1fr;
+  gap: 0.6rem 0.8rem;
+  align-items: center;
+}
+
+.wifi-grid label {
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.wifi-grid select,
+.wifi-grid input {
+  width: 100%;
+  border: 1px solid rgba(26, 32, 44, 0.18);
+  border-radius: 10px;
+  padding: 0.52rem 0.65rem;
+  font: inherit;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--ink);
+}
+
+.wifi-grid select:focus-visible,
+.wifi-grid input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.wifi-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+button.btn[disabled] {
+  opacity: 0.55;
+  cursor: wait;
+  transform: none;
+  box-shadow: none;
+}
+
 .note code {
   padding: 0 0.28rem;
   border-radius: 4px;
@@ -289,5 +358,19 @@ body {
   .status-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .wifi-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .wifi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .wifi-actions .btn {
+    width: 100%;
+    text-align: center;
   }
 }

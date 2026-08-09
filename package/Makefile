@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=srseii-portal
-PKG_VERSION:=0.3.0
+PKG_VERSION:=0.4.0
 PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
@@ -25,6 +25,7 @@ define Package/srseii-portal/install
 	$(CP) ./files/www/srseii/* $(1)/www/srseii/
   $(INSTALL_DIR) $(1)/www/cgi-bin/srseii
   $(INSTALL_BIN) ./files/www/cgi-bin/srseii/status $(1)/www/cgi-bin/srseii/status
+  $(INSTALL_BIN) ./files/www/cgi-bin/srseii/wifi-assistant $(1)/www/cgi-bin/srseii/wifi-assistant
   $(INSTALL_DIR) $(1)/usr/share/srseii
   $(INSTALL_DATA) ./files/usr/share/srseii/root-index.html $(1)/usr/share/srseii/root-index.html
   $(INSTALL_DIR) $(1)/usr/sbin

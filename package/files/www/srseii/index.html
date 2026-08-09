@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="./style.css?v=0.3.1" />
+  <link rel="stylesheet" href="./style.css?v=0.4.0" />
 </head>
 <body>
   <main class="layout">
@@ -21,7 +21,7 @@
       <article class="card" style="--delay: 0ms;">
         <h2 data-i18n="mswebappTitle">Mobile Station Web App</h2>
         <p data-i18n="mswebappDesc">Loks und Weichen steuern.</p>
-        <a class="btn" href="/mswebapp/" data-i18n="open">Öffnen</a>
+        <a class="btn" href="http://gleisbox:6020/" data-i18n="open">Öffnen</a>
       </article>
 
       <article class="card" style="--delay: 90ms;">
@@ -87,6 +87,34 @@
       <p class="status-note" id="st-note" data-i18n="statusLoading">Status wird geladen...</p>
     </section>
 
+    <section class="wifi" aria-label="WLAN-Assistent">
+      <div class="wifi-header">
+        <h2 data-i18n="wifiAssistantTitle">WLAN-Assistent</h2>
+        <button class="btn btn-secondary" id="wifi-scan" type="button" data-i18n="wifiScan">WLAN-Scan</button>
+      </div>
+
+      <div class="wifi-grid">
+        <label for="wifi-network" data-i18n="wifiNetworkLabel">Gefundenes Netzwerk</label>
+        <select id="wifi-network">
+          <option value="" data-i18n="wifiNetworkPlaceholder">Bitte zuerst scan starten</option>
+        </select>
+
+        <label for="wifi-ssid" data-i18n="wifiSsidLabel">SSID</label>
+        <input id="wifi-ssid" type="text" autocomplete="off" maxlength="32" placeholder="z. B. Heimnetz" />
+
+        <label for="wifi-password" data-i18n="wifiPasswordLabel">Passwort</label>
+        <input id="wifi-password" type="password" autocomplete="new-password" maxlength="63" placeholder="WLAN-Passwort" />
+      </div>
+
+      <div class="wifi-actions">
+        <button class="btn" id="wifi-connect" type="button" data-i18n="wifiConnect">Verbinden</button>
+        <button class="btn btn-secondary" id="wifi-test" type="button" data-i18n="wifiTest">Verbindung testen</button>
+        <button class="btn btn-secondary" id="wifi-rollback" type="button" data-i18n="wifiRollback">Rollback</button>
+      </div>
+
+      <p class="status-note" id="wifi-note" data-i18n="wifiIdle">Bereit.</p>
+    </section>
+
     <section class="note" aria-live="polite">
       <strong data-i18n="noteLabel">Hinweis:</strong>
       <span data-i18n="noteText">Diese Version startet unter <code>/srseii/</code>. Die Root-Seite bleibt vorerst unverändert.</span>
@@ -94,6 +122,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=0.3.1"></script>
+  <script src="./app.js?v=0.4.0"></script>
 </body>
 </html>

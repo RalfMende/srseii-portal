@@ -1,0 +1,352 @@
+#!/bin/sh
+
+# CGI endpoint for WLAN assistant actions:
+# - scan
+# - connect
+# - test
+# - rollback
+
+set -eu
+
+STATE_FILE="/tmp/srseii-wifi-assistant.state"
+WIRELESS_BAK="/tmp/srseii-wireless.bak"
+NETWORK_BAK="/tmp/srseii-network.bak"
+CLIENT_SECTION="srseii_wlan_client"
+
+echo "Content-Type: application/json"
+echo "Cache-Control: no-store"
+echo ""
+
+json_escape() {
+	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+json_error() {
+	message="$1"
+	printf '{"ok":false,"message":"%s"}\n' "$(json_escape "$message")"
+	exit 0
+}
+
+json_ok_message() {
+	message="$1"
+	printf '{"ok":true,"message":"%s"}\n' "$(json_escape "$message")"
+	exit 0
+}
+
+url_decode() {
+	encoded="$1"
+	replaced="$(printf '%s' "$encoded" | sed 's/+/ /g; s/%/\\x/g')"
+	printf '%b' "$replaced"
+}
+
+read_post_body() {
+	if [ "${REQUEST_METHOD:-GET}" != "POST" ]; then
+		printf ''
+		return
+	fi
+
+	length="${CONTENT_LENGTH:-0}"
+	case "$length" in
+		''|*[!0-9]*)
+			length=0
+			;;
+	esac
+
+	if [ "$length" -le 0 ]; then
+		printf ''
+		return
+	fi
+
+	dd bs=1 count="$length" 2>/dev/null || true
+}
+
+get_kv_param() {
+	source_string="$1"
+	key="$2"
+
+	if [ -z "$source_string" ]; then
+		printf ''
+		return
+	fi
+
+	value_enc="$(printf '%s' "$source_string" | tr '&' '\n' | sed -n "s/^$key=//p" | head -n 1)"
+	if [ -z "$value_enc" ]; then
+		printf ''
+		return
+	fi
+
+	url_decode "$value_enc"
+}
+
+get_wifi_iface() {
+	iface=""
+	if command -v iw >/dev/null 2>&1; then
+		iface="$(iw dev 2>/dev/null | awk '/^\s*Interface / {print $2; exit}')"
+	fi
+
+	if [ -z "$iface" ]; then
+		iface="wlan0"
+	fi
+
+	printf '%s' "$iface"
+}
+
+prepare_backup() {
+	if [ -f /etc/config/wireless ]; then
+		cp /etc/config/wireless "$WIRELESS_BAK"
+	fi
+	if [ -f /etc/config/network ]; then
+		cp /etc/config/network "$NETWORK_BAK"
+	fi
+
+	cat >"$STATE_FILE" <<EOF
+WIRELESS_BAK='$WIRELESS_BAK'
+NETWORK_BAK='$NETWORK_BAK'
+EOF
+}
+
+ensure_client_section() {
+	if ! uci -q get wireless."$CLIENT_SECTION" >/dev/null 2>&1; then
+		uci set wireless."$CLIENT_SECTION"='wifi-iface'
+	fi
+	uci set wireless."$CLIENT_SECTION".srseii_managed='1'
+	printf '%s' "$CLIENT_SECTION"
+}
+
+cleanup_duplicate_client_sections() {
+	target_ssid="$1"
+
+	for section in $(uci show wireless 2>/dev/null | sed -n 's/^wireless\.\([^.=]*\)=wifi-iface$/\1/p'); do
+		if [ "$section" = "$CLIENT_SECTION" ]; then
+			continue
+		fi
+
+		mode_value="$(uci -q get wireless."$section".mode 2>/dev/null || true)"
+		ssid_value="$(uci -q get wireless."$section".ssid 2>/dev/null || true)"
+		managed_value="$(uci -q get wireless."$section".srseii_managed 2>/dev/null || true)"
+
+		if [ "$mode_value" = "sta" ] && [ "$ssid_value" = "$target_ssid" ]; then
+			uci -q delete wireless."$section"
+			continue
+		fi
+
+		if [ "$managed_value" = "1" ] && [ "$ssid_value" = "$target_ssid" ]; then
+			uci -q delete wireless."$section"
+		fi
+	done
+}
+
+rollback_config() {
+	if [ ! -f "$STATE_FILE" ]; then
+		return 1
+	fi
+
+	. "$STATE_FILE"
+
+	if [ -f "$WIRELESS_BAK" ]; then
+		cp "$WIRELESS_BAK" /etc/config/wireless
+	fi
+	if [ -f "$NETWORK_BAK" ]; then
+		cp "$NETWORK_BAK" /etc/config/network
+	fi
+
+	if command -v wifi >/dev/null 2>&1; then
+		wifi reload >/dev/null 2>&1 || true
+	fi
+	/etc/init.d/network reload >/dev/null 2>&1 || true
+	return 0
+}
+
+scan_networks() {
+	iface="$(get_wifi_iface)"
+
+	if command -v iwinfo >/dev/null 2>&1; then
+		scan_json="$(iwinfo "$iface" scan 2>/dev/null | awk '
+		function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
+		function emit() {
+			if (ssid == "") return
+			if (!first) printf ","
+			first = 0
+			if (enc == "") enc = "unknown"
+			if (sig == "") sig = 0
+			if (qual == "") qual = 0
+			printf "{\"ssid\":\"%s\",\"security\":\"%s\",\"signal\":%s,\"quality\":%s}", esc(ssid), esc(enc), sig, qual
+		}
+		BEGIN { first = 1; ssid = ""; enc = ""; sig = ""; qual = ""; printf "[" }
+		/^Cell / { emit(); ssid = ""; enc = ""; sig = ""; qual = "" }
+		/ESSID:/ {
+			ssid = $0
+			sub(/^.*ESSID:[[:space:]]*"?/, "", ssid)
+			sub(/"?[[:space:]]*$/, "", ssid)
+			gsub(/^[[:space:]]+/, "", ssid)
+		}
+		/Signal:/ {
+			signal_line = $0
+			if (match(signal_line, /Signal:[[:space:]]*(-?[0-9]+)(\.[0-9]+)?/, m)) {
+				sig = m[1]
+			}
+		}
+		/Quality:/ {
+			quality_line = $0
+			if (match(quality_line, /Quality:[[:space:]]*([0-9]+)\/[[:space:]]*([0-9]+)/, q)) {
+				if (q[2] > 0) qual = int((q[1] * 100) / q[2])
+			}
+		}
+		$1 == "Encryption:" {
+			enc = substr($0, index($0, $2))
+		}
+		END { emit(); printf "]" }
+		')"
+		printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
+		exit 0
+	fi
+
+	if command -v iw >/dev/null 2>&1; then
+		scan_json="$(iw dev "$iface" scan 2>/dev/null | awk '
+		function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
+		BEGIN { first = 1; printf "[" }
+		/SSID: / {
+			ssid = $0
+			sub(/^[[:space:]]*SSID:[[:space:]]*/, "", ssid)
+			if (ssid != "") {
+				if (!first) printf ","
+				first = 0
+				printf "{\"ssid\":\"%s\",\"security\":\"unknown\",\"signal\":0,\"quality\":0}", esc(ssid)
+			}
+		}
+		END { printf "]" }
+		')"
+		printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
+		exit 0
+	fi
+
+	json_error "No scan tool available (iwinfo/iw missing)."
+}
+
+wireless_connected_and_ip() {
+	iface="$(get_wifi_iface)"
+	connected=false
+	ip_addr=""
+
+	if command -v iw >/dev/null 2>&1; then
+		if iw dev "$iface" link 2>/dev/null | grep -q 'Connected to'; then
+			connected=true
+		fi
+	fi
+
+	if command -v ubus >/dev/null 2>&1 && command -v jsonfilter >/dev/null 2>&1; then
+		wwan_json="$(ubus call network.interface.wwan status 2>/dev/null || true)"
+		if [ -n "$wwan_json" ]; then
+			ip_addr="$(printf '%s' "$wwan_json" | jsonfilter -e '@["ipv4-address"][0].address' 2>/dev/null || true)"
+		fi
+	fi
+
+	if [ -z "$ip_addr" ]; then
+		ip_addr="$(ip -o -4 addr show scope global 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n 1 || true)"
+	fi
+
+	if [ "$connected" = true ] && [ -n "$ip_addr" ]; then
+		return 0
+	fi
+
+	return 1
+}
+
+connect_network() {
+	form_data="$1"
+	ssid="$(get_kv_param "$form_data" "ssid")"
+	password="$(get_kv_param "$form_data" "password")"
+
+	if [ -z "$ssid" ]; then
+		json_error "SSID is required."
+	fi
+
+	prepare_backup
+	cleanup_duplicate_client_sections "$ssid"
+
+	sta_section="$(ensure_client_section)"
+
+	radio_section="$(uci show wireless 2>/dev/null | sed -n 's/^wireless\.\([^.=]*\)=wifi-device$/\1/p' | head -n 1 || true)"
+	if [ -z "$radio_section" ]; then
+		json_error "No wifi device section found in /etc/config/wireless."
+	fi
+
+	uci set wireless."$sta_section".device="$radio_section"
+	uci set wireless."$sta_section".mode='sta'
+	uci set wireless."$sta_section".network='wwan'
+	uci set wireless."$sta_section".ssid="$ssid"
+	uci set wireless."$sta_section".disabled='0'
+ 	uci set wireless."$sta_section".srseii_managed='1'
+
+	if [ -n "$password" ]; then
+		uci set wireless."$sta_section".encryption='psk2'
+		uci set wireless."$sta_section".key="$password"
+	else
+		uci set wireless."$sta_section".encryption='none'
+		uci -q delete wireless."$sta_section".key || true
+	fi
+
+	if ! uci -q get network.wwan >/dev/null 2>&1; then
+		uci set network.wwan='interface'
+	fi
+	uci set network.wwan.proto='dhcp'
+
+	uci commit wireless
+	uci commit network
+
+	if command -v wifi >/dev/null 2>&1; then
+		wifi reload >/dev/null 2>&1 || true
+	fi
+	/etc/init.d/network reload >/dev/null 2>&1 || true
+
+	printf '{"ok":true,"message":"Configuration applied. Run connection test.","requiresTest":true}\n'
+	exit 0
+}
+
+test_connection() {
+	if wireless_connected_and_ip; then
+		rm -f "$STATE_FILE"
+		json_ok_message "WLAN connection successful."
+	fi
+
+	if rollback_config; then
+		json_error "Connection test failed. Previous configuration restored."
+	fi
+
+	json_error "Connection test failed and no rollback state was found."
+}
+
+manual_rollback() {
+	if rollback_config; then
+		rm -f "$STATE_FILE"
+		json_ok_message "Rollback complete."
+	fi
+
+	json_error "No rollback state available."
+}
+
+query_action="$(get_kv_param "${QUERY_STRING:-}" "action")"
+post_data="$(read_post_body)"
+post_action="$(get_kv_param "$post_data" "action")"
+action="$query_action"
+if [ -n "$post_action" ]; then
+	action="$post_action"
+fi
+
+case "$action" in
+	scan)
+		scan_networks
+		;;
+	connect)
+		connect_network "$post_data"
+		;;
+	test)
+		test_connection
+		;;
+	rollback)
+		manual_rollback
+		;;
+	*)
+		json_error "Unknown action. Use scan, connect, test or rollback."
+		;;
+esac

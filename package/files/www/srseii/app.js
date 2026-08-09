@@ -4,6 +4,14 @@
   var railcontrolLink = document.getElementById("railcontrol-link");
   var hostHint = document.getElementById("host-hint");
   var refreshButton = document.getElementById("refresh-status");
+  var wifiScanButton = document.getElementById("wifi-scan");
+  var wifiConnectButton = document.getElementById("wifi-connect");
+  var wifiTestButton = document.getElementById("wifi-test");
+  var wifiRollbackButton = document.getElementById("wifi-rollback");
+  var wifiNetworkSelect = document.getElementById("wifi-network");
+  var wifiSsidInput = document.getElementById("wifi-ssid");
+  var wifiPasswordInput = document.getElementById("wifi-password");
+  var wifiNote = document.getElementById("wifi-note");
   var host = window.location.hostname || "gleisbox";
   var lang = detectLanguage();
 
@@ -42,7 +50,26 @@
       statusLoadError: "Status konnte nicht geladen werden:",
       unknown: "unbekannt",
       notAvailable: "nicht verfügbar",
-      hostHintPrefix: "RailControl-Ziel"
+      hostHintPrefix: "RailControl-Ziel",
+      wifiAssistantTitle: "WLAN-Assistent",
+      wifiScan: "WLAN-Scan",
+      wifiNetworkLabel: "Gefundenes Netzwerk",
+      wifiNetworkPlaceholder: "Bitte zuerst scan starten",
+      wifiSsidLabel: "SSID",
+      wifiPasswordLabel: "Passwort",
+      wifiConnect: "Verbinden",
+      wifiTest: "Verbindung testen",
+      wifiRollback: "Rollback",
+      wifiIdle: "Bereit.",
+      wifiScanning: "Scan laeuft...",
+      wifiScanDone: "Scan abgeschlossen.",
+      wifiNoNetworks: "Keine WLAN-Netzwerke gefunden.",
+      wifiPickOrEnterSsid: "Bitte Netzwerk auswaehlen oder SSID eintragen.",
+      wifiApplying: "Konfiguration wird uebernommen...",
+      wifiApplyOk: "Konfiguration uebernommen. Jetzt Verbindung testen.",
+      wifiTesting: "Verbindung wird getestet...",
+      wifiRollbackRunning: "Rollback laeuft...",
+      wifiRequestFailed: "WLAN-Aktion fehlgeschlagen:"
     },
     en: {
       pageTitle: "SRSEII Portal",
@@ -78,7 +105,26 @@
       statusLoadError: "Status could not be loaded:",
       unknown: "unknown",
       notAvailable: "not available",
-      hostHintPrefix: "RailControl target"
+      hostHintPrefix: "RailControl target",
+      wifiAssistantTitle: "WLAN assistant",
+      wifiScan: "Scan WLAN",
+      wifiNetworkLabel: "Detected network",
+      wifiNetworkPlaceholder: "Run a scan first",
+      wifiSsidLabel: "SSID",
+      wifiPasswordLabel: "Password",
+      wifiConnect: "Connect",
+      wifiTest: "Test connection",
+      wifiRollback: "Rollback",
+      wifiIdle: "Ready.",
+      wifiScanning: "Scanning...",
+      wifiScanDone: "Scan finished.",
+      wifiNoNetworks: "No WLAN networks found.",
+      wifiPickOrEnterSsid: "Select a network or enter an SSID.",
+      wifiApplying: "Applying configuration...",
+      wifiApplyOk: "Configuration applied. Test the connection now.",
+      wifiTesting: "Testing connection...",
+      wifiRollbackRunning: "Rolling back...",
+      wifiRequestFailed: "WLAN action failed:"
     }
   };
 
@@ -154,6 +200,213 @@
     note.textContent = text;
   }
 
+  function setWifiNote(text, isError) {
+    if (!wifiNote) {
+      return;
+    }
+    wifiNote.textContent = text;
+    wifiNote.classList.toggle("err", !!isError);
+  }
+
+  function toggleWifiActions(disabled) {
+    if (wifiScanButton) {
+      wifiScanButton.disabled = disabled;
+    }
+    if (wifiConnectButton) {
+      wifiConnectButton.disabled = disabled;
+    }
+    if (wifiTestButton) {
+      wifiTestButton.disabled = disabled;
+    }
+    if (wifiRollbackButton) {
+      wifiRollbackButton.disabled = disabled;
+    }
+  }
+
+  function setNetworkOptions(networks) {
+    if (!wifiNetworkSelect) {
+      return;
+    }
+
+    wifiNetworkSelect.innerHTML = "";
+
+    var defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = t("wifiNetworkPlaceholder");
+    wifiNetworkSelect.appendChild(defaultOption);
+
+    if (!networks || !networks.length) {
+      return;
+    }
+
+    networks.sort(function (a, b) {
+      return (b.quality || 0) - (a.quality || 0);
+    });
+
+    networks.forEach(function (network) {
+      if (!network || !network.ssid) {
+        return;
+      }
+
+      var option = document.createElement("option");
+      option.value = network.ssid;
+      option.textContent = network.ssid + " (" + (network.security || "?") + ", " + (network.quality || 0) + "%)";
+      wifiNetworkSelect.appendChild(option);
+    });
+  }
+
+  function postWifiAction(action, payload) {
+    var params = new URLSearchParams();
+    params.set("action", action);
+
+    Object.keys(payload || {}).forEach(function (key) {
+      params.set(key, payload[key]);
+    });
+
+    return fetch("/cgi-bin/srseii/wifi-assistant", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+      },
+      body: params.toString(),
+      cache: "no-store"
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+      return response.text().then(function (text) {
+        try {
+          return JSON.parse(text);
+        } catch (parseError) {
+          parseError.rawResponse = text;
+          throw parseError;
+        }
+      });
+    });
+  }
+
+  function scanWifi() {
+    setWifiNote(t("wifiScanning"), false);
+    toggleWifiActions(true);
+
+    fetch("/cgi-bin/srseii/wifi-assistant?action=scan", { cache: "no-store" })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+        return response.text().then(function (text) {
+          try {
+            return JSON.parse(text);
+          } catch (parseError) {
+            parseError.rawResponse = text;
+            throw parseError;
+          }
+        });
+      })
+      .then(function (data) {
+        if (!data.ok) {
+          throw new Error(data.message || t("wifiRequestFailed"));
+        }
+
+        var networks = Array.isArray(data.networks) ? data.networks : [];
+        setNetworkOptions(networks);
+
+        if (networks.length === 0) {
+          setWifiNote(t("wifiNoNetworks"), true);
+          return;
+        }
+
+        if (wifiNetworkSelect) {
+          wifiNetworkSelect.selectedIndex = 1;
+          if (wifiSsidInput) {
+            wifiSsidInput.value = wifiNetworkSelect.value || "";
+          }
+        }
+        setWifiNote(data.message || t("wifiScanDone"), false);
+      })
+      .catch(function (error) {
+        var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
+        setWifiNote(t("wifiRequestFailed") + " " + error.message + extra, true);
+      })
+      .finally(function () {
+        toggleWifiActions(false);
+      });
+  }
+
+  function connectWifi() {
+    var selectedSsid = wifiSsidInput && wifiSsidInput.value ? wifiSsidInput.value.trim() : "";
+    var password = wifiPasswordInput && wifiPasswordInput.value ? wifiPasswordInput.value : "";
+
+    if (!selectedSsid) {
+      setWifiNote(t("wifiPickOrEnterSsid"), true);
+      return;
+    }
+
+    setWifiNote(t("wifiApplying"), false);
+    toggleWifiActions(true);
+
+    postWifiAction("connect", {
+      ssid: selectedSsid,
+      password: password
+    })
+      .then(function (data) {
+        if (!data.ok) {
+          throw new Error(data.message || t("wifiRequestFailed"));
+        }
+        setWifiNote(data.message || t("wifiApplyOk"), false);
+      })
+      .catch(function (error) {
+        var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
+        setWifiNote(t("wifiRequestFailed") + " " + error.message + extra, true);
+      })
+      .finally(function () {
+        toggleWifiActions(false);
+      });
+  }
+
+  function testWifi() {
+    setWifiNote(t("wifiTesting"), false);
+    toggleWifiActions(true);
+
+    postWifiAction("test", {})
+      .then(function (data) {
+        if (!data.ok) {
+          throw new Error(data.message || t("wifiRequestFailed"));
+        }
+        setWifiNote(data.message || t("statusLoaded"), false);
+        loadStatus();
+      })
+      .catch(function (error) {
+        var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
+        setWifiNote(t("wifiRequestFailed") + " " + error.message + extra, true);
+        loadStatus();
+      })
+      .finally(function () {
+        toggleWifiActions(false);
+      });
+  }
+
+  function rollbackWifi() {
+    setWifiNote(t("wifiRollbackRunning"), false);
+    toggleWifiActions(true);
+
+    postWifiAction("rollback", {})
+      .then(function (data) {
+        if (!data.ok) {
+          throw new Error(data.message || t("wifiRequestFailed"));
+        }
+        setWifiNote(data.message || t("statusLoaded"), false);
+        loadStatus();
+      })
+      .catch(function (error) {
+        var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
+        setWifiNote(t("wifiRequestFailed") + " " + error.message + extra, true);
+      })
+      .finally(function () {
+        toggleWifiActions(false);
+      });
+  }
+
   function loadStatus() {
     setStatusNote(t("statusLoading"));
 
@@ -196,6 +449,26 @@
     refreshButton.addEventListener("click", loadStatus);
   }
 
+  if (wifiNetworkSelect && wifiSsidInput) {
+    wifiNetworkSelect.addEventListener("change", function () {
+      wifiSsidInput.value = wifiNetworkSelect.value || "";
+    });
+  }
+
+  if (wifiScanButton) {
+    wifiScanButton.addEventListener("click", scanWifi);
+  }
+  if (wifiConnectButton) {
+    wifiConnectButton.addEventListener("click", connectWifi);
+  }
+  if (wifiTestButton) {
+    wifiTestButton.addEventListener("click", testWifi);
+  }
+  if (wifiRollbackButton) {
+    wifiRollbackButton.addEventListener("click", rollbackWifi);
+  }
+
   applyTranslations();
+  setWifiNote(t("wifiIdle"), false);
   loadStatus();
 })();
