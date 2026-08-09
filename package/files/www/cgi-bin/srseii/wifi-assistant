@@ -4,13 +4,9 @@
 # - scan
 # - connect
 # - test
-# - rollback
 
 set -eu
 
-STATE_FILE="/tmp/srseii-wifi-assistant.state"
-WIRELESS_BAK="/tmp/srseii-wireless.bak"
-NETWORK_BAK="/tmp/srseii-network.bak"
 CLIENT_PREFIX="srseii_sta_"
 
 echo "Content-Type: application/json"
@@ -91,20 +87,6 @@ get_wifi_iface() {
 	printf '%s' "$iface"
 }
 
-prepare_backup() {
-	if [ -f /etc/config/wireless ]; then
-		cp /etc/config/wireless "$WIRELESS_BAK"
-	fi
-	if [ -f /etc/config/network ]; then
-		cp /etc/config/network "$NETWORK_BAK"
-	fi
-
-	cat >"$STATE_FILE" <<EOF
-WIRELESS_BAK='$WIRELESS_BAK'
-NETWORK_BAK='$NETWORK_BAK'
-EOF
-}
-
 ssid_key() {
 	ssid_raw="$1"
 	if command -v cksum >/dev/null 2>&1; then
@@ -164,27 +146,6 @@ disable_other_sta_on_same_device() {
 			uci set wireless."$section".disabled='1'
 		fi
 	done
-}
-
-rollback_config() {
-	if [ ! -f "$STATE_FILE" ]; then
-		return 1
-	fi
-
-	. "$STATE_FILE"
-
-	if [ -f "$WIRELESS_BAK" ]; then
-		cp "$WIRELESS_BAK" /etc/config/wireless
-	fi
-	if [ -f "$NETWORK_BAK" ]; then
-		cp "$NETWORK_BAK" /etc/config/network
-	fi
-
-	if command -v wifi >/dev/null 2>&1; then
-		wifi reload >/dev/null 2>&1 || true
-	fi
-	/etc/init.d/network reload >/dev/null 2>&1 || true
-	return 0
 }
 
 scan_networks() {
@@ -321,7 +282,6 @@ connect_network() {
 		json_error "SSID is required."
 	fi
 
-	prepare_backup
 	sta_section="$(ensure_client_section_for_ssid "$ssid")"
 
 	radio_section="$(uci show wireless 2>/dev/null | sed -n 's/^wireless\.\([^.=]*\)=wifi-device$/\1/p' | head -n 1 || true)"
@@ -377,24 +337,10 @@ connect_network() {
 
 test_connection() {
 	if wireless_connected_and_ip; then
-		rm -f "$STATE_FILE"
 		json_ok_message "WLAN connection successful."
 	fi
 
-	if rollback_config; then
-		json_error "Connection test failed. Previous configuration restored."
-	fi
-
-	json_error "Connection test failed and no rollback state was found."
-}
-
-manual_rollback() {
-	if rollback_config; then
-		rm -f "$STATE_FILE"
-		json_ok_message "Rollback complete."
-	fi
-
-	json_error "No rollback state available."
+	json_error "Connection test failed."
 }
 
 query_action="$(get_kv_param "${QUERY_STRING:-}" "action")"
@@ -415,10 +361,7 @@ case "$action" in
 	test)
 		test_connection
 		;;
-	rollback)
-		manual_rollback
-		;;
 	*)
-		json_error "Unknown action. Use scan, connect, test or rollback."
+		json_error "Unknown action. Use scan, connect or test."
 		;;
 esac

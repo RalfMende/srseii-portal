@@ -8,7 +8,6 @@
   var wifiScanButton = document.getElementById("wifi-scan");
   var wifiConnectButton = document.getElementById("wifi-connect");
   var wifiTestButton = document.getElementById("wifi-test");
-  var wifiRollbackButton = document.getElementById("wifi-rollback");
   var wifiNetworkSelect = document.getElementById("wifi-network");
   var wifiSsidInput = document.getElementById("wifi-ssid");
   var wifiPasswordInput = document.getElementById("wifi-password");
@@ -60,7 +59,6 @@
       wifiPasswordLabel: "Passwort",
       wifiConnect: "Verbinden",
       wifiTest: "Verbindung testen",
-      wifiRollback: "Rollback",
       wifiIdle: "Bereit.",
       wifiScanning: "Scan laeuft...",
       wifiScanDone: "Scan abgeschlossen.",
@@ -69,7 +67,6 @@
       wifiApplying: "Konfiguration wird uebernommen...",
       wifiApplyOk: "Konfiguration uebernommen. Jetzt Verbindung testen.",
       wifiTesting: "Verbindung wird getestet...",
-      wifiRollbackRunning: "Rollback laeuft...",
       wifiRequestFailed: "WLAN-Aktion fehlgeschlagen:"
     },
     en: {
@@ -115,7 +112,6 @@
       wifiPasswordLabel: "Password",
       wifiConnect: "Connect",
       wifiTest: "Test connection",
-      wifiRollback: "Rollback",
       wifiIdle: "Ready.",
       wifiScanning: "Scanning...",
       wifiScanDone: "Scan finished.",
@@ -124,7 +120,6 @@
       wifiApplying: "Applying configuration...",
       wifiApplyOk: "Configuration applied. Test the connection now.",
       wifiTesting: "Testing connection...",
-      wifiRollbackRunning: "Rolling back...",
       wifiRequestFailed: "WLAN action failed:"
     }
   };
@@ -239,9 +234,6 @@
     }
     if (wifiTestButton) {
       wifiTestButton.disabled = disabled;
-    }
-    if (wifiRollbackButton) {
-      wifiRollbackButton.disabled = disabled;
     }
   }
 
@@ -408,27 +400,6 @@
       });
   }
 
-  function rollbackWifi() {
-    setWifiNote(t("wifiRollbackRunning"), false);
-    toggleWifiActions(true);
-
-    postWifiAction("rollback", {})
-      .then(function (data) {
-        if (!data.ok) {
-          throw new Error(data.message || t("wifiRequestFailed"));
-        }
-        setWifiNote(data.message || t("statusLoaded"), false);
-        loadStatus();
-      })
-      .catch(function (error) {
-        var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
-        setWifiNote(t("wifiRequestFailed") + " " + error.message + extra, true);
-      })
-      .finally(function () {
-        toggleWifiActions(false);
-      });
-  }
-
   function loadStatus() {
     setStatusNote(t("statusLoading"));
 
@@ -489,10 +460,6 @@
   if (wifiTestButton) {
     wifiTestButton.addEventListener("click", testWifi);
   }
-  if (wifiRollbackButton) {
-    wifiRollbackButton.addEventListener("click", rollbackWifi);
-  }
-
   applyTranslations();
   setWifiNote(t("wifiIdle"), false);
   loadStatus();
