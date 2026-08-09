@@ -77,7 +77,7 @@ get_kv_param() {
 get_wifi_iface() {
 	iface=""
 	if command -v iw >/dev/null 2>&1; then
-		iface="$(iw dev 2>/dev/null | awk '/^\s*Interface / {print $2; exit}')"
+		iface="$(iw dev 2>/dev/null | awk '/^[[:space:]]*Interface / {print $2; exit}')"
 	fi
 
 	if [ -z "$iface" ]; then
@@ -160,11 +160,11 @@ scan_networks() {
 
 	interfaces=""
 	if command -v iw >/dev/null 2>&1; then
-		interfaces="$(iw dev 2>/dev/null | awk '/^\s*Interface / {print $2}' || true)"
+		interfaces="$(iw dev 2>/dev/null | awk '/^[[:space:]]*Interface / {print $2}' || true)"
 	fi
 
 	if [ -z "$interfaces" ] && command -v iwinfo >/dev/null 2>&1; then
-		interfaces="$(iwinfo 2>/dev/null | awk 'NF > 0 {print $1}' | sed 's/[[:space:]]*$//' | sed '/^$/d' || true)"
+		interfaces="$(iwinfo 2>/dev/null | awk '/^[^[:space:]][^[:space:]]*[[:space:]]+ESSID:/ {print $1}' | sed 's/[[:space:]]*$//' | sed '/^$/d' || true)"
 	fi
 
 	if [ -z "$interfaces" ]; then
