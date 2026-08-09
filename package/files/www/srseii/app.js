@@ -2,6 +2,7 @@
   "use strict";
 
   var railcontrolLink = document.getElementById("railcontrol-link");
+  var mswebappLink = document.getElementById("mswebapp-link");
   var hostHint = document.getElementById("host-hint");
   var refreshButton = document.getElementById("refresh-status");
   var wifiScanButton = document.getElementById("wifi-scan");
@@ -12,7 +13,7 @@
   var wifiSsidInput = document.getElementById("wifi-ssid");
   var wifiPasswordInput = document.getElementById("wifi-password");
   var wifiNote = document.getElementById("wifi-note");
-  var host = window.location.hostname || "gleisbox";
+  var host = window.location.hostname || "";
   var lang = detectLanguage();
 
   var translations = {
@@ -145,6 +146,26 @@
     el.textContent = text;
   }
 
+  function updateAppLinks(targetHost) {
+    if (!targetHost) {
+      return;
+    }
+
+    host = targetHost;
+
+    if (mswebappLink) {
+      mswebappLink.href = "http://" + host + ":6020/";
+    }
+
+    if (railcontrolLink) {
+      railcontrolLink.href = "http://" + host + ":8082/";
+    }
+
+    if (hostHint) {
+      hostHint.textContent = t("hostHintPrefix") + ": http://" + host + ":8082/";
+    }
+  }
+
   function applyTranslations() {
     document.documentElement.lang = lang;
     document.title = t("pageTitle");
@@ -166,13 +187,14 @@
       refreshButton.textContent = t("refresh");
     }
 
-    if (railcontrolLink) {
-      railcontrolLink.href = "http://" + host + ":8082/";
-      railcontrolLink.textContent = t("open");
+    updateAppLinks(host);
+
+    if (mswebappLink) {
+      mswebappLink.textContent = t("open");
     }
 
-    if (hostHint) {
-      hostHint.textContent = t("hostHintPrefix") + ": http://" + host + ":8082/";
+    if (railcontrolLink) {
+      railcontrolLink.textContent = t("open");
     }
   }
 
@@ -422,6 +444,9 @@
         setText("st-model", data.model || t("unknown"));
 
         var network = data.network || {};
+        if (network.ip) {
+          updateAppLinks(network.ip);
+        }
         setPill("st-lan", !!network.lan);
         setPill("st-wifi", !!network.wifi);
         setText("st-ssid", network.ssid || t("unknown"));
