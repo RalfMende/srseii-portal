@@ -7,13 +7,18 @@
   var refreshButton = document.getElementById("refresh-status");
   var wifiScanButton = document.getElementById("wifi-scan");
   var wifiConnectButton = document.getElementById("wifi-connect");
-  var wifiTestButton = document.getElementById("wifi-test");
+  var wifiManualToggleButton = document.getElementById("wifi-manual-toggle");
+  var wifiManualHint = document.getElementById("wifi-manual-hint");
+  var wifiManualFields = document.getElementById("wifi-manual-fields");
   var wifiNetworkSelect = document.getElementById("wifi-network");
   var wifiSsidInput = document.getElementById("wifi-ssid");
+  var wifiSecuritySelect = document.getElementById("wifi-security");
   var wifiPasswordInput = document.getElementById("wifi-password");
   var wifiNote = document.getElementById("wifi-note");
   var host = window.location.hostname || "";
   var lang = detectLanguage();
+  var manualMode = false;
+  var scannedNetworksBySsid = {};
 
   var translations = {
     de: {
@@ -30,6 +35,10 @@
       open: "Öffnen",
       statusTitle: "Status",
       refresh: "Aktualisieren",
+      networkSectionTitle: "Netzwerk",
+      lanStatusTitle: "LAN-Verbindung",
+      wifiStatusTitle: "WLAN-Verbindung",
+      statusLabel: "Status",
       systemTitle: "System",
       hostnameLabel: "Hostname",
       modelLabel: "Modell",
@@ -56,17 +65,31 @@
       wifiNetworkLabel: "Gefundenes Netzwerk",
       wifiNetworkPlaceholder: "Bitte zuerst scan starten",
       wifiSsidLabel: "SSID",
+      wifiSsidManualLabel: "SSID (manuell)",
+      wifiSecurityLabel: "Sicherheit",
+      wifiSecurityAuto: "Automatisch",
+      wifiSecurityWpa2: "WPA2-PSK",
+      wifiSecurityMixed: "WPA/WPA2 gemischt",
+      wifiSecurityWpa3: "WPA3-SAE",
+      wifiSecurityOpen: "Offen (kein Passwort)",
+      wifiManualToggleShow: "Show Advanced Config",
+      wifiManualToggleHide: "Hide Advanced Config",
+      wifiManualHint: "Nur bei versteckten SSIDs oder wenn der Scan das Netzwerk nicht findet.",
       wifiPasswordLabel: "Passwort",
       wifiConnect: "Verbinden",
-      wifiTest: "Verbindung testen",
       wifiIdle: "Bereit.",
       wifiScanning: "Scan laeuft...",
       wifiScanDone: "Scan abgeschlossen.",
       wifiNoNetworks: "Keine WLAN-Netzwerke gefunden.",
-      wifiPickOrEnterSsid: "Bitte Netzwerk auswaehlen oder SSID eintragen.",
+      wifiPickOrEnterSsid: "Bitte Netzwerk auswaehlen.",
+      wifiPickManualSsid: "Bitte SSID fuer die manuelle Konfiguration eintragen.",
+      wifiSelectNetworkFirst: "Bitte zuerst ein WLAN aus der Liste auswaehlen.",
+      wifiPasswordRequired: "Bitte Passwort eingeben oder Sicherheit auf offen setzen.",
       wifiApplying: "Konfiguration wird uebernommen...",
-      wifiApplyOk: "Konfiguration uebernommen. Jetzt Verbindung testen.",
-      wifiTesting: "Verbindung wird getestet...",
+      wifiApplyOk: "Konfiguration uebernommen.",
+      wifiTesting: "Verbindung wird automatisch geprueft...",
+      wifiConnectedNow: "WLAN verbunden. Status wurde aktualisiert.",
+      wifiConnectTimeout: "Verbindung noch nicht bestaetigt. Bitte kurz warten oder Einstellungen pruefen.",
       wifiRequestFailed: "WLAN-Aktion fehlgeschlagen:"
     },
     en: {
@@ -83,6 +106,10 @@
       open: "Open",
       statusTitle: "Status",
       refresh: "Refresh",
+      networkSectionTitle: "Network",
+      lanStatusTitle: "LAN connection",
+      wifiStatusTitle: "WLAN connection",
+      statusLabel: "Status",
       systemTitle: "System",
       hostnameLabel: "Hostname",
       modelLabel: "Model",
@@ -109,17 +136,31 @@
       wifiNetworkLabel: "Detected network",
       wifiNetworkPlaceholder: "Run a scan first",
       wifiSsidLabel: "SSID",
+      wifiSsidManualLabel: "SSID (manual)",
+      wifiSecurityLabel: "Security",
+      wifiSecurityAuto: "Automatic",
+      wifiSecurityWpa2: "WPA2-PSK",
+      wifiSecurityMixed: "WPA/WPA2 mixed",
+      wifiSecurityWpa3: "WPA3-SAE",
+      wifiSecurityOpen: "Open (no password)",
+      wifiManualToggleShow: "Show Advanced Config",
+      wifiManualToggleHide: "Hide Advanced Config",
+      wifiManualHint: "Use this only for hidden SSIDs or if scan does not list the network.",
       wifiPasswordLabel: "Password",
       wifiConnect: "Connect",
-      wifiTest: "Test connection",
       wifiIdle: "Ready.",
       wifiScanning: "Scanning...",
       wifiScanDone: "Scan finished.",
       wifiNoNetworks: "No WLAN networks found.",
-      wifiPickOrEnterSsid: "Select a network or enter an SSID.",
+      wifiPickOrEnterSsid: "Select a network.",
+      wifiPickManualSsid: "Enter the SSID for manual setup.",
+      wifiSelectNetworkFirst: "Select a WLAN from the list first.",
+      wifiPasswordRequired: "Enter a password or set security to open.",
       wifiApplying: "Applying configuration...",
-      wifiApplyOk: "Configuration applied. Test the connection now.",
-      wifiTesting: "Testing connection...",
+      wifiApplyOk: "Configuration applied.",
+      wifiTesting: "Checking connection automatically...",
+      wifiConnectedNow: "WLAN connected. Status has been updated.",
+      wifiConnectTimeout: "Connection not confirmed yet. Please wait or review settings.",
       wifiRequestFailed: "WLAN action failed:"
     }
   };
@@ -217,6 +258,14 @@
     note.textContent = text;
   }
 
+  function setNetworkNote(text) {
+    var note = document.getElementById("network-note");
+    if (!note) {
+      return;
+    }
+    note.textContent = text;
+  }
+
   function setWifiNote(text, isError) {
     if (!wifiNote) {
       return;
@@ -225,16 +274,143 @@
     wifiNote.classList.toggle("err", !!isError);
   }
 
-  function toggleWifiActions(disabled) {
-    if (wifiScanButton) {
+  function isManualMode() {
+    return manualMode;
+  }
+
+  function setManualMode(enabled) {
+    manualMode = !!enabled;
+
+    if (wifiManualFields) {
+      wifiManualFields.classList.toggle("is-hidden", !manualMode);
+    }
+    if (wifiManualHint) {
+      wifiManualHint.classList.toggle("is-hidden", !manualMode);
+    }
+    if (wifiManualToggleButton) {
+      wifiManualToggleButton.textContent = manualMode ? t("wifiManualToggleHide") : t("wifiManualToggleShow");
+    }
+
+    if (manualMode && wifiNetworkSelect) {
+      wifiNetworkSelect.value = "";
+    }
+  }
+
+  function normalizeSecurity(securityText) {
+    var text = (securityText || "").toLowerCase();
+
+    if (!text) {
+      return "auto";
+    }
+    if (text.indexOf("open") !== -1 || text.indexOf("none") !== -1 || text.indexOf("offen") !== -1) {
+      return "none";
+    }
+    if (text.indexOf("wpa3") !== -1 || text.indexOf("sae") !== -1) {
+      return "sae";
+    }
+    if ((text.indexOf("wpa") !== -1 && text.indexOf("wpa2") !== -1) || text.indexOf("mixed") !== -1) {
+      return "psk-mixed";
+    }
+    if (text.indexOf("wpa2") !== -1 || text.indexOf("psk2") !== -1) {
+      return "psk2";
+    }
+
+    return "auto";
+  }
+
+  function toggleWifiActions(disabled, keepScanEnabled) {
+    if (wifiScanButton && !keepScanEnabled) {
       wifiScanButton.disabled = disabled;
     }
     if (wifiConnectButton) {
       wifiConnectButton.disabled = disabled;
     }
-    if (wifiTestButton) {
-      wifiTestButton.disabled = disabled;
+  }
+
+  function applyStatusData(data) {
+    setText("st-hostname", data.hostname || t("unknown"));
+    setText("st-model", data.model || t("unknown"));
+
+    var network = data.network || {};
+    if (network.ip) {
+      updateAppLinks(network.ip);
     }
+    setPill("net-lan-state", !!network.lan);
+    setPill("net-wifi-state", !!network.wifi);
+    setText("net-lan-ip", network.lanIp || t("notAvailable"));
+    setText("net-wifi-ssid", network.ssid || t("unknown"));
+    setText("net-wifi-ip", network.wifiIp || t("notAvailable"));
+
+    setPill("st-mswebapp", !!(data.apps && data.apps.mswebapp));
+    setPill("st-railcontrol-app", !!(data.apps && data.apps.railcontrol));
+
+    setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));
+    setPill("st-z21emu", !!(data.services && data.services.z21emu));
+    setPill("st-can2lan", !!(data.services && data.services.can2lan));
+    setPill("st-clone-ms2-loco", !!(data.services && data.services["clone-ms2-loco"]));
+    setPill("st-maecanserver", !!(data.services && data.services.maecanserver));
+    setPill("st-ms2-loco-list", !!(data.services && data.services["ms2-loco-list"]));
+    setPill("st-wake-up-links88", !!(data.services && data.services["wake-up-links88"]));
+
+    return network;
+  }
+
+  function fetchStatusData() {
+    return fetch("/cgi-bin/srseii/status", { cache: "no-store" })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+        return response.json();
+      });
+  }
+
+  function isWifiConnected(network, expectedSsid) {
+    if (!network || !network.wifi) {
+      return false;
+    }
+
+    if (!network.wifiIp) {
+      return false;
+    }
+
+    if (expectedSsid && network.ssid && network.ssid !== "unbekannt" && network.ssid !== "unknown" && network.ssid !== "nicht verbunden") {
+      return network.ssid === expectedSsid;
+    }
+
+    return true;
+  }
+
+  function waitForWifiConnection(expectedSsid) {
+    var maxAttempts = 15;
+    var delayMs = 2000;
+    var attempt = 0;
+
+    function poll() {
+      attempt += 1;
+
+      return fetchStatusData().then(function (data) {
+        var network = applyStatusData(data);
+        setStatusNote(t("statusLoaded"));
+        setNetworkNote(network.message || t("statusLoaded"));
+
+        if (isWifiConnected(network, expectedSsid)) {
+          return true;
+        }
+
+        if (attempt >= maxAttempts) {
+          return false;
+        }
+
+        return new Promise(function (resolve) {
+          setTimeout(function () {
+            resolve(poll());
+          }, delayMs);
+        });
+      });
+    }
+
+    return poll();
   }
 
   function setNetworkOptions(networks) {
@@ -243,6 +419,7 @@
     }
 
     wifiNetworkSelect.innerHTML = "";
+    scannedNetworksBySsid = {};
 
     var defaultOption = document.createElement("option");
     defaultOption.value = "";
@@ -261,6 +438,11 @@
       if (!network || !network.ssid) {
         return;
       }
+
+      scannedNetworksBySsid[network.ssid] = {
+        security: network.security || "",
+        normalizedSecurity: normalizeSecurity(network.security || "")
+      };
 
       var option = document.createElement("option");
       option.value = network.ssid;
@@ -301,7 +483,7 @@
 
   function scanWifi() {
     setWifiNote(t("wifiScanning"), false);
-    toggleWifiActions(true);
+    toggleWifiActions(true, false);
 
     fetch("/cgi-bin/srseii/wifi-assistant?action=scan", { cache: "no-store" })
       .then(function (response) {
@@ -332,9 +514,6 @@
 
         if (wifiNetworkSelect) {
           wifiNetworkSelect.selectedIndex = 1;
-          if (wifiSsidInput) {
-            wifiSsidInput.value = wifiNetworkSelect.value || "";
-          }
         }
         setWifiNote(data.message || t("wifiScanDone"), false);
       })
@@ -343,52 +522,58 @@
         setWifiNote(t("wifiRequestFailed") + " " + error.message + extra, true);
       })
       .finally(function () {
-        toggleWifiActions(false);
+        toggleWifiActions(false, false);
       });
   }
 
   function connectWifi() {
-    var selectedSsid = wifiSsidInput && wifiSsidInput.value ? wifiSsidInput.value.trim() : "";
+    var selectedSsid = "";
+    var security = "auto";
+    var fromManual = isManualMode();
+
+    if (fromManual) {
+      selectedSsid = wifiSsidInput && wifiSsidInput.value ? wifiSsidInput.value.trim() : "";
+      security = wifiSecuritySelect && wifiSecuritySelect.value ? wifiSecuritySelect.value : "auto";
+    } else {
+      selectedSsid = wifiNetworkSelect && wifiNetworkSelect.value ? wifiNetworkSelect.value.trim() : "";
+      if (selectedSsid && scannedNetworksBySsid[selectedSsid]) {
+        security = scannedNetworksBySsid[selectedSsid].normalizedSecurity || "auto";
+      }
+    }
+
     var password = wifiPasswordInput && wifiPasswordInput.value ? wifiPasswordInput.value : "";
 
     if (!selectedSsid) {
-      setWifiNote(t("wifiPickOrEnterSsid"), true);
+      setWifiNote(fromManual ? t("wifiPickManualSsid") : t("wifiSelectNetworkFirst"), true);
+      return;
+    }
+
+    if (fromManual && security !== "none" && security !== "auto" && !password) {
+      setWifiNote(t("wifiPasswordRequired"), true);
       return;
     }
 
     setWifiNote(t("wifiApplying"), false);
-    toggleWifiActions(true);
+    toggleWifiActions(true, true);
 
     postWifiAction("connect", {
       ssid: selectedSsid,
-      password: password
+      password: password,
+      security: security
     })
       .then(function (data) {
         if (!data.ok) {
           throw new Error(data.message || t("wifiRequestFailed"));
         }
-        setWifiNote(data.message || t("wifiApplyOk"), false);
+        setWifiNote(t("wifiTesting"), false);
+        return waitForWifiConnection(selectedSsid);
       })
-      .catch(function (error) {
-        var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
-        setWifiNote(t("wifiRequestFailed") + " " + error.message + extra, true);
-      })
-      .finally(function () {
-        toggleWifiActions(false);
-      });
-  }
-
-  function testWifi() {
-    setWifiNote(t("wifiTesting"), false);
-    toggleWifiActions(true);
-
-    postWifiAction("test", {})
-      .then(function (data) {
-        if (!data.ok) {
-          throw new Error(data.message || t("wifiRequestFailed"));
+      .then(function (connected) {
+        if (connected) {
+          setWifiNote(t("wifiConnectedNow"), false);
+        } else {
+          setWifiNote(t("wifiConnectTimeout"), true);
         }
-        setWifiNote(data.message || t("statusLoaded"), false);
-        loadStatus();
       })
       .catch(function (error) {
         var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
@@ -396,48 +581,24 @@
         loadStatus();
       })
       .finally(function () {
-        toggleWifiActions(false);
+        toggleWifiActions(false, true);
       });
   }
 
   function loadStatus() {
     setStatusNote(t("statusLoading"));
+    setNetworkNote(t("statusLoading"));
 
-    fetch("/cgi-bin/srseii/status", { cache: "no-store" })
-      .then(function (response) {
-        if (!response.ok) {
-          throw new Error("HTTP " + response.status);
-        }
-        return response.json();
-      })
+    fetchStatusData()
       .then(function (data) {
-        setText("st-hostname", data.hostname || t("unknown"));
-        setText("st-model", data.model || t("unknown"));
+        var network = applyStatusData(data);
 
-        var network = data.network || {};
-        if (network.ip) {
-          updateAppLinks(network.ip);
-        }
-        setPill("st-lan", !!network.lan);
-        setPill("st-wifi", !!network.wifi);
-        setText("st-ssid", network.ssid || t("unknown"));
-        setText("st-ip", network.ip || t("notAvailable"));
-
-        setPill("st-mswebapp", !!(data.apps && data.apps.mswebapp));
-        setPill("st-railcontrol-app", !!(data.apps && data.apps.railcontrol));
-
-        setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));
-        setPill("st-z21emu", !!(data.services && data.services.z21emu));
-        setPill("st-can2lan", !!(data.services && data.services.can2lan));
-        setPill("st-clone-ms2-loco", !!(data.services && data.services["clone-ms2-loco"]));
-        setPill("st-maecanserver", !!(data.services && data.services.maecanserver));
-        setPill("st-ms2-loco-list", !!(data.services && data.services["ms2-loco-list"]));
-        setPill("st-wake-up-links88", !!(data.services && data.services["wake-up-links88"]));
-
-        setStatusNote(network.message || t("statusLoaded"));
+        setStatusNote(t("statusLoaded"));
+        setNetworkNote(network.message || t("statusLoaded"));
       })
       .catch(function (error) {
         setStatusNote(t("statusLoadError") + " " + error.message);
+        setNetworkNote(t("statusLoadError") + " " + error.message);
       });
   }
 
@@ -445,9 +606,20 @@
     refreshButton.addEventListener("click", loadStatus);
   }
 
-  if (wifiNetworkSelect && wifiSsidInput) {
+  if (wifiNetworkSelect) {
     wifiNetworkSelect.addEventListener("change", function () {
-      wifiSsidInput.value = wifiNetworkSelect.value || "";
+      if (isManualMode()) {
+        return;
+      }
+      if (wifiSsidInput) {
+        wifiSsidInput.value = "";
+      }
+    });
+  }
+
+  if (wifiManualToggleButton) {
+    wifiManualToggleButton.addEventListener("click", function () {
+      setManualMode(!isManualMode());
     });
   }
 
@@ -457,10 +629,8 @@
   if (wifiConnectButton) {
     wifiConnectButton.addEventListener("click", connectWifi);
   }
-  if (wifiTestButton) {
-    wifiTestButton.addEventListener("click", testWifi);
-  }
   applyTranslations();
+  setManualMode(false);
   setWifiNote(t("wifiIdle"), false);
   loadStatus();
 })();

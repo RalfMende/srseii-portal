@@ -117,7 +117,48 @@ if [ -z "$model_value" ] && command -v ubus >/dev/null 2>&1 && command -v jsonfi
 fi
 [ -n "$model_value" ] || model_value="unknown"
 
+get_interface_ipv4() {
+	iface_name="$1"
+	ip -o -4 addr show dev "$iface_name" scope global 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n 1 || true
+}
+
+get_ubus_interface_ipv4() {
+	target_interface="$1"
+
+	if ! command -v ubus >/dev/null 2>&1 || ! command -v jsonfilter >/dev/null 2>&1; then
+		printf ''
+		return
+	fi
+
+	status_json="$(ubus call network.interface."$target_interface" status 2>/dev/null || true)"
+	if [ -z "$status_json" ]; then
+		printf ''
+		return
+	fi
+
+	printf '%s' "$status_json" | jsonfilter -e '@["ipv4-address"][0].address' 2>/dev/null || true
+}
+
+get_wwan_ssid() {
+	if ! command -v ubus >/dev/null 2>&1 || ! command -v jsonfilter >/dev/null 2>&1; then
+		printf ''
+		return
+	fi
+
+	wwan_status_json="$(ubus call network.interface.wwan status 2>/dev/null || true)"
+	if [ -z "$wwan_status_json" ]; then
+		printf ''
+		return
+	fi
+
+	ssid_candidate="$(printf '%s' "$wwan_status_json" | jsonfilter -e '@.data.ssid' 2>/dev/null || true)"
+	[ -n "$ssid_candidate" ] || ssid_candidate="$(printf '%s' "$wwan_status_json" | jsonfilter -e '@.ssid' 2>/dev/null || true)"
+
+	printf '%s' "$ssid_candidate"
+}
+
 lan_up=false
+lan_ip=""
 if command -v ubus >/dev/null 2>&1 && command -v jsonfilter >/dev/null 2>&1; then
 	if_dump="$(ubus call network.interface dump 2>/dev/null || true)"
 	if [ -n "$if_dump" ]; then
@@ -130,39 +171,74 @@ fi
 if [ "$lan_up" = false ]; then
 	ip -4 addr show br-lan 2>/dev/null | grep -q 'inet ' && lan_up=true
 fi
+lan_ip="$(get_ubus_interface_ipv4 lan)"
+[ -n "$lan_ip" ] || lan_ip="$(get_interface_ipv4 br-lan)"
 
 wifi_up=false
 ssid_value=""
+wifi_ip=""
+wifi_iface=""
+wwan_up=false
 
 if command -v iw >/dev/null 2>&1; then
 	interfaces="$(iw dev 2>/dev/null | awk '/^\s*Interface /{print $2}' || true)"
 	for iface in $interfaces; do
 		if iw dev "$iface" link 2>/dev/null | grep -q 'Connected to'; then
 			wifi_up=true
+			wifi_iface="$iface"
 			ssid_value="$(iw dev "$iface" link 2>/dev/null | awk -F': ' '/SSID:/ {print $2; exit}')"
 			break
 		fi
 	done
 fi
 
-if [ -z "$ssid_value" ] && command -v ubus >/dev/null 2>&1; then
-	wifi_json="$(ubus call network.wireless status 2>/dev/null || true)"
-	if [ -n "$wifi_json" ]; then
-		if printf '%s' "$wifi_json" | grep -q '"up": true'; then
+if [ -z "$ssid_value" ] && [ -n "$wifi_iface" ] && command -v iw >/dev/null 2>&1; then
+	ssid_value="$(iw dev "$wifi_iface" link 2>/dev/null | awk -F': ' '/SSID:/ {print $2; exit}')"
+fi
+
+if command -v ubus >/dev/null 2>&1 && command -v jsonfilter >/dev/null 2>&1; then
+	wwan_status="$(ubus call network.interface.wwan status 2>/dev/null || true)"
+	if [ -n "$wwan_status" ]; then
+		wwan_flag="$(printf '%s' "$wwan_status" | jsonfilter -e '@.up' 2>/dev/null || true)"
+		if [ "$wwan_flag" = "true" ]; then
+			wwan_up=true
 			wifi_up=true
 		fi
-		ssid_value="$(printf '%s' "$wifi_json" | sed -n 's/.*"ssid":"\([^"]*\)".*/\1/p' | head -n 1)"
+	fi
+
+	if [ -z "$ssid_value" ] && [ "$wifi_up" = true ]; then
+		ssid_value="$(get_wwan_ssid)"
 	fi
 fi
-[ -n "$ssid_value" ] || ssid_value="$(uci -q get wireless.@wifi-iface[0].ssid 2>/dev/null || true)"
+[ -n "$wifi_iface" ] || wifi_iface="$(uci -q get wireless.@wifi-iface[0].ifname 2>/dev/null || true)"
+[ -n "$wifi_iface" ] || wifi_iface="wlan0"
+[ -n "$wifi_ip" ] || wifi_ip="$(get_ubus_interface_ipv4 wwan)"
+[ -n "$wifi_ip" ] || wifi_ip="$(get_interface_ipv4 "$wifi_iface")"
+
+if [ -n "$wifi_ip" ] && [ "$wifi_up" = false ]; then
+	wifi_up=true
+fi
+
+if [ "$wifi_up" = false ]; then
+	ssid_value="nicht verbunden"
+	wifi_ip=""
+fi
+
 [ -n "$ssid_value" ] || ssid_value="unbekannt"
 
 ip_value="$(ip -o -4 addr show scope global 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n 1 || true)"
 [ -n "$ip_value" ] || ip_value="nicht verfügbar"
 
+primary_ip="$lan_ip"
+if [ -z "$primary_ip" ]; then
+	primary_ip="$wifi_ip"
+fi
+[ -n "$primary_ip" ] || primary_ip="$ip_value"
+[ -n "$primary_ip" ] || primary_ip="nicht verfügbar"
+
 status_message="Keine aktive Netzwerkverbindung."
 if [ "$lan_up" = true ] || [ "$wifi_up" = true ]; then
-	if [ "$ip_value" = "nicht verfügbar" ]; then
+	if [ "$primary_ip" = "nicht verfügbar" ]; then
 		status_message="Verbindung vorhanden, aber keine IP-Adresse gefunden."
 	else
 		status_message="Netzwerkverbindung verfügbar."
@@ -225,5 +301,5 @@ ms2_loco_list_service_value="$(bool_from_rc "$ms2_loco_list_service_rc")"
 wake_up_links88_service_value="$(bool_from_rc "$wake_up_links88_service_rc")"
 
 cat <<EOF
-{"hostname":"$(json_escape "$hostname_value")","model":"$(json_escape "$model_value")","network":{"lan":$lan_up,"wifi":$wifi_up,"ssid":"$(json_escape "$ssid_value")","ip":"$(json_escape "$ip_value")","message":"$(json_escape "$status_message")"},"apps":{"mswebapp":$mswebapp_value,"railcontrol":$railcontrol_pkg_value},"services":{"railcontrol":$railcontrol_service_value,"z21emu":$z21emu_service_value,"can2lan":$can2lan_service_value,"clone-ms2-loco":$clone_ms2_loco_service_value,"maecanserver":$maecanserver_service_value,"ms2-loco-list":$ms2_loco_list_service_value,"wake-up-links88":$wake_up_links88_service_value}}
+{"hostname":"$(json_escape "$hostname_value")","model":"$(json_escape "$model_value")","network":{"lan":$lan_up,"wifi":$wifi_up,"ssid":"$(json_escape "$ssid_value")","ip":"$(json_escape "$primary_ip")","lanIp":"$(json_escape "$lan_ip")","wifiIp":"$(json_escape "$wifi_ip")","wifiInterface":"$(json_escape "$wifi_iface")","message":"$(json_escape "$status_message")"},"apps":{"mswebapp":$mswebapp_value,"railcontrol":$railcontrol_pkg_value},"services":{"railcontrol":$railcontrol_service_value,"z21emu":$z21emu_service_value,"can2lan":$can2lan_service_value,"clone-ms2-loco":$clone_ms2_loco_service_value,"maecanserver":$maecanserver_service_value,"ms2-loco-list":$ms2_loco_list_service_value,"wake-up-links88":$wake_up_links88_service_value}}
 EOF

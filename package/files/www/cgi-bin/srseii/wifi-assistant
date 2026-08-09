@@ -154,6 +154,10 @@ scan_networks() {
 		wifi up >/dev/null 2>&1 || true
 	fi
 
+	scan_file="/tmp/srseii-scan.$$.tsv"
+	: >"$scan_file"
+	trap 'rm -f "$scan_file"' EXIT INT TERM
+
 	interfaces=""
 	if command -v iw >/dev/null 2>&1; then
 		interfaces="$(iw dev 2>/dev/null | awk '/^\s*Interface / {print $2}' || true)"
@@ -175,18 +179,15 @@ scan_networks() {
 		if command -v iwinfo >/dev/null 2>&1; then
 			scan_output="$(iwinfo "$iface" scan 2>/dev/null || true)"
 			if [ -n "$scan_output" ] && printf '%s' "$scan_output" | grep -q 'ESSID:'; then
-				scan_json="$(printf '%s' "$scan_output" | awk '
-				function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
+				printf '%s' "$scan_output" | awk '
 				function emit() {
 					if (ssid == "") return
-					if (!first) printf ","
-					first = 0
 					if (enc == "") enc = "unknown"
 					if (sig == "") sig = 0
 					if (qual == "") qual = 0
-					printf "{\"ssid\":\"%s\",\"security\":\"%s\",\"signal\":%s,\"quality\":%s}", esc(ssid), esc(enc), sig, qual
+					printf "%s\t%s\t%s\t%s\n", ssid, enc, sig, qual
 				}
-				BEGIN { first = 1; ssid = ""; enc = ""; sig = ""; qual = ""; printf "[" }
+				BEGIN { ssid = ""; enc = ""; sig = ""; qual = "" }
 				/^Cell / { emit(); ssid = ""; enc = ""; sig = ""; qual = "" }
 				/ESSID:/ {
 					ssid = $0
@@ -209,35 +210,56 @@ scan_networks() {
 				$1 == "Encryption:" {
 					enc = substr($0, index($0, $2))
 				}
-				END { emit(); printf "]" }
-				')"
-				printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
-				exit 0
+				END { emit() }
+				' >>"$scan_file"
 			fi
 		fi
 
 		if command -v iw >/dev/null 2>&1; then
 			scan_output="$(iw dev "$iface" scan 2>/dev/null || true)"
 			if [ -n "$scan_output" ] && printf '%s' "$scan_output" | grep -q 'SSID:'; then
-				scan_json="$(printf '%s' "$scan_output" | awk '
-				function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
-				BEGIN { first = 1; printf "[" }
+				printf '%s' "$scan_output" | awk '
 				/SSID: / {
 					ssid = $0
 					sub(/^[[:space:]]*SSID:[[:space:]]*/, "", ssid)
 					if (ssid != "") {
-						if (!first) printf ","
-						first = 0
-						printf "{\"ssid\":\"%s\",\"security\":\"unknown\",\"signal\":0,\"quality\":0}", esc(ssid)
+						printf "%s\t%s\t%s\t%s\n", ssid, "unknown", 0, 0
 					}
 				}
-				END { printf "]" }
-				')"
-				printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
-				exit 0
+				' >>"$scan_file"
 			fi
 		fi
 	done
+
+	if [ -s "$scan_file" ]; then
+		scan_json="$(awk -F '\t' '
+		function esc(s) { gsub(/\\/, "\\\\", s); gsub(/"/, "\\\"", s); return s }
+		{
+			ssid = $1
+			sec = $2
+			sig = $3 + 0
+			qual = $4 + 0
+			if (ssid == "") next
+			if (!(ssid in keep) || qual > keepQual[ssid]) {
+				keep[ssid] = sec
+				keepSig[ssid] = sig
+				keepQual[ssid] = qual
+			}
+		}
+		END {
+			printf "["
+			first = 1
+			for (s in keep) {
+				if (!first) printf ","
+				first = 0
+				printf "{\"ssid\":\"%s\",\"security\":\"%s\",\"signal\":%d,\"quality\":%d}", esc(s), esc(keep[s]), keepSig[s], keepQual[s]
+			}
+			printf "]"
+		}
+		' "$scan_file")"
+		printf '{"ok":true,"networks":%s,"message":"scan complete"}\n' "$scan_json"
+		exit 0
+	fi
 
 	iface_list="$(printf '%s' "$interfaces" | tr '\n' ' ' | sed 's/[[:space:]]\+/ /g; s/^ //; s/ $//')"
 	[ -n "$iface_list" ] || iface_list="none"
@@ -277,6 +299,7 @@ connect_network() {
 	form_data="$1"
 	ssid="$(get_kv_param "$form_data" "ssid")"
 	password="$(get_kv_param "$form_data" "password")"
+	security="$(get_kv_param "$form_data" "security")"
 
 	if [ -z "$ssid" ]; then
 		json_error "SSID is required."
@@ -299,13 +322,45 @@ connect_network() {
 	disable_other_managed_sta_profiles "$sta_section"
 	disable_other_sta_on_same_device "$sta_section" "$radio_section"
 
-	if [ -n "$password" ]; then
-		uci set wireless."$sta_section".encryption='psk2'
-		uci set wireless."$sta_section".key="$password"
-	else
-		uci set wireless."$sta_section".encryption='none'
-		uci -q delete wireless."$sta_section".key || true
-	fi
+	case "$security" in
+		""|auto)
+			if [ -n "$password" ]; then
+				uci set wireless."$sta_section".encryption='psk2'
+				uci set wireless."$sta_section".key="$password"
+			else
+				uci set wireless."$sta_section".encryption='none'
+				uci -q delete wireless."$sta_section".key || true
+			fi
+			;;
+		none|open)
+			uci set wireless."$sta_section".encryption='none'
+			uci -q delete wireless."$sta_section".key || true
+			;;
+		psk2|wpa2)
+			if [ -z "$password" ]; then
+				json_error "Password is required for WPA2."
+			fi
+			uci set wireless."$sta_section".encryption='psk2'
+			uci set wireless."$sta_section".key="$password"
+			;;
+		psk-mixed|mixed)
+			if [ -z "$password" ]; then
+				json_error "Password is required for mixed WPA mode."
+			fi
+			uci set wireless."$sta_section".encryption='psk-mixed'
+			uci set wireless."$sta_section".key="$password"
+			;;
+		sae|wpa3)
+			if [ -z "$password" ]; then
+				json_error "Password is required for WPA3."
+			fi
+			uci set wireless."$sta_section".encryption='sae'
+			uci set wireless."$sta_section".key="$password"
+			;;
+		*)
+			json_error "Invalid security mode. Use auto, none, psk2, psk-mixed or sae."
+			;;
+	esac
 
 	if ! uci -q get network.wwan >/dev/null 2>&1; then
 		uci set network.wwan='interface'

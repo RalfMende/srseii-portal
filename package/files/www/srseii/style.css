@@ -159,6 +159,65 @@ body {
   padding: 1rem;
 }
 
+.network {
+  margin-top: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.network-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
+}
+
+.network-header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+}
+
+.network-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.network-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  padding: 0.75rem;
+}
+
+.network-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1rem;
+}
+
+.network-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.network-card li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid rgba(26, 32, 44, 0.06);
+}
+
+.network-card li:last-child {
+  border-bottom: none;
+}
+
 .status-header {
   display: flex;
   align-items: center;
@@ -260,6 +319,11 @@ body {
   padding: 1rem;
 }
 
+.wifi-inline {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.92);
+}
+
 .wifi-header {
   display: flex;
   align-items: center;
@@ -269,6 +333,11 @@ body {
 }
 
 .wifi-header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+}
+
+.wifi-header h3 {
   margin: 0;
   font-size: 1.18rem;
 }
@@ -300,6 +369,34 @@ body {
 .wifi-grid input:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 1px;
+}
+
+.wifi-manual-toggle-wrap {
+  margin-top: 0.65rem;
+}
+
+.btn-ghost {
+  color: var(--brand-dark);
+  background: rgba(30, 58, 95, 0.08);
+  border: 1px solid rgba(30, 58, 95, 0.24);
+}
+
+.btn-ghost:hover {
+  box-shadow: none;
+  transform: none;
+  background: rgba(30, 58, 95, 0.14);
+}
+
+.wifi-manual-hint {
+  margin-top: 0.65rem;
+}
+
+.wifi-manual-fields {
+  margin-top: 0.45rem;
+}
+
+.is-hidden {
+  display: none;
 }
 
 .wifi-actions {
@@ -360,6 +457,11 @@ button.btn[disabled] {
     align-items: flex-start;
   }
 
+  .network-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .wifi-header {
     flex-direction: column;
     align-items: flex-start;
@@ -370,6 +472,11 @@ button.btn[disabled] {
   }
 
   .wifi-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .wifi-manual-toggle-wrap .btn {
     width: 100%;
     text-align: center;
   }
