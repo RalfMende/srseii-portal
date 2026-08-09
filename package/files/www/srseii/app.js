@@ -341,6 +341,11 @@
     setText("net-wifi-ssid", network.ssid || t("unknown"));
     setText("net-wifi-ip", network.wifiIp || t("notAvailable"));
 
+    var wifiAssistant = document.getElementById("wifi-assistant");
+    if (wifiAssistant) {
+      wifiAssistant.classList.toggle("is-hidden", !!network.wifi);
+    }
+
     setPill("st-mswebapp", !!(data.apps && data.apps.mswebapp));
     setPill("st-railcontrol-app", !!(data.apps && data.apps.railcontrol));
 
