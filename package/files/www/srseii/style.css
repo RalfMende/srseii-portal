@@ -110,6 +110,10 @@ body {
   color: var(--muted);
 }
 
+.feature-panel-central {
+  margin-top: 1.4rem;
+}
+
 .feature-grid {
   display: grid;
   gap: 0.95rem;

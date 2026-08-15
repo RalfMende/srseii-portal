@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="./style.css?v=0.5.2" />
+  <link rel="stylesheet" href="./style.css?v=0.5.3" />
 </head>
 <body>
   <main class="layout">
@@ -22,7 +22,7 @@
         <h2>Modellbahn-Funktionen</h2>
       </div>
 
-      <div class="feature-panel">
+      <div class="feature-panel feature-panel-webapps">
         <h3 data-i18n="webAppsSectionTitle">Direkt im Browser</h3>
         <div class="feature-grid">
           <article class="feature-card" style="--delay: 0ms;">
@@ -41,14 +41,21 @@
         </div>
       </div>
 
-      <div class="feature-panel">
-        <h3 data-i18n="mobileUseCaseSectionTitle">Mit Smartphone / Tablet</h3>
+      <div class="feature-panel feature-panel-central">
+        <h3 data-i18n="centralInterfacesSectionTitle">Zentralen-Schnittstellen</h3>
         <div class="feature-grid">
           <article class="feature-card" style="--delay: 180ms;">
-            <h4 data-i18n="z21UseCaseTitle">Z21 Emulator</h4>
+            <h4 data-i18n="z21UseCaseTitle">Z21 Schnittstellen Emulator</h4>
             <p data-i18n="z21UseCaseShort">Verbindung mit der Z21-App oder WLAN-Maus.</p>
             <div class="feature-status"><span id="st-z21emu-feature" class="pill pending">wird geladen</span></div>
             <button class="btn" id="z21emu-guide-button" type="button" data-i18n="z21GuideButton">Anleitung</button>
+          </article>
+
+          <article class="feature-card" style="--delay: 270ms;">
+            <h4 data-i18n="centralStationTitle">Central Station 2 Schnittstellen Emulator</h4>
+            <p data-i18n="centralStationDesc">Verbindung mit kompatiblen Apps wie RemoteCS, RailControl Pro, ... oder Mobile Station WLAN.</p>
+            <div class="feature-status"><span id="st-central-station-feature" class="pill pending">wird geladen</span></div>
+            <button class="btn" id="central-station-guide-button" type="button" data-i18n="centralStationGuideButton">Anleitung</button>
           </article>
         </div>
       </div>
@@ -222,6 +229,28 @@
     </div>
   </dialog>
 
-  <script src="./app.js?v=0.5.2"></script>
+  <dialog class="modal" id="central-station-guide-dialog" aria-labelledby="central-station-guide-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="central-station-guide-title" data-i18n="centralStationGuideTitle">Central-Station-Schnittstelle verbinden</h2>
+        <button class="modal-close" id="central-station-guide-close" type="button" aria-label="Schließen" data-i18n-aria-label="close">×</button>
+      </div>
+      <section class="guide-section">
+        <h3 data-i18n="centralStationGuideStepsTitle">So verbindest du dein Gerät</h3>
+        <ol>
+          <li data-i18n="centralStationStep1">Gerät oder App mit demselben Netzwerk wie den SRSEII verbinden.</li>
+          <li data-i18n="centralStationStep2">Eine kompatible Steuer-App öffnen.</li>
+          <li data-i18n="centralStationStep3">Als Zentrale oder Server die Central-Station-Schnittstelle auswählen.</li>
+          <li><span data-i18n="centralStationStep4">Die folgende SRSEII-IP-Adresse eintragen:</span> <strong id="central-station-guide-ip">-</strong></li>
+        </ol>
+      </section>
+      <section class="guide-section guide-note">
+        <h3 data-i18n="centralStationExamplesTitle">Beispiele</h3>
+        <p data-i18n="centralStationExamplesText">RemoteCS, RailControl Pro und Mobile Station WLAN können als kompatible Clients verwendet werden, sofern ihre Schnittstellenkonfiguration dies unterstützt.</p>
+      </section>
+    </div>
+  </dialog>
+
+  <script src="./app.js?v=0.5.3"></script>
 </body>
 </html>

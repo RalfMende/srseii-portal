@@ -6,6 +6,9 @@
   var z21emuGuideButton = document.getElementById("z21emu-guide-button");
   var z21emuGuideDialog = document.getElementById("z21emu-guide-dialog");
   var z21emuGuideCloseButton = document.getElementById("z21emu-guide-close");
+  var centralStationGuideButton = document.getElementById("central-station-guide-button");
+  var centralStationGuideDialog = document.getElementById("central-station-guide-dialog");
+  var centralStationGuideCloseButton = document.getElementById("central-station-guide-close");
   var luciLink = document.getElementById("luci-link");
   var terminalLink = document.getElementById("terminal-link");
   var hostHint = document.getElementById("host-hint");
@@ -36,8 +39,8 @@
       railcontrolTitle: "RailControl",
       railcontrolDesc: "Modellbahnsteuerung im Browser.",
       webAppsSectionTitle: "Direkt im Browser von Smartphone / Tablet / PC",
-      mobileUseCaseSectionTitle: "Über App auf Smartphone / Tablet",
-      z21UseCaseTitle: "Z21 Emulator",
+      centralInterfacesSectionTitle: "Zentralen-Schnittstellen",
+      z21UseCaseTitle: "Z21 Schnittstellen Emulator",
       z21UseCaseShort: "Verbindung mit der Z21-App oder WLAN-Maus.",
       z21GuideButton: "Anleitung",
       z21GuideTitle: "Z21 verbinden",
@@ -57,6 +60,17 @@
       z21ImportantText: "Smartphone/Tablet bzw. WLAN-Maus müssen sich im gleichen Netzwerk wie die Z21 befinden.",
       z21AppNoteTitle: "Hinweis zur Z21 App",
       z21AppNoteText: "Die Z21-App kann kostenlos installiert und getestet werden. In der kostenlosen Version ist die Steuerung jedoch auf eine Lokomotive beschränkt. Für die Steuerung mehrerer Lokomotiven muss die Z21-Vollversion als In-App-Kauf freigeschaltet werden.",
+      centralStationTitle: "Central Station 2 Schnittstellen Emulator",
+      centralStationDesc: "Verbindung mit kompatiblen Apps wie RemoteCS, RailControl Pro, ... oder Mobile Station WLAN.",
+      centralStationGuideButton: "Anleitung",
+      centralStationGuideTitle: "Central-Station-Schnittstelle verbinden",
+      centralStationGuideStepsTitle: "So verbindest du dein Gerät",
+      centralStationStep1: "Gerät oder App mit demselben Netzwerk wie den SRSEII verbinden.",
+      centralStationStep2: "Eine kompatible Steuer-App öffnen.",
+      centralStationStep3: "Als Zentrale oder Server die Central-Station-Schnittstelle auswählen.",
+      centralStationStep4: "Die folgende SRSEII-IP-Adresse eintragen:",
+      centralStationExamplesTitle: "Beispiele",
+      centralStationExamplesText: "RemoteCS, RailControl Pro und Mobile Station WLAN können als kompatible Clients verwendet werden, sofern ihre Schnittstellenkonfiguration dies unterstützt.",
       close: "Schließen",
       luciTitle: "LuCI (expert mode)",
       luciDesc: "Erweiterte OpenWrt-Einstellungen.",
@@ -130,8 +144,8 @@
       railcontrolTitle: "RailControl",
       railcontrolDesc: "Model railway control in the browser.",
       webAppsSectionTitle: "Via Browser from Smartphone / Tablet / PC",
-      mobileUseCaseSectionTitle: "Via App on Smartphone / Tablet",
-      z21UseCaseTitle: "Z21 emulator",
+      centralInterfacesSectionTitle: "Central interfaces",
+      z21UseCaseTitle: "Z21 interface emulator",
       z21UseCaseShort: "Connect using the Z21 app or a WLAN mouse.",
       z21GuideButton: "Instructions",
       z21GuideTitle: "Connect Z21",
@@ -151,6 +165,17 @@
       z21ImportantText: "The smartphone, tablet, or WLAN mouse must be connected to the same network as the Z21.",
       z21AppNoteTitle: "Note on the Z21 app",
       z21AppNoteText: "The Z21 app can be installed and tested free of charge. In the free version, control is limited to one locomotive. To control multiple locomotives, the full Z21 version must be unlocked through an in-app purchase.",
+      centralStationTitle: "Central Station 2 Interface Emulator",
+      centralStationDesc: "Connect using compatible apps such as RemoteCS, RailControl Pro, ... or Mobile Station WLAN",
+      centralStationGuideButton: "Instructions",
+      centralStationGuideTitle: "Connect the Central Station interface",
+      centralStationGuideStepsTitle: "Connect your device",
+      centralStationStep1: "Connect the device or app to the same network as the SRSEII.",
+      centralStationStep2: "Open a compatible control app.",
+      centralStationStep3: "Select the Central Station interface as the central station or server.",
+      centralStationStep4: "Enter the following SRSEII IP address:",
+      centralStationExamplesTitle: "Examples",
+      centralStationExamplesText: "RemoteCS, RailControl Pro, and Mobile Station WLAN may be used as compatible clients when their interface configuration supports it.",
       close: "Close",
       luciTitle: "LuCI (expert mode)",
       luciDesc: "Advanced OpenWrt settings.",
@@ -390,6 +415,11 @@
     setText("z21emu-guide-ip-mouse", value);
   }
 
+  function setCentralStationGuideIp(ipAddress) {
+    var value = ipAddress || t("notAvailable");
+    setText("central-station-guide-ip", value);
+  }
+
   function setWifiNote(text, isError) {
     if (!wifiNote) {
       return;
@@ -473,14 +503,17 @@
     var mswebappUcReady = !!(data.services && data.services.mswebapp);
     var railcontrolUcReady = !!(data.services && data.services.railcontrol);
     var z21emuUcReady = !!(data.services && data.services.z21emu) && !!(data.services && data.services.can2lan);
+    var centralStationUcReady = !!(data.services && data.services.can2lan);
 
     setAppStatus("st-mswebapp-feature", mswebappUcReady ? "ready" : "problem");
     setAppStatus("st-railcontrol-feature", railcontrolUcReady ? "ready" : "problem");
     setAppStatus("st-z21emu-feature", z21emuUcReady ? "ready" : "problem");
+    setAppStatus("st-central-station-feature", centralStationUcReady ? "ready" : "problem");
     setFeatureLinkState(mswebappLink, mswebappUcReady, "http://" + host + ":6020/");
     setFeatureLinkState(railcontrolLink, railcontrolUcReady, "http://" + host + ":8082/");
 
     setZ21GuideIp(network.ip);
+    setCentralStationGuideIp(network.ip);
 
     setPill("st-mswebapp-svc", !!(data.services && data.services.mswebapp));
     setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));
@@ -748,6 +781,26 @@
   if (z21emuGuideButton && z21emuGuideDialog) {
     z21emuGuideButton.addEventListener("click", function () {
       z21emuGuideDialog.showModal();
+    });
+  }
+
+  if (centralStationGuideButton && centralStationGuideDialog) {
+    centralStationGuideButton.addEventListener("click", function () {
+      centralStationGuideDialog.showModal();
+    });
+  }
+
+  if (centralStationGuideCloseButton && centralStationGuideDialog) {
+    centralStationGuideCloseButton.addEventListener("click", function () {
+      centralStationGuideDialog.close();
+    });
+  }
+
+  if (centralStationGuideDialog) {
+    centralStationGuideDialog.addEventListener("click", function (event) {
+      if (event.target === centralStationGuideDialog) {
+        centralStationGuideDialog.close();
+      }
     });
   }
 
