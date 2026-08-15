@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="./style.css?v=0.5.3" />
+  <link rel="stylesheet" href="./style.css?v=0.5.4" />
 </head>
 <body>
   <main class="layout">
@@ -22,8 +22,8 @@
         <h2>Modellbahn-Funktionen</h2>
       </div>
 
-      <div class="feature-panel feature-panel-webapps">
-        <h3 data-i18n="webAppsSectionTitle">Direkt im Browser</h3>
+      <div class="feature-panel feature-panel-web">
+        <h3 data-i18n="webAppsSectionTitle">Web-Steuerungen</h3>
         <div class="feature-grid">
           <article class="feature-card" style="--delay: 0ms;">
             <h4 data-i18n="mswebappTitle">Mobile Station Web App</h4>
@@ -52,10 +52,36 @@
           </article>
 
           <article class="feature-card" style="--delay: 270ms;">
-            <h4 data-i18n="centralStationTitle">Central Station 2 Schnittstellen Emulator</h4>
-            <p data-i18n="centralStationDesc">Verbindung mit kompatiblen Apps wie RemoteCS, RailControl Pro, ... oder Mobile Station WLAN.</p>
+            <h4 data-i18n="centralStationTitle">Central-Station-kompatible Schnittstelle</h4>
+            <p data-i18n="centralStationDesc">Verbindung über kompatible Apps wie RemoteCS, RailControl Pro oder Mobile Station WLAN.</p>
             <div class="feature-status"><span id="st-central-station-feature" class="pill pending">wird geladen</span></div>
             <button class="btn" id="central-station-guide-button" type="button" data-i18n="centralStationGuideButton">Anleitung</button>
+          </article>
+        </div>
+      </div>
+
+      <div class="feature-panel feature-panel-pc">
+        <h3 data-i18n="pcSoftwareSectionTitle">PC-Steuerungssoftware</h3>
+        <div class="feature-grid">
+          <article class="feature-card" style="--delay: 360ms;">
+            <h4 data-i18n="itrainTitle">iTrain</h4>
+            <p data-i18n="itrainDesc">PC-basierte Modellbahnsteuerung mit eigener Einrichtung.</p>
+            <div class="feature-status"><span id="st-itrain-feature" class="pill warn">Einrichtung erforderlich</span></div>
+            <button class="btn btn-secondary" id="itrain-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+          </article>
+
+          <article class="feature-card" style="--delay: 450ms;">
+            <h4 data-i18n="winDigipetTitle">Win-Digipet</h4>
+            <p data-i18n="winDigipetDesc">Desktop-Anbindung mit eigener SRSEII-Konfiguration.</p>
+            <div class="feature-status"><span id="st-win-digipet-feature" class="pill warn">Einrichtung erforderlich</span></div>
+            <button class="btn btn-secondary" id="win-digipet-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+          </article>
+
+          <article class="feature-card" style="--delay: 540ms;">
+            <h4 data-i18n="rocrailTitle">Rocrail</h4>
+            <p data-i18n="rocrailDesc">PC-Steuerung, je nach Setup separat einzurichten.</p>
+            <div class="feature-status"><span id="st-rocrail-feature" class="pill warn">Einrichtung erforderlich</span></div>
+            <button class="btn btn-secondary" id="rocrail-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
           </article>
         </div>
       </div>
@@ -251,6 +277,6 @@
     </div>
   </dialog>
 
-  <script src="./app.js?v=0.5.3"></script>
+  <script src="./app.js?v=0.5.4"></script>
 </body>
 </html>

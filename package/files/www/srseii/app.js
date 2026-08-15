@@ -38,10 +38,11 @@
       mswebappDesc: "Loks und Weichen steuern.",
       railcontrolTitle: "RailControl",
       railcontrolDesc: "Modellbahnsteuerung im Browser.",
-      webAppsSectionTitle: "Direkt im Browser von Smartphone / Tablet / PC",
+      webAppsSectionTitle: "Web-Steuerungen",
       centralInterfacesSectionTitle: "Zentralen-Schnittstellen",
-      z21UseCaseTitle: "Z21 Schnittstellen Emulator",
-      z21UseCaseShort: "Verbindung mit der Z21-App oder WLAN-Maus.",
+      pcSoftwareSectionTitle: "PC-Steuerungssoftware",
+      z21UseCaseTitle: "Z21-kompatible Schnittstelle",
+      z21UseCaseShort: "Verbindung mit der Z21-App oder Z21-WLAN-Maus.",
       z21GuideButton: "Anleitung",
       z21GuideTitle: "Z21 verbinden",
       z21AppTitle: "1. Z21-App verbinden",
@@ -60,9 +61,16 @@
       z21ImportantText: "Smartphone/Tablet bzw. WLAN-Maus müssen sich im gleichen Netzwerk wie die Z21 befinden.",
       z21AppNoteTitle: "Hinweis zur Z21 App",
       z21AppNoteText: "Die Z21-App kann kostenlos installiert und getestet werden. In der kostenlosen Version ist die Steuerung jedoch auf eine Lokomotive beschränkt. Für die Steuerung mehrerer Lokomotiven muss die Z21-Vollversion als In-App-Kauf freigeschaltet werden.",
-      centralStationTitle: "Central Station 2 Schnittstellen Emulator",
-      centralStationDesc: "Verbindung mit kompatiblen Apps wie RemoteCS, RailControl Pro, ... oder Mobile Station WLAN.",
+      centralStationTitle: "Central Station 2 kompatible Schnittstelle",
+      centralStationDesc: "Verbindung über kompatible Apps wie RemoteCS, RailControl Pro oder Mobile Station WLAN.",
       centralStationGuideButton: "Anleitung",
+      setupButton: "Einrichten",
+      itrainTitle: "iTrain",
+      itrainDesc: "PC-basierte Modellbahnsteuerung mit eigener Einrichtung.",
+      winDigipetTitle: "Win-Digipet",
+      winDigipetDesc: "Desktop-Anbindung mit eigener SRSEII-Konfiguration.",
+      rocrailTitle: "Rocrail",
+      rocrailDesc: "PC-Steuerung, je nach Setup separat einzurichten.",
       centralStationGuideTitle: "Central-Station-Schnittstelle verbinden",
       centralStationGuideStepsTitle: "So verbindest du dein Gerät",
       centralStationStep1: "Gerät oder App mit demselben Netzwerk wie den SRSEII verbinden.",
@@ -143,10 +151,11 @@
       mswebappDesc: "Control locomotives and turnouts.",
       railcontrolTitle: "RailControl",
       railcontrolDesc: "Model railway control in the browser.",
-      webAppsSectionTitle: "Via Browser from Smartphone / Tablet / PC",
+      webAppsSectionTitle: "Web controls",
       centralInterfacesSectionTitle: "Central interfaces",
-      z21UseCaseTitle: "Z21 interface emulator",
-      z21UseCaseShort: "Connect using the Z21 app or a WLAN mouse.",
+      pcSoftwareSectionTitle: "PC control software",
+      z21UseCaseTitle: "Z21-compatible interface",
+      z21UseCaseShort: "Connect using the Z21 app or Z21 WLAN Mouse.",
       z21GuideButton: "Instructions",
       z21GuideTitle: "Connect Z21",
       z21AppTitle: "1. Connect the Z21 app",
@@ -165,9 +174,16 @@
       z21ImportantText: "The smartphone, tablet, or WLAN mouse must be connected to the same network as the Z21.",
       z21AppNoteTitle: "Note on the Z21 app",
       z21AppNoteText: "The Z21 app can be installed and tested free of charge. In the free version, control is limited to one locomotive. To control multiple locomotives, the full Z21 version must be unlocked through an in-app purchase.",
-      centralStationTitle: "Central Station 2 Interface Emulator",
-      centralStationDesc: "Connect using compatible apps such as RemoteCS, RailControl Pro, ... or Mobile Station WLAN",
+      centralStationTitle: "Central Station 2 compatible interface",
+      centralStationDesc: "Connect using compatible apps such as RemoteCS, RailControl Pro, or Mobile Station WLAN.",
       centralStationGuideButton: "Instructions",
+      setupButton: "Set up",
+      itrainTitle: "iTrain",
+      itrainDesc: "PC-based model railway control requiring a dedicated setup.",
+      winDigipetTitle: "Win-Digipet",
+      winDigipetDesc: "Desktop connectivity with its own SRSEII configuration.",
+      rocrailTitle: "Rocrail",
+      rocrailDesc: "PC control software that must be configured separately.",
       centralStationGuideTitle: "Connect the Central Station interface",
       centralStationGuideStepsTitle: "Connect your device",
       centralStationStep1: "Connect the device or app to the same network as the SRSEII.",
@@ -357,14 +373,20 @@
       return;
     }
 
-    if (state === "problem") {
-      el.classList.add("pill", "err");
-      el.textContent = "Nicht bereit";
+    if (state === "setup") {
+      el.classList.add("pill", "warn");
+      el.textContent = "Einrichtung erforderlich";
       return;
     }
 
-    el.classList.add("pill", "warn");
-    el.textContent = "Nicht bereit";
+    if (state === "unavailable") {
+      el.classList.add("pill", "warn");
+      el.textContent = "Nicht verfügbar";
+      return;
+    }
+
+    el.classList.add("pill", "err");
+    el.textContent = "Problem";
   }
 
   function setFeatureLinkState(linkEl, ready, url) {
@@ -500,25 +522,38 @@
       wifiAssistant.classList.toggle("is-hidden", !!network.wifi);
     }
 
-    var mswebappUcReady = !!(data.services && data.services.mswebapp);
-    var railcontrolUcReady = !!(data.services && data.services.railcontrol);
-    var z21emuUcReady = !!(data.services && data.services.z21emu) && !!(data.services && data.services.can2lan);
-    var centralStationUcReady = !!(data.services && data.services.can2lan);
+    // Web apps are exposed as app readiness in the backend payload.
+    var mswebappReady = !!(data.apps && data.apps.mswebapp);
+    var railcontrolReady = !!(data.apps && data.apps.railcontrol);
 
-    setAppStatus("st-mswebapp-feature", mswebappUcReady ? "ready" : "problem");
-    setAppStatus("st-railcontrol-feature", railcontrolUcReady ? "ready" : "problem");
-    setAppStatus("st-z21emu-feature", z21emuUcReady ? "ready" : "problem");
-    setAppStatus("st-central-station-feature", centralStationUcReady ? "ready" : "problem");
-    setFeatureLinkState(mswebappLink, mswebappUcReady, "http://" + host + ":6020/");
-    setFeatureLinkState(railcontrolLink, railcontrolUcReady, "http://" + host + ":8082/");
+    // Interface use-cases are exposed as dedicated use-case flags.
+    var z21InterfaceReady = !!(data.useCases && data.useCases.z21interface);
+    var centralStationReady = !!(data.useCases && data.useCases.cs2interface);
+
+    // Technical services remain separate and are shown only in the diagnostics list.
+    var mswebappService = !!(data.services && data.services.mswebapp);
+    var railcontrolService = !!(data.services && data.services.railcontrol);
+    var z21Service = !!(data.services && data.services.z21emu);
+    var can2lanService = !!(data.services && data.services.can2lan);
+
+    setAppStatus("st-mswebapp-feature", mswebappReady ? "ready" : "setup");
+    setAppStatus("st-railcontrol-feature", railcontrolReady ? "ready" : "setup");
+    setAppStatus("st-z21emu-feature", z21InterfaceReady ? "ready" : "setup");
+    setAppStatus("st-central-station-feature", centralStationReady ? "ready" : "setup");
+    setAppStatus("st-itrain-feature", "setup");
+    setAppStatus("st-win-digipet-feature", "setup");
+    setAppStatus("st-rocrail-feature", "setup");
+
+    setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + ":6020/");
+    setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + ":8082/");
 
     setZ21GuideIp(network.ip);
     setCentralStationGuideIp(network.ip);
 
-    setPill("st-mswebapp-svc", !!(data.services && data.services.mswebapp));
-    setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));
-    setPill("st-z21emu", !!(data.services && data.services.z21emu));
-    setPill("st-can2lan", !!(data.services && data.services.can2lan));
+    setPill("st-mswebapp-svc", mswebappService);
+    setPill("st-railcontrol-svc", railcontrolService);
+    setPill("st-z21emu", z21Service);
+    setPill("st-can2lan", can2lanService);
     setPill("st-clone-ms2-loco", !!(data.services && data.services["clone-ms2-loco"]));
     setPill("st-maecanserver", !!(data.services && data.services.maecanserver));
     setPill("st-ms2-loco-list", !!(data.services && data.services["ms2-loco-list"]));
