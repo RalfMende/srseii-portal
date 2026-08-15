@@ -32,6 +32,15 @@
       mswebappDesc: "Loks und Weichen steuern.",
       railcontrolTitle: "RailControl",
       railcontrolDesc: "Modellbahnsteuerung im Browser.",
+      webAppsSectionTitle: "Direkt im Browser von Smartphone / Tablet / PC",
+      mobileUseCaseSectionTitle: "Über App auf Smartphone / Tablet",
+      z21UseCaseTitle: "Z21 Emulator",
+      z21UseCaseShort: "Verbindung mit der Z21-App oder WLAN-Maus.",
+      z21UseCaseIpLabel: "SRSEII-IP-Adresse:",
+      z21Step1: "Smartphone oder Tablet mit demselben Netzwerk verbinden.",
+      z21Step2: "Die Z21-App öffnen.",
+      z21Step3: "Im Menü Einstellungen > Z21 Einstellungen öffnen.",
+      z21Step4: "Die angezeigte IP-Adresse (oder Hostname) eintragen.",
       luciTitle: "LuCI (expert mode)",
       luciDesc: "Erweiterte OpenWrt-Einstellungen.",
       open: "Öffnen",
@@ -103,6 +112,15 @@
       mswebappDesc: "Control locomotives and turnouts.",
       railcontrolTitle: "RailControl",
       railcontrolDesc: "Model railway control in the browser.",
+      webAppsSectionTitle: "Via Browser from Smartphone / Tablet / PC",
+      mobileUseCaseSectionTitle: "Via App on Smartphone / Tablet",
+      z21UseCaseTitle: "Z21 emulator",
+      z21UseCaseShort: "Connect using the Z21 app or a WLAN mouse.",
+      z21UseCaseIpLabel: "SRSEII IP address:",
+      z21Step1: "Connect your smartphone or tablet to the same network.",
+      z21Step2: "Open the Z21 app.",
+      z21Step3: "Open Settings > Z21 settings in the menu.",
+      z21Step4: "Enter the displayed IP address (or hostname).",
       luciTitle: "LuCI (expert mode)",
       luciDesc: "Advanced OpenWrt settings.",
       open: "Open",
@@ -407,13 +425,17 @@
       wifiAssistant.classList.toggle("is-hidden", !!network.wifi);
     }
 
-    var mswebappReady = !!(data.apps && data.apps.mswebapp);
-    var railcontrolReady = !!(data.apps && data.apps.railcontrol);
+    var mswebappUcReady = !!(data.services && data.services.mswebapp);
+    var railcontrolUcReady = !!(data.services && data.services.railcontrol);
+    var z21emuUcReady = !!(data.services && data.services.z21emu) && !!(data.services && data.services.can2lan);
 
-    setAppStatus("st-mswebapp-feature", mswebappReady ? "ready" : "problem");
-    setAppStatus("st-railcontrol-feature", railcontrolReady ? "ready" : "problem");
-    setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + ":6020/");
-    setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + ":8082/");
+    setAppStatus("st-mswebapp-feature", mswebappUcReady ? "ready" : "problem");
+    setAppStatus("st-railcontrol-feature", railcontrolUcReady ? "ready" : "problem");
+    setAppStatus("st-z21emu-feature", z21emuUcReady ? "ready" : "problem");
+    setFeatureLinkState(mswebappLink, mswebappUcReady, "http://" + host + ":6020/");
+    setFeatureLinkState(railcontrolLink, railcontrolUcReady, "http://" + host + ":8082/");
+
+    setText("st-z21emu-ip", network.ip || t("notAvailable"));
 
     setPill("st-mswebapp-svc", !!(data.services && data.services.mswebapp));
     setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));

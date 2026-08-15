@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="./style.css?v=0.5.1" />
+  <link rel="stylesheet" href="./style.css?v=0.5.2" />
 </head>
 <body>
   <main class="layout">
@@ -23,20 +23,40 @@
       </div>
 
       <div class="feature-panel">
-        <h3>Direkt im Browser</h3>
+        <h3 data-i18n="webAppsSectionTitle">Direkt im Browser</h3>
         <div class="feature-grid">
           <article class="feature-card" style="--delay: 0ms;">
-            <h4>Mobile Station Web App</h4>
-            <p>Loks und Weichen steuern.</p>
+            <h4 data-i18n="mswebappTitle">Mobile Station Web App</h4>
+            <p data-i18n="mswebappDesc">Loks und Weichen steuern.</p>
             <div class="feature-status"><span id="st-mswebapp-feature" class="pill pending">wird geladen</span></div>
             <a class="btn" id="mswebapp-link" href="/srseii/" data-i18n="open">Öffnen</a>
           </article>
 
           <article class="feature-card" style="--delay: 90ms;">
-            <h4>RailControl</h4>
-            <p>Modellbahnsteuerung im Browser.</p>
+            <h4 data-i18n="railcontrolTitle">RailControl</h4>
+            <p data-i18n="railcontrolDesc">Modellbahnsteuerung im Browser.</p>
             <div class="feature-status"><span id="st-railcontrol-feature" class="pill pending">wird geladen</span></div>
             <a class="btn" id="railcontrol-link" href="/srseii/" data-i18n="open">Öffnen</a>
+          </article>
+        </div>
+      </div>
+
+      <div class="feature-panel">
+        <h3 data-i18n="mobileUseCaseSectionTitle">Mit Smartphone / Tablet</h3>
+        <div class="feature-grid">
+          <article class="feature-card" style="--delay: 180ms;">
+            <h4 data-i18n="z21UseCaseTitle">Z21 Emulator</h4>
+            <p data-i18n="z21UseCaseShort">Verbindung mit der Z21-App oder WLAN-Maus.</p>
+            <div class="feature-status"><span id="st-z21emu-feature" class="pill pending">wird geladen</span></div>
+            <div class="feature-help" id="z21emu-details">
+              <p><span data-i18n="z21UseCaseIpLabel">SRSEII-IP-Adresse:</span> <strong id="st-z21emu-ip">-</strong></p>
+              <ol>
+                <li data-i18n="z21Step1">Smartphone oder Tablet mit demselben Netzwerk verbinden.</li>
+                <li data-i18n="z21Step2">Die Z21-App öffnen.</li>
+                <li data-i18n="z21Step3">Im Menü Einstellungen &gt; Z21 Einstellungen öffnen.</li>
+                <li data-i18n="z21Step4">Die angezeigte IP-Adresse (alt. Hostname) eintragen.</li>
+              </ol>
+            </div>
           </article>
         </div>
       </div>
@@ -169,6 +189,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=0.5.1"></script>
+  <script src="./app.js?v=0.5.2"></script>
 </body>
 </html>
