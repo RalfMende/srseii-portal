@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="./style.css?v=0.5.2" />
+  <link rel="stylesheet" href="./style.css?v=0.5.1" />
 </head>
 <body>
   <main class="layout">
@@ -17,24 +17,29 @@
       <p class="subtitle" data-i18n="heroSubtitle">Gleisbox als Zentrale</p>
     </header>
 
-    <section class="grid" aria-label="Portal Anwendungen">
-      <article class="card" style="--delay: 0ms;">
-        <h2 data-i18n="mswebappTitle">Mobile Station Web App</h2>
-        <p data-i18n="mswebappDesc">Loks und Weichen steuern.</p>
-        <a class="btn" id="mswebapp-link" href="/srseii/" data-i18n="open">Öffnen</a>
-      </article>
+    <section class="feature-block" aria-label="Modellbahn-Funktionen">
+      <div class="feature-header">
+        <h2>Modellbahn-Funktionen</h2>
+      </div>
 
-      <article class="card" style="--delay: 90ms;">
-        <h2 data-i18n="railcontrolTitle">RailControl</h2>
-        <p data-i18n="railcontrolDesc">Modellbahnsteuerung im Browser.</p>
-        <a class="btn" id="railcontrol-link" href="/srseii/" data-i18n="open">Öffnen</a>
-      </article>
+      <div class="feature-panel">
+        <h3>Direkt im Browser</h3>
+        <div class="feature-grid">
+          <article class="feature-card" style="--delay: 0ms;">
+            <h4>Mobile Station Web App</h4>
+            <p>Loks und Weichen steuern.</p>
+            <div class="feature-status"><span id="st-mswebapp-feature" class="pill pending">wird geladen</span></div>
+            <a class="btn" id="mswebapp-link" href="/srseii/" data-i18n="open">Öffnen</a>
+          </article>
 
-      <article class="card" style="--delay: 180ms;">
-        <h2 data-i18n="luciTitle">LuCI (Expertenmodus)</h2>
-        <p data-i18n="luciDesc">Erweiterte OpenWrt-Einstellungen.</p>
-        <a class="btn btn-secondary" href="/cgi-bin/luci/" data-i18n="open">Öffnen</a>
-      </article>
+          <article class="feature-card" style="--delay: 90ms;">
+            <h4>RailControl</h4>
+            <p>Modellbahnsteuerung im Browser.</p>
+            <div class="feature-status"><span id="st-railcontrol-feature" class="pill pending">wird geladen</span></div>
+            <a class="btn" id="railcontrol-link" href="/srseii/" data-i18n="open">Öffnen</a>
+          </article>
+        </div>
+      </div>
     </section>
 
     <section class="status" aria-label="Systemstatus">
@@ -52,16 +57,9 @@
         </article>
 
         <article class="status-card">
-          <h3 data-i18n="appsTitle">Apps</h3>
-          <ul>
-            <li><span class="label">MSWebApp</span><span id="st-mswebapp" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">RailControl</span><span id="st-railcontrol-app" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          </ul>
-        </article>
-
-        <article class="status-card">
           <h3 data-i18n="servicesTitle">Dienste</h3>
           <ul>
+            <li><span class="label">MSWebApp</span><span id="st-mswebapp-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
             <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
             <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">wird geladen</span></li>
             <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
@@ -102,8 +100,29 @@
       </div>
 
       <p class="status-note" id="network-note" data-i18n="statusLoading">Status wird geladen...</p>
+    </section>
 
-      <div class="wifi wifi-inline is-hidden" id="wifi-assistant" aria-label="WLAN-Assistent">
+    <section class="tooling-block" aria-label="Expertenwerkzeuge">
+      <div class="tooling-header">
+        <h2>Expertenwerkzeuge</h2>
+      </div>
+
+      <div class="tooling-grid">
+        <article class="tooling-card">
+          <h3>LuCI (expert mode)</h3>
+          <p>Erweiterte OpenWrt-Einstellungen.</p>
+          <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/">Öffnen</a>
+        </article>
+
+        <article class="tooling-card">
+          <h3>Terminal</h3>
+          <p>Direkter SSH-Zugriff über Port 22.</p>
+          <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/">Öffnen</a>
+        </article>
+      </div>
+    </section>
+
+    <div class="wifi wifi-inline is-hidden" id="wifi-assistant" aria-label="WLAN-Assistent">
         <div class="wifi-header">
           <h3 data-i18n="wifiAssistantTitle">WLAN-Assistent</h3>
           <button class="btn btn-secondary" id="wifi-scan" type="button" data-i18n="wifiScan">WLAN-Scan</button>
@@ -142,7 +161,6 @@
 
         <p class="status-note" id="wifi-note" data-i18n="wifiIdle">Bereit.</p>
       </div>
-    </section>
 
     <section class="note" aria-live="polite">
       <strong data-i18n="noteLabel">Hinweis:</strong>
@@ -151,6 +169,6 @@
     </section>
   </main>
 
-  <script src="./app.js?v=0.5.2"></script>
+  <script src="./app.js?v=0.5.1"></script>
 </body>
 </html>

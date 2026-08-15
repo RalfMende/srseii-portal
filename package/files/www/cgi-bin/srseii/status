@@ -245,9 +245,14 @@ if [ "$lan_up" = true ] || [ "$wifi_up" = true ]; then
 	fi
 fi
 
-mswebapp_rc=1
+mswebapp_pkg_rc=1
 if is_pkg_installed mswebapp; then
-	mswebapp_rc=0
+	mswebapp_pkg_rc=0
+fi
+
+mswebapp_service_rc=1
+if is_service_running mswebapp; then
+	mswebapp_service_rc=0
 fi
 
 railcontrol_pkg_rc=1
@@ -290,9 +295,22 @@ if is_service_running wake-up-links88; then
 	wake_up_links88_service_rc=0
 fi
 
-mswebapp_value="$(bool_from_rc "$mswebapp_rc")"
+mswebapp_ready_rc=1
+if [ "$mswebapp_pkg_rc" -eq 0 ] && [ "$mswebapp_service_rc" -eq 0 ] && [ "$can2lan_service_rc" -eq 0 ] && [ "$clone_ms2_loco_service_rc" -eq 0 ]; then
+	mswebapp_ready_rc=0
+fi
+
+railcontrol_ready_rc=1
+if [ "$railcontrol_pkg_rc" -eq 0 ] && [ "$railcontrol_service_rc" -eq 0 ] && [ "$can2lan_service_rc" -eq 0 ] && [ "$clone_ms2_loco_service_rc" -eq 0 ]; then
+	railcontrol_ready_rc=0
+fi
+
+mswebapp_pkg_value="$(bool_from_rc "$mswebapp_pkg_rc")"
+mswebapp_service_value="$(bool_from_rc "$mswebapp_service_rc")"
+mswebapp_ready_value="$(bool_from_rc "$mswebapp_ready_rc")"
 railcontrol_pkg_value="$(bool_from_rc "$railcontrol_pkg_rc")"
 railcontrol_service_value="$(bool_from_rc "$railcontrol_service_rc")"
+railcontrol_ready_value="$(bool_from_rc "$railcontrol_ready_rc")"
 z21emu_service_value="$(bool_from_rc "$z21emu_service_rc")"
 can2lan_service_value="$(bool_from_rc "$can2lan_service_rc")"
 clone_ms2_loco_service_value="$(bool_from_rc "$clone_ms2_loco_service_rc")"
@@ -301,5 +319,5 @@ ms2_loco_list_service_value="$(bool_from_rc "$ms2_loco_list_service_rc")"
 wake_up_links88_service_value="$(bool_from_rc "$wake_up_links88_service_rc")"
 
 cat <<EOF
-{"hostname":"$(json_escape "$hostname_value")","model":"$(json_escape "$model_value")","network":{"lan":$lan_up,"wifi":$wifi_up,"ssid":"$(json_escape "$ssid_value")","ip":"$(json_escape "$primary_ip")","lanIp":"$(json_escape "$lan_ip")","wifiIp":"$(json_escape "$wifi_ip")","wifiInterface":"$(json_escape "$wifi_iface")","message":"$(json_escape "$status_message")"},"apps":{"mswebapp":$mswebapp_value,"railcontrol":$railcontrol_pkg_value},"services":{"railcontrol":$railcontrol_service_value,"z21emu":$z21emu_service_value,"can2lan":$can2lan_service_value,"clone-ms2-loco":$clone_ms2_loco_service_value,"maecanserver":$maecanserver_service_value,"ms2-loco-list":$ms2_loco_list_service_value,"wake-up-links88":$wake_up_links88_service_value}}
+{"hostname":"$(json_escape "$hostname_value")","model":"$(json_escape "$model_value")","network":{"lan":$lan_up,"wifi":$wifi_up,"ssid":"$(json_escape "$ssid_value")","ip":"$(json_escape "$primary_ip")","lanIp":"$(json_escape "$lan_ip")","wifiIp":"$(json_escape "$wifi_ip")","wifiInterface":"$(json_escape "$wifi_iface")","message":"$(json_escape "$status_message")"},"apps":{"mswebapp":$mswebapp_ready_value,"railcontrol":$railcontrol_ready_value},"services":{"mswebapp":$mswebapp_service_value,"railcontrol":$railcontrol_service_value,"z21emu":$z21emu_service_value,"can2lan":$can2lan_service_value,"clone-ms2-loco":$clone_ms2_loco_service_value,"maecanserver":$maecanserver_service_value,"ms2-loco-list":$ms2_loco_list_service_value,"wake-up-links88":$wake_up_links88_service_value}}
 EOF

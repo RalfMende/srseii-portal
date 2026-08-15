@@ -85,16 +85,40 @@ body {
   font-weight: 600;
 }
 
-.grid {
+.feature-block {
+  margin-top: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.feature-header {
+  margin-bottom: 0.85rem;
+}
+
+.feature-header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+  letter-spacing: 0.04em;
+}
+
+.feature-panel h3 {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+  color: var(--muted);
+}
+
+.feature-grid {
   display: grid;
   gap: 0.95rem;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.card {
+.feature-card {
   border: 1px solid var(--line);
   background: var(--card);
-  backdrop-filter: blur(2px);
   border-radius: 16px;
   padding: 1rem;
   box-shadow: var(--shadow);
@@ -102,15 +126,70 @@ body {
   animation-delay: var(--delay);
 }
 
-.card h2 {
+.feature-card h4 {
   margin: 0 0 0.4rem;
   font-size: 1.12rem;
 }
 
-.card p {
+.feature-card p {
   margin: 0 0 0.9rem;
   color: var(--muted);
   min-height: 2.6em;
+}
+
+.feature-status {
+  margin: 0 0 0.85rem;
+}
+
+.tooling-block {
+  margin-top: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+.tooling-header {
+  margin-bottom: 0.85rem;
+}
+
+.tooling-header h2 {
+  margin: 0;
+  font-size: 1.18rem;
+}
+
+.tooling-grid {
+  display: grid;
+  gap: 0.95rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.tooling-card {
+  border: 1px solid var(--line);
+  background: var(--card);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.tooling-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.12rem;
+}
+
+.tooling-card p {
+  margin: 0 0 0.9rem;
+  color: var(--muted);
+  min-height: 2.6em;
+}
+
+.grid {
+  display: none;
+}
+
+.card {
+  display: none;
 }
 
 .btn {
@@ -128,6 +207,14 @@ body {
 .btn:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 14px rgba(20, 36, 54, 0.2);
+}
+
+.btn.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+  box-shadow: none;
+  filter: grayscale(0.2);
 }
 
 .btn:focus-visible {
@@ -289,9 +376,15 @@ body {
 }
 
 .pill.err {
-  color: #47505a;
-  background: #eceff3;
-  border-color: #cfd6de;
+  color: #6b1f2d;
+  background: #f7dfe4;
+  border-color: #e2aebd;
+}
+
+.pill.warn {
+  color: #6b4a1a;
+  background: #fdf1d6;
+  border-color: #f0d48a;
 }
 
 .pill.pending {

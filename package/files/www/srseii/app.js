@@ -3,6 +3,8 @@
 
   var railcontrolLink = document.getElementById("railcontrol-link");
   var mswebappLink = document.getElementById("mswebapp-link");
+  var luciLink = document.getElementById("luci-link");
+  var terminalLink = document.getElementById("terminal-link");
   var hostHint = document.getElementById("host-hint");
   var refreshButton = document.getElementById("refresh-status");
   var wifiScanButton = document.getElementById("wifi-scan");
@@ -30,7 +32,7 @@
       mswebappDesc: "Loks und Weichen steuern.",
       railcontrolTitle: "RailControl",
       railcontrolDesc: "Modellbahnsteuerung im Browser.",
-      luciTitle: "LuCI (Expertenmodus)",
+      luciTitle: "LuCI (expert mode)",
       luciDesc: "Erweiterte OpenWrt-Einstellungen.",
       open: "Öffnen",
       statusTitle: "Status",
@@ -183,11 +185,12 @@
   }
 
   function updateAppLinks(targetHost) {
-    if (!targetHost) {
+    var resolvedHost = targetHost || host || window.location.hostname || "";
+    if (!resolvedHost) {
       return;
     }
 
-    host = targetHost;
+    host = resolvedHost;
 
     if (mswebappLink) {
       mswebappLink.href = "http://" + host + ":6020/";
@@ -195,6 +198,14 @@
 
     if (railcontrolLink) {
       railcontrolLink.href = "http://" + host + ":8082/";
+    }
+
+    if (luciLink) {
+      luciLink.href = "http://" + host + "/cgi-bin/luci/";
+    }
+
+    if (terminalLink) {
+      terminalLink.href = "http://" + host + ":22/";
     }
 
     if (hostHint) {
@@ -240,7 +251,7 @@
       return;
     }
 
-    el.classList.remove("pending", "ok", "err");
+    el.classList.remove("pending", "ok", "err", "warn");
     if (isOk) {
       el.classList.add("pill", "ok");
       el.textContent = t("active");
@@ -248,6 +259,56 @@
       el.classList.add("pill", "err");
       el.textContent = t("inactive");
     }
+  }
+
+  function setAppStatus(id, state) {
+    var el = document.getElementById(id);
+    if (!el) {
+      return;
+    }
+
+    el.classList.remove("pending", "ok", "err", "warn");
+
+    if (state === "ready") {
+      el.classList.add("pill", "ok");
+      el.textContent = "Bereit";
+      return;
+    }
+
+    if (state === "problem") {
+      el.classList.add("pill", "err");
+      el.textContent = "Nicht bereit";
+      return;
+    }
+
+    el.classList.add("pill", "warn");
+    el.textContent = "Nicht bereit";
+  }
+
+  function setFeatureLinkState(linkEl, ready, url) {
+    if (!linkEl) {
+      return;
+    }
+
+    if (ready) {
+      linkEl.classList.remove("is-disabled");
+      linkEl.setAttribute("aria-disabled", "false");
+      linkEl.removeAttribute("tabindex");
+      linkEl.style.pointerEvents = "auto";
+      linkEl.href = url;
+      return;
+    }
+
+    linkEl.classList.add("is-disabled");
+    linkEl.setAttribute("aria-disabled", "true");
+    linkEl.setAttribute("tabindex", "-1");
+    linkEl.style.pointerEvents = "none";
+    linkEl.href = "#";
+    linkEl.onclick = function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
+    };
   }
 
   function setStatusNote(text) {
@@ -346,9 +407,15 @@
       wifiAssistant.classList.toggle("is-hidden", !!network.wifi);
     }
 
-    setPill("st-mswebapp", !!(data.apps && data.apps.mswebapp));
-    setPill("st-railcontrol-app", !!(data.apps && data.apps.railcontrol));
+    var mswebappReady = !!(data.apps && data.apps.mswebapp);
+    var railcontrolReady = !!(data.apps && data.apps.railcontrol);
 
+    setAppStatus("st-mswebapp-feature", mswebappReady ? "ready" : "problem");
+    setAppStatus("st-railcontrol-feature", railcontrolReady ? "ready" : "problem");
+    setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + ":6020/");
+    setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + ":8082/");
+
+    setPill("st-mswebapp-svc", !!(data.services && data.services.mswebapp));
     setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));
     setPill("st-z21emu", !!(data.services && data.services.z21emu));
     setPill("st-can2lan", !!(data.services && data.services.can2lan));
