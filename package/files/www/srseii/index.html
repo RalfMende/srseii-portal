@@ -48,15 +48,7 @@
             <h4 data-i18n="z21UseCaseTitle">Z21 Emulator</h4>
             <p data-i18n="z21UseCaseShort">Verbindung mit der Z21-App oder WLAN-Maus.</p>
             <div class="feature-status"><span id="st-z21emu-feature" class="pill pending">wird geladen</span></div>
-            <div class="feature-help" id="z21emu-details">
-              <p><span data-i18n="z21UseCaseIpLabel">SRSEII-IP-Adresse:</span> <strong id="st-z21emu-ip">-</strong></p>
-              <ol>
-                <li data-i18n="z21Step1">Smartphone oder Tablet mit demselben Netzwerk verbinden.</li>
-                <li data-i18n="z21Step2">Die Z21-App öffnen.</li>
-                <li data-i18n="z21Step3">Im Menü Einstellungen &gt; Z21 Einstellungen öffnen.</li>
-                <li data-i18n="z21Step4">Die angezeigte IP-Adresse (alt. Hostname) eintragen.</li>
-              </ol>
-            </div>
+            <button class="btn" id="z21emu-guide-button" type="button" data-i18n="z21GuideButton">Anleitung</button>
           </article>
         </div>
       </div>
@@ -188,6 +180,47 @@
       <span id="host-hint"></span>
     </section>
   </main>
+
+  <dialog class="modal" id="z21emu-guide-dialog" aria-labelledby="z21emu-guide-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="z21emu-guide-title" data-i18n="z21GuideTitle">Z21 verbinden</h2>
+        <button class="modal-close" id="z21emu-guide-close" type="button" aria-label="Schließen" data-i18n-aria-label="close">×</button>
+      </div>
+
+      <section class="guide-section">
+        <h3 data-i18n="z21AppTitle">1. Z21-App verbinden</h3>
+        <ol>
+          <li data-i18n="z21AppStep1">Smartphone/Tablet mit dem WLAN der Z21 verbinden.</li>
+          <li data-i18n="z21AppStep2">Z21-App öffnen.</li>
+          <li data-i18n="z21AppStep3">In den Einstellungen die Verbindung zur Z21 auswählen.</li>
+          <li><span data-i18n="z21AppStep4">Als IP-Adresse die folgende Adresse eintragen:</span> <strong id="z21emu-guide-ip">-</strong></li>
+          <li data-i18n="z21AppStep5">Verbindung speichern bzw. herstellen.</li>
+        </ol>
+      </section>
+
+      <section class="guide-section">
+        <h3 data-i18n="z21MouseTitle">2. WLAN-Maus verbinden</h3>
+        <ol>
+          <li data-i18n="z21MouseStep1">WLAN-Maus einschalten.</li>
+          <li data-i18n="z21MouseStep2">In den WLAN-Einstellungen das WLAN der Z21 auswählen.</li>
+          <li data-i18n="z21MouseStep3">Mit dem WLAN verbinden.</li>
+          <li><span data-i18n="z21MouseStep4">In den Verbindungseinstellungen der WLAN-Maus die Z21-IP-Adresse eintragen:</span> <strong id="z21emu-guide-ip-mouse">-</strong></li>
+          <li data-i18n="z21MouseStep5">Verbindung bestätigen.</li>
+        </ol>
+      </section>
+
+      <section class="guide-section guide-note">
+        <h3 data-i18n="z21ImportantTitle">Wichtig</h3>
+        <p data-i18n="z21ImportantText">Smartphone/Tablet bzw. WLAN-Maus müssen sich im gleichen Netzwerk wie die Z21 befinden.</p>
+      </section>
+
+      <section class="guide-section guide-note">
+        <h3 data-i18n="z21AppNoteTitle">Hinweis zur Z21 App</h3>
+        <p data-i18n="z21AppNoteText">Die Z21-App kann kostenlos installiert und getestet werden. In der kostenlosen Version ist die Steuerung jedoch auf eine Lokomotive beschränkt. Für die Steuerung mehrerer Lokomotiven muss die Z21-Vollversion als In-App-Kauf freigeschaltet werden.</p>
+      </section>
+    </div>
+  </dialog>
 
   <script src="./app.js?v=0.5.2"></script>
 </body>

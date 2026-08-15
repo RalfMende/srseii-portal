@@ -3,6 +3,9 @@
 
   var railcontrolLink = document.getElementById("railcontrol-link");
   var mswebappLink = document.getElementById("mswebapp-link");
+  var z21emuGuideButton = document.getElementById("z21emu-guide-button");
+  var z21emuGuideDialog = document.getElementById("z21emu-guide-dialog");
+  var z21emuGuideCloseButton = document.getElementById("z21emu-guide-close");
   var luciLink = document.getElementById("luci-link");
   var terminalLink = document.getElementById("terminal-link");
   var hostHint = document.getElementById("host-hint");
@@ -36,11 +39,25 @@
       mobileUseCaseSectionTitle: "Über App auf Smartphone / Tablet",
       z21UseCaseTitle: "Z21 Emulator",
       z21UseCaseShort: "Verbindung mit der Z21-App oder WLAN-Maus.",
-      z21UseCaseIpLabel: "SRSEII-IP-Adresse:",
-      z21Step1: "Smartphone oder Tablet mit demselben Netzwerk verbinden.",
-      z21Step2: "Die Z21-App öffnen.",
-      z21Step3: "Im Menü Einstellungen > Z21 Einstellungen öffnen.",
-      z21Step4: "Die angezeigte IP-Adresse (oder Hostname) eintragen.",
+      z21GuideButton: "Anleitung",
+      z21GuideTitle: "Z21 verbinden",
+      z21AppTitle: "1. Z21-App verbinden",
+      z21AppStep1: "Smartphone/Tablet mit dem WLAN der Z21 verbinden.",
+      z21AppStep2: "Z21-App öffnen.",
+      z21AppStep3: "In den Einstellungen die Verbindung zur Z21 auswählen.",
+      z21AppStep4: "Als IP-Adresse die folgende Adresse eintragen:",
+      z21AppStep5: "Verbindung speichern bzw. herstellen.",
+      z21MouseTitle: "2. WLAN-Maus verbinden",
+      z21MouseStep1: "WLAN-Maus einschalten.",
+      z21MouseStep2: "In den WLAN-Einstellungen das WLAN der Z21 auswählen.",
+      z21MouseStep3: "Mit dem WLAN verbinden.",
+      z21MouseStep4: "In den Verbindungseinstellungen der WLAN-Maus die Z21-IP-Adresse eintragen:",
+      z21MouseStep5: "Verbindung bestätigen.",
+      z21ImportantTitle: "Wichtig",
+      z21ImportantText: "Smartphone/Tablet bzw. WLAN-Maus müssen sich im gleichen Netzwerk wie die Z21 befinden.",
+      z21AppNoteTitle: "Hinweis zur Z21 App",
+      z21AppNoteText: "Die Z21-App kann kostenlos installiert und getestet werden. In der kostenlosen Version ist die Steuerung jedoch auf eine Lokomotive beschränkt. Für die Steuerung mehrerer Lokomotiven muss die Z21-Vollversion als In-App-Kauf freigeschaltet werden.",
+      close: "Schließen",
       luciTitle: "LuCI (expert mode)",
       luciDesc: "Erweiterte OpenWrt-Einstellungen.",
       open: "Öffnen",
@@ -116,11 +133,25 @@
       mobileUseCaseSectionTitle: "Via App on Smartphone / Tablet",
       z21UseCaseTitle: "Z21 emulator",
       z21UseCaseShort: "Connect using the Z21 app or a WLAN mouse.",
-      z21UseCaseIpLabel: "SRSEII IP address:",
-      z21Step1: "Connect your smartphone or tablet to the same network.",
-      z21Step2: "Open the Z21 app.",
-      z21Step3: "Open Settings > Z21 settings in the menu.",
-      z21Step4: "Enter the displayed IP address (or hostname).",
+      z21GuideButton: "Instructions",
+      z21GuideTitle: "Connect Z21",
+      z21AppTitle: "1. Connect the Z21 app",
+      z21AppStep1: "Connect your smartphone or tablet to the Z21 WLAN.",
+      z21AppStep2: "Open the Z21 app.",
+      z21AppStep3: "Select the connection to the Z21 in Settings.",
+      z21AppStep4: "Enter the following IP address:",
+      z21AppStep5: "Save or establish the connection.",
+      z21MouseTitle: "2. Connect the WLAN mouse",
+      z21MouseStep1: "Switch on the WLAN mouse.",
+      z21MouseStep2: "Select the Z21 WLAN in the WLAN settings.",
+      z21MouseStep3: "Connect to the WLAN.",
+      z21MouseStep4: "Enter the Z21 IP address in the WLAN mouse connection settings:",
+      z21MouseStep5: "Confirm the connection.",
+      z21ImportantTitle: "Important",
+      z21ImportantText: "The smartphone, tablet, or WLAN mouse must be connected to the same network as the Z21.",
+      z21AppNoteTitle: "Note on the Z21 app",
+      z21AppNoteText: "The Z21 app can be installed and tested free of charge. In the free version, control is limited to one locomotive. To control multiple locomotives, the full Z21 version must be unlocked through an in-app purchase.",
+      close: "Close",
       luciTitle: "LuCI (expert mode)",
       luciDesc: "Advanced OpenWrt settings.",
       open: "Open",
@@ -248,6 +279,14 @@
       }
     });
 
+    var ariaLabelElements = document.querySelectorAll("[data-i18n-aria-label]");
+    Array.prototype.forEach.call(ariaLabelElements, function (el) {
+      var ariaLabelKey = el.getAttribute("data-i18n-aria-label");
+      if (ariaLabelKey && translations[lang][ariaLabelKey]) {
+        el.setAttribute("aria-label", translations[lang][ariaLabelKey]);
+      }
+    });
+
     if (refreshButton) {
       refreshButton.textContent = t("refresh");
     }
@@ -345,6 +384,12 @@
     note.textContent = text;
   }
 
+  function setZ21GuideIp(ipAddress) {
+    var value = ipAddress || t("notAvailable");
+    setText("z21emu-guide-ip", value);
+    setText("z21emu-guide-ip-mouse", value);
+  }
+
   function setWifiNote(text, isError) {
     if (!wifiNote) {
       return;
@@ -435,7 +480,7 @@
     setFeatureLinkState(mswebappLink, mswebappUcReady, "http://" + host + ":6020/");
     setFeatureLinkState(railcontrolLink, railcontrolUcReady, "http://" + host + ":8082/");
 
-    setText("st-z21emu-ip", network.ip || t("notAvailable"));
+    setZ21GuideIp(network.ip);
 
     setPill("st-mswebapp-svc", !!(data.services && data.services.mswebapp));
     setPill("st-railcontrol-svc", !!(data.services && data.services.railcontrol));
@@ -698,6 +743,26 @@
 
   if (refreshButton) {
     refreshButton.addEventListener("click", loadStatus);
+  }
+
+  if (z21emuGuideButton && z21emuGuideDialog) {
+    z21emuGuideButton.addEventListener("click", function () {
+      z21emuGuideDialog.showModal();
+    });
+  }
+
+  if (z21emuGuideCloseButton && z21emuGuideDialog) {
+    z21emuGuideCloseButton.addEventListener("click", function () {
+      z21emuGuideDialog.close();
+    });
+  }
+
+  if (z21emuGuideDialog) {
+    z21emuGuideDialog.addEventListener("click", function (event) {
+      if (event.target === z21emuGuideDialog) {
+        z21emuGuideDialog.close();
+      }
+    });
   }
 
   if (wifiNetworkSelect) {

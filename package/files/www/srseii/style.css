@@ -137,27 +137,79 @@ body {
   min-height: 2.6em;
 }
 
-.feature-help {
-  margin-top: 0.9rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 0.92rem;
-}
-
-.feature-help p {
-  margin: 0 0 0.4rem;
-  min-height: auto;
-}
-
-.feature-help ol {
-  margin: 0;
-  padding-left: 1.2rem;
-  line-height: 1.6;
-}
-
 .feature-status {
   margin: 0 0 0.85rem;
+}
+
+.modal {
+  width: min(680px, calc(100vw - 2rem));
+  max-height: min(760px, calc(100vh - 2rem));
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--card);
+  box-shadow: 0 24px 60px rgba(19, 27, 38, 0.28);
+}
+
+.modal::backdrop {
+  background: rgba(18, 38, 63, 0.56);
+}
+
+.modal-content {
+  max-height: inherit;
+  overflow-y: auto;
+  padding: 1.25rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.modal-close {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  background: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.guide-section {
+  padding-top: 1rem;
+}
+
+.guide-section h3 {
+  margin: 0 0 0.55rem;
+  font-size: 1.05rem;
+}
+
+.guide-section p,
+.guide-section ol {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.guide-section ol {
+  padding-left: 1.35rem;
+}
+
+.guide-note {
+  border-top: 1px solid var(--line);
 }
 
 .tooling-block {
