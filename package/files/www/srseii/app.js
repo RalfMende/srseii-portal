@@ -47,7 +47,7 @@
       z21GuideButton: "Anleitung",
       z21GuideTitle: "Z21 verbinden",
       z21AppTitle: "1. Z21-App verbinden",
-      z21AppStep1: "Smartphone/Tablet mit dem WLAN der Z21 verbinden.",
+      z21AppStep1: "Smartphone/Tablet mit demselben WLAN wie die Z21 verbinden.",
       z21AppStep2: "Z21-App öffnen.",
       z21AppStep3: "Im Menü unter Einstellungen > Z21 Einstellungen > IP-Adresse auswählen.",
       z21AppStep4: "Als IP-Adresse die folgende Adresse eintragen:",
@@ -100,11 +100,32 @@
       ipLabel: "IP",
       appsTitle: "Apps",
       servicesTitle: "Dienste",
+      modelRailwayBaseFunctionsTitle: "Modellbahn Basisfunktionen",
+      overallStatus: "Gesamtstatus",
+      technicalDetailsTitle: "Technische Details",
+      modelRailwayFunctionsTitle: "Modellbahn-Funktionen",
+      modelRailwayFunctionsIntro: "Wie möchtest du deine Modellbahn steuern?",
+      browserDirectTitle: "DIREKT IM BROWSER",
+      smartphoneTabletTitle: "MIT SMARTPHONE / TABLET",
+      pcControlTitle: "MIT PC-STEUERUNG",
+      eventsTitle: "Ereignisse",
+      noEvents: "Keine Ereignisse.",
+      expertToolsTitle: "Expertenwerkzeuge",
+      sshTerminalTitle: "SSH / Terminal",
+      sshTerminalDesc: "Direkter Zugriff auf die Shell über Port 22.",
       noteLabel: "Hinweis:",
       noteText: "Diese Version startet unter /srseii/. Die Root-Seite bleibt vorerst unverändert.",
       loading: "wird geladen",
       active: "aktiv",
       inactive: "inaktiv",
+      ready: "Bereit",
+      setupRequired: "Einrichtung erforderlich",
+      notReady: "Nicht bereit",
+      problem: "Problem",
+      ok: "OK",
+      check: "Prüfen",
+      overallReady: "SRSEII ist bereit",
+      overallAttention: "SRSEII benötigt Aufmerksamkeit",
       statusLoading: "Status wird geladen...",
       statusLoaded: "Status erfolgreich aktualisiert.",
       statusLoadError: "Status konnte nicht geladen werden:",
@@ -123,8 +144,8 @@
       wifiSecurityMixed: "WPA/WPA2 gemischt",
       wifiSecurityWpa3: "WPA3-SAE",
       wifiSecurityOpen: "Offen (kein Passwort)",
-      wifiManualToggleShow: "Show Advanced Config",
-      wifiManualToggleHide: "Hide Advanced Config",
+      wifiManualToggleShow: "Erweiterte Konfiguration anzeigen",
+      wifiManualToggleHide: "Erweiterte Konfiguration ausblenden",
       wifiManualHint: "Nur bei versteckten SSIDs oder wenn der Scan das Netzwerk nicht findet.",
       wifiPasswordLabel: "Passwort",
       wifiConnect: "Verbinden",
@@ -160,7 +181,7 @@
       z21GuideButton: "Instructions",
       z21GuideTitle: "Connect Z21",
       z21AppTitle: "1. Connect the Z21 app",
-      z21AppStep1: "Connect your smartphone or tablet to the Z21 WLAN.",
+      z21AppStep1: "Connect your smartphone or tablet to the same Wifi as the Z21.",
       z21AppStep2: "Open the Z21 app.",
       z21AppStep3: "In the menu, go to Settings > Z21 Settings > IP Address.",
       z21AppStep4: "Enter the following IP address:",
@@ -168,11 +189,11 @@
       z21MouseTitle: "2. Connect the WLAN mouse",
       z21MouseStep1: "Display shows SSID -> Continue with *OK button.",
       z21MouseStep2: "Display shows SEARCH -> Continue with *OK button.",
-      z21MouseStep3: "Use the arrow keys to select the desired WLAN network.",
+      z21MouseStep3: "Use the arrow keys to select the desired Wifi network.",
       z21MouseStep4: "Display shows PWD -> Continue with *OK button.",
-      z21MouseStep5: "Enter the WLAN password -> Continue with *OK button.",
+      z21MouseStep5: "Enter the Wifi password -> Continue with *OK button.",
       z21ImportantTitle: "Important",
-      z21ImportantText: "The smartphone, tablet, or WLAN mouse must be connected to the same network as the Z21.",
+      z21ImportantText: "The smartphone, tablet, or Z21 WLAN Mouse must be connected to the same network as the Z21.",
       z21AppNoteTitle: "Note on the Z21 app",
       z21AppNoteText: "The Z21 app can be installed and tested free of charge. In the free version, control is limited to one locomotive. To control multiple locomotives, the full Z21 version must be unlocked through an in-app purchase.",
       centralStationTitle: "Central Station 2 compatible interface",
@@ -201,23 +222,81 @@
       refresh: "Refresh",
       networkSectionTitle: "Network",
       lanStatusTitle: "LAN connection",
-      wifiStatusTitle: "WLAN connection",
+      wifiStatusTitle: "Wifi connection",
       statusLabel: "Status",
       systemTitle: "System",
       hostnameLabel: "Hostname",
       modelLabel: "Model",
       networkTitle: "Network",
       lanLabel: "LAN",
-      wifiLabel: "WLAN",
+      wifiLabel: "Wifi",
       ssidLabel: "SSID",
       ipLabel: "IP",
       appsTitle: "Apps",
       servicesTitle: "Services",
+      modelRailwayBaseFunctionsTitle: "Model railway base functions",
+      overallStatus: "Overall status",
+      technicalDetailsTitle: "Technical details",
+      modelRailwayFunctionsTitle: "Model railway functions",
+      modelRailwayFunctionsIntro: "How would you like to control your model railway?",
+      browserDirectTitle: "DIRECTLY IN THE BROWSER",
+      smartphoneTabletTitle: "WITH SMARTPHONE / TABLET",
+      pcControlTitle: "WITH PC CONTROL",
+      eventsTitle: "Events",
+      noEvents: "No events.",
+      expertToolsTitle: "Expert tools",
+      sshTerminalTitle: "SSH / Terminal",
+      sshTerminalDesc: "Direct access to the shell via port 22.",
       noteLabel: "Note:",
       noteText: "This version starts under /srseii/. The root page remains unchanged for now.",
       loading: "loading",
       active: "active",
       inactive: "inactive",
+      ready: "Ready",
+      setupRequired: "Setup required",
+      notReady: "Not ready",
+      problem: "Problem",
+      ok: "OK",
+      check: "Check",
+      overallReady: "SRSEII is ready",
+      overallAttention: "SRSEII needs attention",
+      statusLoading: "Loading status...",
+      statusLoaded: "Status updated successfully.",
+      statusLoadError: "Status could not be loaded:",
+      unknown: "unknown",
+      notAvailable: "not available",
+      hostHintPrefix: "RailControl target",
+      wifiAssistantTitle: "Wifi configuration",
+      wifiScan: "Scan Wifi",
+      wifiNetworkLabel: "Detected network",
+      wifiNetworkPlaceholder: "Run a scan first",
+      wifiSsidLabel: "SSID",
+      wifiSsidManualLabel: "SSID (manual)",
+      wifiSecurityLabel: "Security",
+      wifiSecurityAuto: "Automatic",
+      wifiSecurityWpa2: "WPA2-PSK",
+      wifiSecurityMixed: "WPA/WPA2 mixed",
+      wifiSecurityWpa3: "WPA3-SAE",
+      wifiSecurityOpen: "Open (no password)",
+      wifiManualToggleShow: "Show advanced configuration",
+      wifiManualToggleHide: "Hide advanced configuration",
+      wifiManualHint: "Use this only for hidden SSIDs or if the scan does not list the network.",
+      wifiPasswordLabel: "Password",
+      wifiConnect: "Connect",
+      wifiIdle: "Ready.",
+      wifiScanning: "Scanning...",
+      wifiScanDone: "Scan finished.",
+      wifiNoNetworks: "No Wifi networks found.",
+      wifiPickOrEnterSsid: "Select a network.",
+      wifiPickManualSsid: "Enter the SSID for manual configuration.",
+      wifiSelectNetworkFirst: "Select a Wifi from the list first.",
+      wifiPasswordRequired: "Enter a password or set security to open.",
+      wifiApplying: "Applying configuration...",
+      wifiApplyOk: "Configuration applied.",
+      wifiTesting: "Checking connection automatically...",
+      wifiConnectedNow: "Wifi connected. Status has been updated.",
+      wifiConnectTimeout: "Connection not confirmed yet. Please wait or review settings.",
+      wifiRequestFailed: "Wifi action failed:",
       statusLoading: "Loading status...",
       statusLoaded: "Status updated successfully.",
       statusLoadError: "Status could not be loaded:",
@@ -373,24 +452,24 @@
 
     if (state === "ready") {
       el.classList.add("pill", "ok");
-      el.textContent = "Bereit";
+      el.textContent = t("ready");
       return;
     }
 
     if (state === "setup") {
       el.classList.add("pill", "warn");
-      el.textContent = "Einrichtung erforderlich";
+      el.textContent = t("setupRequired");
       return;
     }
 
     if (state === "unavailable") {
       el.classList.add("pill", "warn");
-      el.textContent = "Nicht verfügbar";
+      el.textContent = t("notAvailable");
       return;
     }
 
     el.classList.add("pill", "err");
-    el.textContent = "Problem";
+    el.textContent = t("problem");
   }
 
   function setFeatureLinkState(linkEl, ready, url) {
@@ -435,12 +514,12 @@
 
     list.innerHTML = "";
 
-    var items = Array.isArray(events) && events.length ? events.slice(0, 5) : [{ level: "info", message: "Keine Ereignisse.", time: "-" }];
+    var items = Array.isArray(events) && events.length ? events.slice(0, 5) : [{ level: "info", message: t("noEvents"), time: "-" }];
 
     items.forEach(function (eventItem) {
       var item = document.createElement("li");
       var level = eventItem && eventItem.level ? String(eventItem.level).toLowerCase() : "info";
-      var message = eventItem && eventItem.message ? String(eventItem.message) : "Keine Ereignisse.";
+      var message = eventItem && eventItem.message ? String(eventItem.message) : t("noEvents");
       var time = eventItem && eventItem.time ? String(eventItem.time) : "-";
       item.className = "event-item " + level;
       item.innerHTML = '<span class="event-level">' + level + '</span><span class="event-message">' + message + '</span><span class="event-time">' + time + '</span>';
@@ -545,13 +624,13 @@
     setText("net-lan-ip", network.lanIp || t("notAvailable"));
     setText("net-wifi-ssid", network.ssid || t("unknown"));
     setText("net-wifi-ip", network.wifiIp || t("notAvailable"));
-    setPill("st-openwrt-state", !!openwrt.ok, "OK", "Prüfen");
-    setPill("st-can2lan-status", !!can2lan.active, "Bereit", "Nicht bereit");
+    setPill("st-openwrt-state", !!openwrt.ok, t("ok"), t("check"));
+    setPill("st-can2lan-status", !!can2lan.active, t("ready"), t("notReady"));
 
     renderEventLog(Array.isArray(data.events) ? data.events : []);
 
     var overallReady = !!overall.ready;
-    var overallLabel = overall.label || (overallReady ? "SRSEII ist bereit" : "SRSEII benötigt Aufmerksamkeit");
+    var overallLabel = overall.label || (overallReady ? t("overallReady") : t("overallAttention"));
     var overallBadge = document.getElementById("st-overall-label");
     if (overallBadge) {
       overallBadge.textContent = overallLabel;

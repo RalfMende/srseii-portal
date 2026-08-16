@@ -97,20 +97,20 @@
         </article>
 
         <article class="status-card">
-          <h3>Modellbahn Basisfunktionen</h3>
+          <h3 data-i18n="modelRailwayBaseFunctionsTitle">Modellbahn Basisfunktionen</h3>
           <ul>
             <li><span class="label">Gleisbox CAN-Verbindung</span><span id="st-can2lan-status" class="pill pending" data-i18n="loading">wird geladen</span></li>
           </ul>
         </article>
 
         <article class="status-card status-card-wide">
-          <h3>Gesamtstatus</h3>
-          <p class="overall-status" id="st-overall-label">wird geladen</p>
+          <h3 data-i18n="overallStatus">Gesamtstatus</h3>
+          <p class="overall-status" id="st-overall-label" data-i18n="loading">wird geladen</p>
         </article>
       </div>
 
       <details class="status-details">
-        <summary>Technische Details</summary>
+        <summary data-i18n="technicalDetailsTitle">Technische Details</summary>
         <ul class="status-details-list">
           <li><span class="label">Hostname</span><span id="st-hostname">-</span></li>
           <li><span class="label">Modell</span><span id="st-model">-</span></li>
@@ -130,12 +130,12 @@
 
     <section class="feature-block" aria-label="Modellbahn-Funktionen">
       <div class="feature-header">
-        <h2>Modellbahn-Funktionen</h2>
-        <p class="feature-intro">Wie möchtest du deine Modellbahn steuern?</p>
+        <h2 data-i18n="modelRailwayFunctionsTitle">Modellbahn-Funktionen</h2>
+        <p class="feature-intro" data-i18n="modelRailwayFunctionsIntro">Wie möchtest du deine Modellbahn steuern?</p>
       </div>
 
       <div class="feature-group">
-        <h3>DIREKT IM BROWSER</h3>
+        <h3 data-i18n="browserDirectTitle">DIREKT IM BROWSER</h3>
 
         <article class="feature-card" style="--delay: 0ms;">
           <div class="feature-copy">
@@ -161,7 +161,7 @@
       </div>
 
       <div class="feature-group">
-        <h3>MIT SMARTPHONE / TABLET</h3>
+        <h3 data-i18n="smartphoneTabletTitle">MIT SMARTPHONE / TABLET</h3>
 
         <article class="feature-card" style="--delay: 180ms;">
           <div class="feature-copy">
@@ -187,7 +187,7 @@
       </div>
 
       <div class="feature-group">
-        <h3>MIT PC-STEUERUNG</h3>
+        <h3 data-i18n="pcControlTitle">MIT PC-STEUERUNG</h3>
 
         <article class="feature-card" style="--delay: 360ms;">
           <div class="feature-copy">
@@ -226,36 +226,36 @@
 
     <section class="status" aria-label="Ereignisse">
       <div class="status-header">
-        <h2>Ereignisse</h2>
+        <h2 data-i18n="eventsTitle">Ereignisse</h2>
       </div>
       <ul class="event-log" id="event-log-list">
-        <li>Keine Ereignisse.</li>
+        <li data-i18n="noEvents">Keine Ereignisse.</li>
       </ul>
     </section>
 
     <section class="tooling-block" aria-label="Expertenwerkzeuge">
       <div class="feature-header">
-        <h2>Expertenwerkzeuge</h2>
+        <h2 data-i18n="expertToolsTitle">Expertenwerkzeuge</h2>
       </div>
 
       <div class="feature-group">
         <article class="feature-card" style="--delay: 0ms;">
           <div class="feature-copy">
-            <h4>LuCI (expert mode)</h4>
-            <p>Erweiterte OpenWrt-Einstellungen.</p>
+            <h4 data-i18n="luciTitle">LuCI (expert mode)</h4>
+            <p data-i18n="luciDesc">Erweiterte OpenWrt-Einstellungen.</p>
           </div>
           <div class="feature-actions">
-            <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/">Öffnen</a>
+            <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/" data-i18n="open">Öffnen</a>
           </div>
         </article>
 
         <article class="feature-card" style="--delay: 90ms;">
           <div class="feature-copy">
-            <h4>SSH / Terminal</h4>
-            <p>Direkter Zugriff auf die Shell über Port 22.</p>
+            <h4 data-i18n="sshTerminalTitle">SSH / Terminal</h4>
+            <p data-i18n="sshTerminalDesc">Direkter Zugriff auf die Shell über Port 22.</p>
           </div>
           <div class="feature-actions">
-            <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/">Öffnen</a>
+            <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/" data-i18n="open">Öffnen</a>
           </div>
         </article>
       </div>
