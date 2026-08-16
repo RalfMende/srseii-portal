@@ -18,13 +18,21 @@
     </header>
 
     <section class="network" aria-label="Network">
-      <div class="network-header">
-        <h2 data-i18n="networkSectionTitle">Network</h2>
-        <button class="btn btn-secondary" id="refresh-status" type="button" data-i18n="refresh">Refresh</button>
-      </div>
-      <p class="feature-intro" data-i18n="networkIntro">How to find and reach your SRSEII on the network.</p>
+      <details class="section-toggle" id="network-toggle">
+        <summary class="section-summary">
+          <span class="section-summary-text">
+            <h2 data-i18n="networkSectionTitle">Network</h2>
+            <p class="feature-intro" data-i18n="networkIntro">How to find and reach your SRSEII on the network.</p>
+          </span>
+          <span class="section-toggle-chevron" aria-hidden="true"></span>
+        </summary>
 
-      <div class="network-grid">
+        <div class="section-body">
+          <div class="section-body-actions">
+            <button class="btn btn-secondary" id="refresh-status" type="button" data-i18n="refresh">Refresh</button>
+          </div>
+
+          <div class="network-grid">
         <article class="network-card">
           <h3 data-i18n="lanStatusTitle">LAN connection</h3>
           <ul>
@@ -81,17 +89,24 @@
         <p class="status-note" id="wifi-note" data-i18n="wifiIdle">Ready.</p>
       </details>
 
-      <p class="status-note" id="network-note" data-i18n="statusLoading">Loading status...</p>
+          <p class="status-note" id="network-note" data-i18n="statusLoading">Loading status...</p>
+        </div>
+      </details>
     </section>
 
     <section class="feature-block" aria-label="Status">
-      <div class="feature-header">
-        <h2 data-i18n="statusTitle">Status</h2>
-        <p class="feature-intro" data-i18n="statusIntro">A quick health check for your SRSEII.</p>
-      </div>
+      <details class="section-toggle" id="status-toggle" open>
+        <summary class="section-summary">
+          <span class="section-summary-text">
+            <h2 data-i18n="statusTitle">Status</h2>
+            <p class="feature-intro" data-i18n="statusIntro">A quick health check for your SRSEII.</p>
+          </span>
+          <span class="section-toggle-chevron" aria-hidden="true"></span>
+        </summary>
 
-      <div class="feature-group">
-        <h3 data-i18n="readinessTitle">Readiness</h3>
+        <div class="section-body">
+          <div class="feature-group">
+            <h3 data-i18n="readinessTitle">Readiness</h3>
         <article class="feature-card">
           <div class="feature-copy">
             <h4 data-i18n="overallStatus">Overall status</h4>
@@ -138,17 +153,24 @@
         </ul>
       </details>
 
-      <p class="status-note" id="st-note" data-i18n="statusLoading">Loading status...</p>
+          <p class="status-note" id="st-note" data-i18n="statusLoading">Loading status...</p>
+        </div>
+      </details>
     </section>
 
     <section class="feature-block" aria-label="Model railway functions">
-      <div class="feature-header">
-        <h2 data-i18n="modelRailwayFunctionsTitle">Model railway functions</h2>
-        <p class="feature-intro" data-i18n="modelRailwayFunctionsIntro">Pick how you'd like to take the controls.</p>
-      </div>
+      <details class="section-toggle" id="model-railway-toggle">
+        <summary class="section-summary">
+          <span class="section-summary-text">
+            <h2 data-i18n="modelRailwayFunctionsTitle">Model railway functions</h2>
+            <p class="feature-intro" data-i18n="modelRailwayFunctionsIntro">Pick how you'd like to take the controls.</p>
+          </span>
+          <span class="section-toggle-chevron" aria-hidden="true"></span>
+        </summary>
 
-      <div class="feature-group">
-        <h3 data-i18n="browserDirectTitle">DIRECTLY IN THE BROWSER</h3>
+        <div class="section-body">
+          <div class="feature-group">
+            <h3 data-i18n="browserDirectTitle">DIRECTLY IN THE BROWSER</h3>
 
         <article class="feature-card" style="--delay: 0ms;">
           <div class="feature-copy">
@@ -234,26 +256,41 @@
             <button class="btn btn-ghost" id="rocrail-guide-button" type="button" data-i18n="setupButton">Set up</button>
           </div>
         </article>
-      </div>
+          </div>
+        </div>
+      </details>
     </section>
 
     <section class="status" aria-label="Events">
-      <div class="status-header">
-        <h2 data-i18n="eventsTitle">Events</h2>
-      </div>
-      <p class="feature-intro" data-i18n="eventsIntro">A quiet logbook of what your SRSEII has been up to.</p>
-      <ul class="event-log" id="event-log-list">
-        <li data-i18n="noEvents">No events.</li>
-      </ul>
+      <details class="section-toggle" id="events-toggle">
+        <summary class="section-summary">
+          <span class="section-summary-text">
+            <h2 data-i18n="eventsTitle">Events</h2>
+            <p class="feature-intro" data-i18n="eventsIntro">A quiet logbook of what your SRSEII has been up to.</p>
+          </span>
+          <span class="section-toggle-chevron" aria-hidden="true"></span>
+        </summary>
+
+        <div class="section-body">
+          <ul class="event-log" id="event-log-list">
+            <li data-i18n="noEvents">No events.</li>
+          </ul>
+        </div>
+      </details>
     </section>
 
     <section class="tooling-block" aria-label="Expert tools">
-      <div class="feature-header">
-        <h2 data-i18n="expertToolsTitle">Expert tools</h2>
-        <p class="feature-intro" data-i18n="expertToolsIntro">Advanced settings ahead — you should know what you're doing here.</p>
-      </div>
+      <details class="section-toggle" id="expert-tools-toggle">
+        <summary class="section-summary">
+          <span class="section-summary-text">
+            <h2 data-i18n="expertToolsTitle">Expert tools</h2>
+            <p class="feature-intro" data-i18n="expertToolsIntro">Advanced settings ahead — you should know what you're doing here.</p>
+          </span>
+          <span class="section-toggle-chevron" aria-hidden="true"></span>
+        </summary>
 
-      <div class="feature-group">
+        <div class="section-body">
+          <div class="feature-group">
         <article class="feature-card" style="--delay: 0ms;">
           <div class="feature-copy">
             <h4 data-i18n="luciTitle">LuCI (expert mode)</h4>
@@ -273,7 +310,9 @@
             <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/" data-i18n="open">Open</a>
           </div>
         </article>
-      </div>
+          </div>
+        </div>
+      </details>
     </section>
 
     <section class="note" aria-live="polite">
