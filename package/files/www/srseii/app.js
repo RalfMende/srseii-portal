@@ -34,6 +34,8 @@
   var manualMode = false;
   var scannedNetworksBySsid = {};
   var wifiAssistantAutoToggle = false;
+  var updateCheckPromise = null;
+  var updateOperationInFlight = false;
   var portalVersion = getPortalVersion();
 
   // Derives the portal version from this script's own cache-busting "?v=" query param.
@@ -147,6 +149,7 @@
       technicalDetailsTitle: "Technische Details",
       modelRailwayFunctionsTitle: "Modellbahn-Funktionen",
       modelRailwayFunctionsIntro: "Wähle, wie du deine Modellbahn steuern möchtest.",
+      modelRailwayStatusError: "Die Modellbahn-Funktionen konnten nicht geprüft werden:",
       browserDirectTitle: "DIREKT IM BROWSER",
       smartphoneTabletTitle: "MIT SMARTPHONE / TABLET",
       pcControlTitle: "MIT PC-STEUERUNG",
@@ -312,6 +315,7 @@
       technicalDetailsTitle: "Technical details",
       modelRailwayFunctionsTitle: "Model railway functions",
       modelRailwayFunctionsIntro: "Pick how you'd like to take the controls.",
+      modelRailwayStatusError: "The model railway functions could not be checked:",
       browserDirectTitle: "DIRECTLY IN THE BROWSER",
       smartphoneTabletTitle: "WITH SMARTPHONE / TABLET",
       pcControlTitle: "WITH PC CONTROL",
@@ -606,6 +610,33 @@
     };
   }
 
+  function setFeatureButtonState(buttonEl, state, readyText) {
+    if (!buttonEl) {
+      return;
+    }
+
+    buttonEl.classList.remove("feature-state-setup", "feature-state-error", "feature-state-unavailable");
+    if (state === "ready") {
+      buttonEl.disabled = false;
+      buttonEl.textContent = readyText;
+      return;
+    }
+
+    buttonEl.disabled = true;
+    buttonEl.classList.add("feature-state-" + state);
+    buttonEl.textContent = state === "error" ? t("problem") : state === "unavailable" ? t("notAvailable") : t("setupRequired");
+  }
+
+  function setModelRailwayNote(text, isError) {
+    var note = document.getElementById("model-railway-note");
+    if (!note) {
+      return;
+    }
+    note.textContent = text;
+    note.classList.toggle("err", !!isError);
+    note.classList.toggle("is-hidden", !text);
+  }
+
   function setStatusNote(text) {
     var note = document.getElementById("st-note");
     if (!note) {
@@ -767,13 +798,15 @@
     var z21Service = !!(data.services && data.services.z21emu);
     var can2lanService = !!(data.services && data.services.can2lan);
 
-    setAppStatus("st-mswebapp-feature", mswebappReady ? "ready" : "setup");
-    setAppStatus("st-railcontrol-feature", railcontrolReady ? "ready" : "setup");
-    setAppStatus("st-z21emu-feature", z21InterfaceReady ? "ready" : "setup");
-    setAppStatus("st-central-station-feature", centralStationReady ? "ready" : "setup");
-    setAppStatus("st-itrain-feature", "setup");
-    setAppStatus("st-win-digipet-feature", "setup");
-    setAppStatus("st-rocrail-feature", "setup");
+    setFeatureButtonState(mswebappLink, mswebappReady ? "ready" : "setup", t("open"));
+    setFeatureButtonState(railcontrolLink, railcontrolReady ? "ready" : "setup", t("open"));
+    setFeatureButtonState(z21emuGuideButton, z21InterfaceReady ? "ready" : "setup", t("z21GuideButton"));
+    setFeatureButtonState(centralStationGuideButton, centralStationReady ? "ready" : "setup", t("centralStationGuideButton"));
+    setFeatureButtonState(document.getElementById("itrain-guide-button"), "setup", t("setupButton"));
+    setFeatureButtonState(document.getElementById("win-digipet-guide-button"), "setup", t("setupButton"));
+    setFeatureButtonState(document.getElementById("rocrail-guide-button"), "setup", t("setupButton"));
+
+    setModelRailwayNote("", false);
 
     setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + ":6020/");
     setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + ":8082/");
@@ -828,7 +861,10 @@
     var updateCount = updateNames.length;
     var isAvailable = data.status === "updates-available" || updateCount > 0;
 
-    if (data.status === "up-to-date" || (!isAvailable && data.ok)) {
+    if (data.status === "busy") {
+      setUpdatePill("warn", t("updateChecking"));
+      setUpdatesNote(data.message || t("updateChecking"), false);
+    } else if (data.status === "up-to-date" || (!isAvailable && data.ok)) {
       setUpdatePill("ok", t("upToDate"));
       setUpdatesNote(t("upToDate"), false);
     } else if (isAvailable) {
@@ -847,12 +883,16 @@
   }
 
   function checkUpdates() {
+    if (updateCheckPromise || updateOperationInFlight) {
+      return updateCheckPromise;
+    }
+
     if (updatePackagesButton) {
       updatePackagesButton.disabled = true;
     }
     setUpdatesNote(t("updatesChecking"), false);
 
-    return fetchUpdateData("GET")
+    updateCheckPromise = fetchUpdateData("GET")
       .then(function (data) {
         applyUpdateData(data);
         return data;
@@ -861,10 +901,20 @@
         setUpdatePill("err", t("problem"));
         setUpdatesNote(t("updateFailed") + " " + error.message, true);
         return null;
+      })
+      .finally(function () {
+        updateCheckPromise = null;
       });
+
+    return updateCheckPromise;
   }
 
   function updatePackages() {
+    if (updateCheckPromise || updateOperationInFlight) {
+      return;
+    }
+
+    updateOperationInFlight = true;
     if (updatePackagesButton) {
       updatePackagesButton.disabled = true;
     }
@@ -877,10 +927,12 @@
         }
         setUpdatesNote(t("updateDone"), false);
         setUpdatePill("ok", t("upToDate"));
+        updateOperationInFlight = false;
         return loadStatus();
       })
       .catch(function (error) {
         setUpdatesNote(t("updateFailed") + " " + error.message, true);
+        updateOperationInFlight = false;
         checkUpdates();
       });
   }
@@ -1127,7 +1179,15 @@
         setNetworkNote(getLocalizedStatusValue(network, "message", "messageDe") || t("statusLoaded"));
       })
       .catch(function (error) {
+        setFeatureButtonState(mswebappLink, "error");
+        setFeatureButtonState(railcontrolLink, "error");
+        setFeatureButtonState(z21emuGuideButton, "error");
+        setFeatureButtonState(centralStationGuideButton, "error");
+        setFeatureButtonState(document.getElementById("itrain-guide-button"), "error");
+        setFeatureButtonState(document.getElementById("win-digipet-guide-button"), "error");
+        setFeatureButtonState(document.getElementById("rocrail-guide-button"), "error");
         setStatusNote(t("statusLoadError") + " " + error.message);
+        setModelRailwayNote(t("modelRailwayStatusError") + " " + error.message, true);
         setNetworkNote(t("statusLoadError") + " " + error.message);
       });
 

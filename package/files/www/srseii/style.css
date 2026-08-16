@@ -219,6 +219,11 @@ body {
   margin: 0 0 0.85rem;
 }
 
+.feature-status-note {
+  border-top: 1px solid rgba(26, 32, 44, 0.08);
+  padding-top: 0.85rem;
+}
+
 .modal {
   width: min(680px, calc(100vw - 2rem));
   max-height: min(760px, calc(100vh - 2rem));
@@ -418,6 +423,23 @@ body {
   pointer-events: none;
   box-shadow: none;
   filter: grayscale(0.2);
+}
+
+.btn.feature-state-setup,
+.btn.feature-state-unavailable {
+  color: #6b4a1a;
+  background: #fdf1d6;
+  border-color: #f0d48a;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.btn.feature-state-error {
+  color: #6b1f2d;
+  background: #f7dfe4;
+  border-color: #e2aebd;
+  opacity: 1;
+  cursor: not-allowed;
 }
 
 .btn:focus-visible {
