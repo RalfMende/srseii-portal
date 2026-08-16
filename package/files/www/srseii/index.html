@@ -17,130 +17,6 @@
       <p class="subtitle" data-i18n="heroSubtitle">Smallest Railroad Server Ever II</p>
     </header>
 
-    <section class="feature-block" aria-label="Modellbahn-Funktionen">
-      <div class="feature-header">
-        <h2>Modellbahn-Funktionen</h2>
-      </div>
-
-      <div class="feature-panel feature-panel-web">
-        <h3 data-i18n="webAppsSectionTitle">Web-Steuerungen</h3>
-        <div class="feature-grid">
-          <article class="feature-card" style="--delay: 0ms;">
-            <h4 data-i18n="mswebappTitle">Mobile Station Web App</h4>
-            <p data-i18n="mswebappDesc">Loks und Weichen steuern.</p>
-            <div class="feature-status"><span id="st-mswebapp-feature" class="pill pending">wird geladen</span></div>
-            <a class="btn" id="mswebapp-link" href="/srseii/" data-i18n="open">Öffnen</a>
-          </article>
-
-          <article class="feature-card" style="--delay: 90ms;">
-            <h4 data-i18n="railcontrolTitle">RailControl</h4>
-            <p data-i18n="railcontrolDesc">Modellbahnsteuerung im Browser.</p>
-            <div class="feature-status"><span id="st-railcontrol-feature" class="pill pending">wird geladen</span></div>
-            <a class="btn" id="railcontrol-link" href="/srseii/" data-i18n="open">Öffnen</a>
-          </article>
-        </div>
-      </div>
-
-      <div class="feature-panel feature-panel-central">
-        <h3 data-i18n="centralInterfacesSectionTitle">Zentralen-Schnittstellen</h3>
-        <div class="feature-grid">
-          <article class="feature-card" style="--delay: 180ms;">
-            <h4 data-i18n="z21UseCaseTitle">Z21 Schnittstellen Emulator</h4>
-            <p data-i18n="z21UseCaseShort">Verbindung mit der Z21-App oder WLAN-Maus.</p>
-            <div class="feature-status"><span id="st-z21emu-feature" class="pill pending">wird geladen</span></div>
-            <button class="btn" id="z21emu-guide-button" type="button" data-i18n="z21GuideButton">Anleitung</button>
-          </article>
-
-          <article class="feature-card" style="--delay: 270ms;">
-            <h4 data-i18n="centralStationTitle">Central-Station-kompatible Schnittstelle</h4>
-            <p data-i18n="centralStationDesc">Verbindung über kompatible Apps wie RemoteCS, RailControl Pro oder Mobile Station WLAN.</p>
-            <div class="feature-status"><span id="st-central-station-feature" class="pill pending">wird geladen</span></div>
-            <button class="btn" id="central-station-guide-button" type="button" data-i18n="centralStationGuideButton">Anleitung</button>
-          </article>
-        </div>
-      </div>
-
-      <div class="feature-panel feature-panel-pc">
-        <h3 data-i18n="pcSoftwareSectionTitle">PC-Steuerungssoftware</h3>
-        <div class="feature-grid">
-          <article class="feature-card" style="--delay: 360ms;">
-            <h4 data-i18n="itrainTitle">iTrain</h4>
-            <p data-i18n="itrainDesc">PC-basierte Modellbahnsteuerung mit eigener Einrichtung.</p>
-            <div class="feature-status"><span id="st-itrain-feature" class="pill warn">Einrichtung erforderlich</span></div>
-            <button class="btn btn-secondary" id="itrain-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
-          </article>
-
-          <article class="feature-card" style="--delay: 450ms;">
-            <h4 data-i18n="winDigipetTitle">Win-Digipet</h4>
-            <p data-i18n="winDigipetDesc">Desktop-Anbindung mit eigener SRSEII-Konfiguration.</p>
-            <div class="feature-status"><span id="st-win-digipet-feature" class="pill warn">Einrichtung erforderlich</span></div>
-            <button class="btn btn-secondary" id="win-digipet-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
-          </article>
-
-          <article class="feature-card" style="--delay: 540ms;">
-            <h4 data-i18n="rocrailTitle">Rocrail</h4>
-            <p data-i18n="rocrailDesc">PC-Steuerung, je nach Setup separat einzurichten.</p>
-            <div class="feature-status"><span id="st-rocrail-feature" class="pill warn">Einrichtung erforderlich</span></div>
-            <button class="btn btn-secondary" id="rocrail-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="status" aria-label="Systemstatus">
-      <div class="status-header">
-        <h2 data-i18n="statusTitle">Status</h2>
-      </div>
-
-      <div class="status-grid">
-        <article class="status-card">
-          <h3 data-i18n="systemTitle">System</h3>
-          <ul>
-            <li><span class="label">OpenWrt</span><span id="st-openwrt-state" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label" data-i18n="hostnameLabel">Hostname</span><span id="st-hostname">-</span></li>
-            <li><span class="label" data-i18n="modelLabel">Modell</span><span id="st-model">-</span></li>
-          </ul>
-        </article>
-
-        <article class="status-card">
-          <h3>Modellbahn Basisfunktionen</h3>
-          <ul>
-            <li><span class="label">Gleisbox CAN-Verbindung</span><span id="st-can2lan-status" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          </ul>
-        </article>
-
-        <article class="status-card status-card-wide">
-          <h3>Gesamtstatus</h3>
-          <p class="overall-status" id="st-overall-label">wird geladen</p>
-        </article>
-      </div>
-
-      <details class="status-details">
-        <summary>Technische Details</summary>
-        <ul class="status-details-list">
-          <li><span class="label">MSWebApp</span><span id="st-mswebapp-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending" data-i18n="loading">wird geladen</span></li>
-        </ul>
-      </details>
-
-      <p class="status-note" id="st-note" data-i18n="statusLoading">Status wird geladen...</p>
-    </section>
-
-    <section class="status" aria-label="Ereignisse">
-      <div class="status-header">
-        <h2>Ereignisse</h2>
-      </div>
-      <ul class="event-log" id="event-log-list">
-        <li>Keine Ereignisse.</li>
-      </ul>
-    </section>
-
     <section class="network" aria-label="Netzwerk">
       <div class="network-header">
         <h2 data-i18n="networkSectionTitle">Netzwerk</h2>
@@ -207,22 +83,180 @@
       <p class="status-note" id="network-note" data-i18n="statusLoading">Status wird geladen...</p>
     </section>
 
+    <section class="status" aria-label="Systemstatus">
+      <div class="status-header">
+        <h2 data-i18n="statusTitle">Status</h2>
+      </div>
+
+      <div class="status-grid compact-status-grid">
+        <article class="status-card">
+          <h3 data-i18n="systemTitle">System</h3>
+          <ul>
+            <li><span class="label">OpenWrt</span><span id="st-openwrt-state" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          </ul>
+        </article>
+
+        <article class="status-card">
+          <h3>Modellbahn Basisfunktionen</h3>
+          <ul>
+            <li><span class="label">Gleisbox CAN-Verbindung</span><span id="st-can2lan-status" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          </ul>
+        </article>
+
+        <article class="status-card status-card-wide">
+          <h3>Gesamtstatus</h3>
+          <p class="overall-status" id="st-overall-label">wird geladen</p>
+        </article>
+      </div>
+
+      <details class="status-details">
+        <summary>Technische Details</summary>
+        <ul class="status-details-list">
+          <li><span class="label">Hostname</span><span id="st-hostname">-</span></li>
+          <li><span class="label">Modell</span><span id="st-model">-</span></li>
+          <li><span class="label">MSWebApp</span><span id="st-mswebapp-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending" data-i18n="loading">wird geladen</span></li>
+        </ul>
+      </details>
+
+      <p class="status-note" id="st-note" data-i18n="statusLoading">Status wird geladen...</p>
+    </section>
+
+    <section class="feature-block" aria-label="Modellbahn-Funktionen">
+      <div class="feature-header">
+        <h2>Modellbahn-Funktionen</h2>
+        <p class="feature-intro">Wie möchtest du deine Modellbahn steuern?</p>
+      </div>
+
+      <div class="feature-group">
+        <h3>DIREKT IM BROWSER</h3>
+
+        <article class="feature-card" style="--delay: 0ms;">
+          <div class="feature-copy">
+            <h4 data-i18n="mswebappTitle">Mobile Station Web App</h4>
+            <p data-i18n="mswebappDesc">Loks und Weichen direkt im Browser.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-mswebapp-feature" class="pill pending">wird geladen</span>
+            <a class="btn btn-secondary" id="mswebapp-link" href="/srseii/" data-i18n="open">Öffnen</a>
+          </div>
+        </article>
+
+        <article class="feature-card" style="--delay: 90ms;">
+          <div class="feature-copy">
+            <h4 data-i18n="railcontrolTitle">RailControl</h4>
+            <p data-i18n="railcontrolDesc">Modellbahnsteuerung im Browser.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-railcontrol-feature" class="pill pending">wird geladen</span>
+            <a class="btn btn-secondary" id="railcontrol-link" href="/srseii/" data-i18n="open">Öffnen</a>
+          </div>
+        </article>
+      </div>
+
+      <div class="feature-group">
+        <h3>MIT SMARTPHONE / TABLET</h3>
+
+        <article class="feature-card" style="--delay: 180ms;">
+          <div class="feature-copy">
+            <h4 data-i18n="z21UseCaseTitle">Z21-kompatible Schnittstelle</h4>
+            <p data-i18n="z21UseCaseShort">Mit einer kompatiblen Z21-App oder WLAN-Maus steuern.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-z21emu-feature" class="pill pending">wird geladen</span>
+            <button class="btn btn-secondary" id="z21emu-guide-button" type="button" data-i18n="z21GuideButton">Anleitung</button>
+          </div>
+        </article>
+
+        <article class="feature-card" style="--delay: 270ms;">
+          <div class="feature-copy">
+            <h4 data-i18n="centralStationTitle">Kompatibles Interface</h4>
+            <p data-i18n="centralStationDesc">Mit einer kompatiblen externen Steuer-App verbinden.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-central-station-feature" class="pill pending">wird geladen</span>
+            <button class="btn btn-secondary" id="central-station-guide-button" type="button" data-i18n="centralStationGuideButton">Anleitung</button>
+          </div>
+        </article>
+      </div>
+
+      <div class="feature-group">
+        <h3>MIT PC-STEUERUNG</h3>
+
+        <article class="feature-card" style="--delay: 360ms;">
+          <div class="feature-copy">
+            <h4 data-i18n="itrainTitle">iTrain</h4>
+            <p data-i18n="itrainDesc">PC-basierte Modellbahnsteuerung mit eigener Einrichtung.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-itrain-feature" class="pill warn">Einrichtung erforderlich</span>
+            <button class="btn btn-ghost" id="itrain-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+          </div>
+        </article>
+
+        <article class="feature-card" style="--delay: 450ms;">
+          <div class="feature-copy">
+            <h4 data-i18n="winDigipetTitle">Win-Digipet</h4>
+            <p data-i18n="winDigipetDesc">Desktop-Anbindung mit eigener SRSEII-Konfiguration.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-win-digipet-feature" class="pill warn">Einrichtung erforderlich</span>
+            <button class="btn btn-ghost" id="win-digipet-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+          </div>
+        </article>
+
+        <article class="feature-card" style="--delay: 540ms;">
+          <div class="feature-copy">
+            <h4 data-i18n="rocrailTitle">Rocrail</h4>
+            <p data-i18n="rocrailDesc">PC-Steuerung, je nach Setup separat einzurichten.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-rocrail-feature" class="pill warn">Einrichtung erforderlich</span>
+            <button class="btn btn-ghost" id="rocrail-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="status" aria-label="Ereignisse">
+      <div class="status-header">
+        <h2>Ereignisse</h2>
+      </div>
+      <ul class="event-log" id="event-log-list">
+        <li>Keine Ereignisse.</li>
+      </ul>
+    </section>
+
     <section class="tooling-block" aria-label="Expertenwerkzeuge">
-      <div class="tooling-header">
+      <div class="feature-header">
         <h2>Expertenwerkzeuge</h2>
       </div>
 
-      <div class="tooling-grid">
-        <article class="tooling-card">
-          <h3>LuCI (expert mode)</h3>
-          <p>Erweiterte OpenWrt-Einstellungen.</p>
-          <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/">Öffnen</a>
+      <div class="feature-group">
+        <article class="feature-card" style="--delay: 0ms;">
+          <div class="feature-copy">
+            <h4>LuCI (expert mode)</h4>
+            <p>Erweiterte OpenWrt-Einstellungen.</p>
+          </div>
+          <div class="feature-actions">
+            <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/">Öffnen</a>
+          </div>
         </article>
 
-        <article class="tooling-card">
-          <h3>Terminal</h3>
-          <p>Direkter SSH-Zugriff über Port 22.</p>
-          <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/">Öffnen</a>
+        <article class="feature-card" style="--delay: 90ms;">
+          <div class="feature-copy">
+            <h4>SSH / Terminal</h4>
+            <p>Direkter Zugriff auf die Shell über Port 22.</p>
+          </div>
+          <div class="feature-actions">
+            <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/">Öffnen</a>
+          </div>
         </article>
       </div>
     </section>
