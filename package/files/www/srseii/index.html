@@ -8,11 +8,15 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="./style.css?v=0.5.4" />
+  <link rel="stylesheet" href="./style.css?v=0.5.8" />
 </head>
 <body>
   <main class="layout">
     <header class="hero">
+      <div class="hero-bar">
+        <button class="hero-link-btn" id="about-button" type="button" data-i18n="aboutButton">About</button>
+        <button class="hero-link-btn" id="online-help-button" type="button" disabled data-i18n="onlineHelpButton">Online Help</button>
+      </div>
       <h1 data-i18n="siteTitle">SRSEII</h1>
       <p class="subtitle" data-i18n="heroSubtitle">Smallest Railroad Server Ever II</p>
     </header>
@@ -393,6 +397,37 @@
     </div>
   </dialog>
 
-  <script src="./app.js?v=0.5.4"></script>
+  <dialog class="modal" id="about-dialog" aria-labelledby="about-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="about-title" data-i18n="aboutTitle">About SRSEII</h2>
+        <button class="modal-close" id="about-close" type="button" aria-label="Close" data-i18n-aria-label="close">×</button>
+      </div>
+
+      <section class="guide-section">
+        <p>
+          <strong>SRSEII – Smallest Railroad Server Ever II</strong>
+          <span data-i18n="aboutIntroConnector">is an open source project by</span>
+          <strong>Gerd (Gerhard Bertelsmann)</strong>.
+        </p>
+        <p data-i18n="aboutDescription">The project turns a suitably modified Gleisbox into a compact model railway central station. A small Linux computer connects the Gleisbox to the network and makes it possible to control the model railway through various applications and interfaces.</p>
+        <p data-i18n="aboutFeatures">Among other things, SRSEII supports control via web applications, mobile devices, and various PC control programs. Interfaces such as Z21 emulation, as well as CAN and S88 connectivity, are also available.</p>
+        <p data-i18n="aboutOpenSourceText">The project's hardware and software are freely available. The project thrives not only on the original development but also on contributions, experience, and further development from the SRSEII community.</p>
+      </section>
+
+      <section class="guide-section guide-note">
+        <h3 data-i18n="aboutLinksTitle">More information</h3>
+        <ul>
+          <li><a href="http://lnxpps.de/can2udp/srseII/" target="_blank" rel="noopener noreferrer" data-i18n="aboutProjectLink">SRSEII project page</a></li>
+          <li><a href="https://www.stummiforum.de/t160368f7-Gleisbox-als-Zentrale.html" target="_blank" rel="noopener noreferrer" data-i18n="aboutForumLink">Stummiforum – "Gleisbox als Zentrale"</a></li>
+        </ul>
+        <p data-i18n="aboutCommunityClosing">The SRSEII project is accompanied and further developed by an active community. The Stummiforum is a central point of contact for questions, experiences, and current developments.</p>
+      </section>
+
+      <p class="about-version"><span data-i18n="aboutVersionLabel">Portal version</span>: <span id="about-version">-</span></p>
+    </div>
+  </dialog>
+
+  <script src="./app.js?v=0.5.8"></script>
 </body>
 </html>

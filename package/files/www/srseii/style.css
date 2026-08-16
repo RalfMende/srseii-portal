@@ -66,6 +66,38 @@ body {
   animation: slideIn 420ms ease-out both;
 }
 
+.hero-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.hero-link-btn {
+  border: none;
+  background: none;
+  padding: 0.3rem 0.4rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--brand-dark);
+  cursor: pointer;
+}
+
+.hero-link-btn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.hero-link-btn:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.hero-link-btn:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
 .eyebrow {
   display: none;
 }
@@ -236,6 +268,14 @@ body {
 
 .guide-section {
   padding-top: 1rem;
+}
+
+.about-version {
+  margin: 1rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 .guide-section h3 {

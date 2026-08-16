@@ -9,6 +9,10 @@
   var centralStationGuideButton = document.getElementById("central-station-guide-button");
   var centralStationGuideDialog = document.getElementById("central-station-guide-dialog");
   var centralStationGuideCloseButton = document.getElementById("central-station-guide-close");
+  var aboutButton = document.getElementById("about-button");
+  var aboutDialog = document.getElementById("about-dialog");
+  var aboutCloseButton = document.getElementById("about-close");
+  var aboutVersionEl = document.getElementById("about-version");
   var luciLink = document.getElementById("luci-link");
   var terminalLink = document.getElementById("terminal-link");
   var hostHint = document.getElementById("host-hint");
@@ -30,6 +34,15 @@
   var manualMode = false;
   var scannedNetworksBySsid = {};
   var wifiAssistantAutoToggle = false;
+  var portalVersion = getPortalVersion();
+
+  // Derives the portal version from this script's own cache-busting "?v=" query param.
+  function getPortalVersion() {
+    var scriptEl = document.currentScript || document.querySelector('script[src*="app.js"]');
+    var src = (scriptEl && scriptEl.src) || "";
+    var match = src.match(/[?&]v=([^&]+)/);
+    return match ? decodeURIComponent(match[1]) : "";
+  }
 
   var translations = {
     de: {
@@ -37,6 +50,18 @@
       metaDescription: "SRSEII Portal",
       siteTitle: "SRSEII",
       heroSubtitle: "Smallest Railroad Server Ever II",
+      aboutButton: "About",
+      aboutTitle: "About SRSEII",
+      aboutIntroConnector: "ist ein Open-Source-Projekt von",
+      aboutDescription: "Das Projekt macht aus einer entsprechend umgebauten Gleisbox eine kompakte Modellbahn-Zentrale. Ein kleiner Linux-Rechner stellt dabei die Verbindung zwischen der Gleisbox und dem Netzwerk her und ermöglicht die Steuerung der Modellbahn über verschiedene Anwendungen und Schnittstellen.",
+      aboutFeatures: "SRSEII unterstützt unter anderem die Steuerung über Webanwendungen, mobile Geräte und verschiedene PC-Steuerungsprogramme. Zusätzlich stehen Schnittstellen wie die Z21-Emulation sowie CAN- und S88-Anbindung zur Verfügung.",
+      aboutOpenSourceText: "Die Hard- und Software des Projekts ist frei zugänglich. Das Projekt lebt dabei nicht nur von der ursprünglichen Entwicklung, sondern auch von Beiträgen, Erfahrungen und Weiterentwicklungen aus der SRSEII-Community.",
+      aboutLinksTitle: "Weitere Informationen",
+      aboutProjectLink: "SRSEII Projektseite",
+      aboutForumLink: "Stummiforum – „Gleisbox als Zentrale“",
+      aboutCommunityClosing: "Das SRSEII-Projekt wird von einer aktiven Community begleitet und weiterentwickelt. Das Stummiforum ist dabei eine zentrale Anlaufstelle für Fragen, Erfahrungen und aktuelle Entwicklungen.",
+      aboutVersionLabel: "Portal-Version",
+      onlineHelpButton: "Online-Hilfe",
       mswebappTitle: "Mobile Station Web App",
       mswebappDesc: "Loks und Weichen steuern.",
       railcontrolTitle: "RailControl",
@@ -190,6 +215,18 @@
       metaDescription: "SRSEII Portal",
       siteTitle: "SRSEII",
       heroSubtitle: "Smallest Railroad Server Ever II",
+      aboutButton: "About",
+      aboutTitle: "About SRSEII",
+      aboutIntroConnector: "is an open source project by",
+      aboutDescription: "The project turns a suitably modified Gleisbox into a compact model railway central station. A small Linux computer connects the Gleisbox to the network and makes it possible to control the model railway through various applications and interfaces.",
+      aboutFeatures: "Among other things, SRSEII supports control via web applications, mobile devices, and various PC control programs. Interfaces such as Z21 emulation, as well as CAN and S88 connectivity, are also available.",
+      aboutOpenSourceText: "The project's hardware and software are freely available. The project thrives not only on the original development but also on contributions, experience, and further development from the SRSEII community.",
+      aboutLinksTitle: "More information",
+      aboutProjectLink: "SRSEII project page",
+      aboutForumLink: "Stummiforum – \"Gleisbox als Zentrale\"",
+      aboutCommunityClosing: "The SRSEII project is accompanied and further developed by an active community. The Stummiforum is a central point of contact for questions, experiences, and current developments.",
+      aboutVersionLabel: "Portal version",
+      onlineHelpButton: "Online Help",
       mswebappTitle: "Mobile Station Web App",
       mswebappDesc: "Control locomotives and turnouts.",
       railcontrolTitle: "RailControl",
@@ -1114,6 +1151,30 @@
   if (centralStationGuideButton && centralStationGuideDialog) {
     centralStationGuideButton.addEventListener("click", function () {
       centralStationGuideDialog.showModal();
+    });
+  }
+
+  if (aboutVersionEl) {
+    aboutVersionEl.textContent = portalVersion || t("unknown");
+  }
+
+  if (aboutButton && aboutDialog) {
+    aboutButton.addEventListener("click", function () {
+      aboutDialog.showModal();
+    });
+  }
+
+  if (aboutCloseButton && aboutDialog) {
+    aboutCloseButton.addEventListener("click", function () {
+      aboutDialog.close();
+    });
+  }
+
+  if (aboutDialog) {
+    aboutDialog.addEventListener("click", function (event) {
+      if (event.target === aboutDialog) {
+        aboutDialog.close();
+      }
     });
   }
 
