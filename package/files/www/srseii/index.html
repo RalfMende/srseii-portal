@@ -115,6 +115,17 @@
 
         <article class="feature-card">
           <div class="feature-copy">
+            <h4 data-i18n="updatesTitle">Updates</h4>
+            <p id="updates-note" data-i18n="updatesChecking">Checking installed packages...</p>
+          </div>
+          <div class="feature-actions">
+            <span class="pill pending" id="st-updates" data-i18n="loading">loading</span>
+            <button class="btn btn-secondary" id="update-packages" type="button" data-i18n="updatePackages" disabled>Update</button>
+          </div>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-copy">
             <h4 data-i18n="systemTitle">System</h4>
             <p data-i18n="systemDesc">OpenWrt is running smoothly and provides the basic functions.</p>
           </div>

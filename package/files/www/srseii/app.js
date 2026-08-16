@@ -13,6 +13,8 @@
   var terminalLink = document.getElementById("terminal-link");
   var hostHint = document.getElementById("host-hint");
   var refreshButton = document.getElementById("refresh-status");
+  var updatePackagesButton = document.getElementById("update-packages");
+  var updatesNote = document.getElementById("updates-note");
   var wifiScanButton = document.getElementById("wifi-scan");
   var wifiConnectButton = document.getElementById("wifi-connect");
   var wifiManualToggleButton = document.getElementById("wifi-manual-toggle");
@@ -88,6 +90,16 @@
       readinessTitle: "Betriebsbereitschaft",
       statusIntro: "Der Kurzcheck: Ist dein SRSEII fit?",
       refresh: "Aktualisieren",
+      updatesTitle: "Updates",
+      updatesChecking: "Installierte Pakete werden geprüft...",
+      updatesAvailable: "Update verfügbar",
+      updatesAvailablePlural: "Updates verfügbar",
+      upToDate: "Up to date",
+      updatePackages: "Update",
+      updateChecking: "Prüfung läuft...",
+      updateRunning: "Updates werden installiert...",
+      updateDone: "Alle verfügbaren Updates wurden installiert.",
+      updateFailed: "Update fehlgeschlagen:",
       networkSectionTitle: "Netzwerk",
       networkIntro: "So findest und erreichst du deinen SRSEII im Netzwerk.",
       lanStatusTitle: "LAN-Verbindung",
@@ -231,6 +243,16 @@
       readinessTitle: "Readiness",
       statusIntro: "A quick health check for your SRSEII.",
       refresh: "Refresh",
+      updatesTitle: "Updates",
+      updatesChecking: "Checking installed packages...",
+      updatesAvailable: "Update available",
+      updatesAvailablePlural: "Updates available",
+      upToDate: "Up to date",
+      updatePackages: "Update",
+      updateChecking: "Checking...",
+      updateRunning: "Installing updates...",
+      updateDone: "All available updates were installed.",
+      updateFailed: "Update failed:",
       networkSectionTitle: "Network",
       networkIntro: "How to find and reach your SRSEII on the network.",
       lanStatusTitle: "LAN connection",
@@ -734,6 +756,98 @@
     return network;
   }
 
+  function setUpdatesNote(text, isError) {
+    if (!updatesNote) {
+      return;
+    }
+    updatesNote.textContent = text;
+    updatesNote.classList.toggle("err", !!isError);
+  }
+
+  function setUpdatePill(state, text) {
+    var pill = document.getElementById("st-updates");
+    if (!pill) {
+      return;
+    }
+    pill.classList.remove("pending", "ok", "err", "warn");
+    pill.classList.add("pill", state);
+    pill.textContent = text;
+  }
+
+  function fetchUpdateData(method) {
+    var options = { method: method || "GET", cache: "no-store" };
+    var url = "/cgi-bin/srseii/update?action=" + (method === "POST" ? "update" : "check");
+
+    return fetch(url, options).then(function (response) {
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+      return response.json();
+    });
+  }
+
+  function applyUpdateData(data) {
+    var updateNames = Array.isArray(data.updates) ? data.updates : [];
+    var updateCount = updateNames.length;
+    var isAvailable = data.status === "updates-available" || updateCount > 0;
+
+    if (data.status === "up-to-date" || (!isAvailable && data.ok)) {
+      setUpdatePill("ok", t("upToDate"));
+      setUpdatesNote(t("upToDate"), false);
+    } else if (isAvailable) {
+      var updateLabel = updateCount + " " + (updateCount === 1 ? t("updatesAvailable") : t("updatesAvailablePlural"));
+      setUpdatePill("warn", updateLabel);
+      setUpdatesNote(updateLabel, false);
+    } else {
+      setPill("st-updates", false, t("upToDate"), t("problem"));
+      setUpdatesNote(data.message || t("updateFailed"), true);
+    }
+
+    if (updatePackagesButton) {
+      updatePackagesButton.disabled = !isAvailable || !data.ok;
+    }
+    return isAvailable;
+  }
+
+  function checkUpdates() {
+    if (updatePackagesButton) {
+      updatePackagesButton.disabled = true;
+    }
+    setUpdatesNote(t("updatesChecking"), false);
+
+    return fetchUpdateData("GET")
+      .then(function (data) {
+        applyUpdateData(data);
+        return data;
+      })
+      .catch(function (error) {
+        setUpdatePill("err", t("problem"));
+        setUpdatesNote(t("updateFailed") + " " + error.message, true);
+        return null;
+      });
+  }
+
+  function updatePackages() {
+    if (updatePackagesButton) {
+      updatePackagesButton.disabled = true;
+    }
+    setUpdatesNote(t("updateRunning"), false);
+
+    fetchUpdateData("POST")
+      .then(function (data) {
+        if (!data.ok) {
+          throw new Error(data.message || t("updateFailed"));
+        }
+        setUpdatesNote(t("updateDone"), false);
+        setUpdatePill("ok", t("upToDate"));
+        return loadStatus();
+      })
+      .catch(function (error) {
+        setUpdatesNote(t("updateFailed") + " " + error.message, true);
+        checkUpdates();
+      });
+  }
+
   function fetchStatusData() {
     return fetch("/cgi-bin/srseii/status", { cache: "no-store" })
       .then(function (response) {
@@ -979,10 +1093,16 @@
         setStatusNote(t("statusLoadError") + " " + error.message);
         setNetworkNote(t("statusLoadError") + " " + error.message);
       });
+
+    checkUpdates();
   }
 
   if (refreshButton) {
     refreshButton.addEventListener("click", loadStatus);
+  }
+
+  if (updatePackagesButton) {
+    updatePackagesButton.addEventListener("click", updatePackages);
   }
 
   if (z21emuGuideButton && z21emuGuideDialog) {

@@ -1,0 +1,116 @@
+#!/bin/sh
+
+set -u
+
+json_escape() {
+	printf '%s' "$1" | tr '\r\n' '  ' | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+json_response() {
+	response_ok="$1"
+	response_status="$2"
+	response_message="$3"
+	response_message_de="$4"
+	response_updates="$5"
+	response_output="$6"
+
+	printf 'Content-Type: application/json\n'
+	printf 'Cache-Control: no-store\n'
+	printf '\n'
+	printf '{"ok":%s,"status":"%s","message":"%s","messageDe":"%s","updates":%s,"output":"%s"}\n' \
+		"$response_ok" \
+		"$(json_escape "$response_status")" \
+		"$(json_escape "$response_message")" \
+		"$(json_escape "$response_message_de")" \
+		"$response_updates" \
+		"$(json_escape "$response_output")"
+}
+
+if ! command -v opkg >/dev/null 2>&1; then
+	json_response false "error" "opkg is not available." "opkg ist nicht verfügbar." '[]' ""
+	exit 0
+fi
+
+request_action="check"
+if [ "${REQUEST_METHOD:-GET}" = "POST" ]; then
+	request_action="update"
+elif printf '%s' "${QUERY_STRING:-}" | grep -q 'action=update'; then
+	request_action="update"
+fi
+
+lock_dir="/tmp/srseii-opkg-update.lock"
+if ! mkdir "$lock_dir" 2>/dev/null; then
+	json_response false "busy" "Another package operation is already running." "Eine andere Paketaktion läuft bereits." '[]' ""
+	exit 0
+fi
+
+work_file="/tmp/srseii-opkg-update.$$"
+trap 'rm -f "$work_file"; rmdir "$lock_dir" 2>/dev/null || true' EXIT
+
+output=""
+if ! update_output="$(opkg update 2>&1)"; then
+	json_response false "error" "Package list refresh failed." "Das Aktualisieren der Paketlisten ist fehlgeschlagen." '[]' "$update_output"
+	exit 0
+fi
+output="$update_output"
+
+upgradable_lines=""
+if ! upgradable_lines="$(opkg list-upgradable 2>&1)"; then
+	json_response false "error" "Could not determine available package updates." "Verfügbare Paket-Updates konnten nicht ermittelt werden." '[]' "$output\n$upgradable_lines"
+	exit 0
+fi
+
+package_names="$(printf '%s\n' "$upgradable_lines" | awk 'NF {print $1}')"
+
+updates_json="["
+update_count=0
+for package_name in $package_names; do
+	case "$package_name" in
+		*[!A-Za-z0-9._+:-]*) continue ;;
+	esac
+	if [ "$update_count" -gt 0 ]; then
+		updates_json="$updates_json,"
+	fi
+	updates_json="$updates_json\"$(json_escape "$package_name")\""
+	update_count=$((update_count + 1))
+done
+updates_json="$updates_json]"
+
+if [ "$request_action" = "check" ]; then
+	if [ "$update_count" -eq 0 ]; then
+		json_response true "up-to-date" "All installed packages are up to date." "Alle installierten Pakete sind aktuell." "$updates_json" "$output"
+	else
+		json_response true "updates-available" "$update_count package update(s) are available." "$update_count Paket-Update(s) sind verfügbar." "$updates_json" "$output"
+	fi
+	exit 0
+fi
+
+if [ "$update_count" -eq 0 ]; then
+	json_response true "up-to-date" "All installed packages are up to date." "Alle installierten Pakete sind aktuell." "$updates_json" "$output"
+	exit 0
+fi
+
+upgrade_failed=false
+for package_name in $package_names; do
+	case "$package_name" in
+		*[!A-Za-z0-9._+:-]*) continue ;;
+	esac
+	if upgrade_output="$(opkg upgrade "$package_name" 2>&1)"; then
+		:
+	else
+		upgrade_failed=true
+	fi
+	if [ -n "$upgrade_output" ]; then
+		output="$output\n$upgrade_output"
+	fi
+	if printf '%s' "$upgrade_output" | grep -Eiq 'error|failed|cannot|not found'; then
+		upgrade_failed=true
+	fi
+done
+
+if [ "$upgrade_failed" = true ]; then
+	json_response false "error" "One or more packages could not be updated." "Ein oder mehrere Pakete konnten nicht aktualisiert werden." "$updates_json" "$output"
+	exit 0
+fi
+
+json_response true "updated" "All available package updates were installed." "Alle verfügbaren Paket-Updates wurden installiert." "$updates_json" "$output"
