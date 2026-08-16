@@ -215,6 +215,36 @@ body {
   border-radius: 8px;
 }
 
+.overall-action {
+  min-width: 10.5rem;
+}
+
+.overall-action-ready {
+  color: #0b5725;
+  background: #d7f3df;
+  border-color: #a2deba;
+  opacity: 1;
+  cursor: default;
+}
+
+.overall-action-update {
+  color: #fff;
+  background: linear-gradient(180deg, #2f4d70, #203853);
+}
+
+.overall-action-error {
+  color: #6b1f2d;
+  background: #f7dfe4;
+  border-color: #e2aebd;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.overall-action-pending {
+  opacity: 0.55;
+  cursor: wait;
+}
+
 .feature-status {
   margin: 0 0 0.85rem;
 }
@@ -610,21 +640,6 @@ body {
   min-height: 100%;
 }
 
-.overall-status {
-  margin: 0.4rem 0 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.overall-status.ok {
-  color: #0b5725;
-}
-
-.overall-status.warn {
-  color: #6b4a1a;
-}
-
 .status-details {
   margin-top: 0.9rem;
   border-top: 1px solid var(--line);
@@ -862,7 +877,7 @@ body {
 
 button.btn[disabled] {
   opacity: 0.55;
-  cursor: wait;
+  cursor: default;
   transform: none;
   box-shadow: none;
 }

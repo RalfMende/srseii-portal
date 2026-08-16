@@ -48,6 +48,7 @@ if ! mkdir "$lock_dir" 2>/dev/null; then
 		json_response false "busy" "Another package operation is already running." "Eine andere Paketaktion läuft bereits." '[]' ""
 		exit 0
 	fi
+	rm -f "$lock_dir/pid"
 	if ! rmdir "$lock_dir" 2>/dev/null || ! mkdir "$lock_dir" 2>/dev/null; then
 		json_response false "busy" "Another package operation is already running." "Eine andere Paketaktion läuft bereits." '[]' ""
 		exit 0
@@ -56,7 +57,7 @@ fi
 printf '%s\n' "$$" > "$lock_dir/pid"
 
 work_file="/tmp/srseii-opkg-update.$$"
-trap 'rm -f "$work_file"; rmdir "$lock_dir" 2>/dev/null || true' EXIT
+trap 'rm -f "$work_file" "$lock_dir/pid"; rmdir "$lock_dir" 2>/dev/null || true' EXIT
 
 output=""
 if ! update_output="$(opkg update 2>&1)"; then

@@ -36,6 +36,7 @@
   var wifiAssistantAutoToggle = false;
   var updateCheckPromise = null;
   var updateOperationInFlight = false;
+  var systemStatusReady = false;
   var portalVersion = getPortalVersion();
 
   // Derives the portal version from this script's own cache-busting "?v=" query param.
@@ -117,7 +118,6 @@
       readinessTitle: "Betriebsbereitschaft",
       statusIntro: "Der Kurzcheck: Ist dein SRSEII fit?",
       refresh: "Aktualisieren",
-      updatesTitle: "Updates",
       updatesChecking: "Installierte Pakete werden geprüft...",
       updatesAvailable: "Update verfügbar",
       updatesAvailablePlural: "Updates verfügbar",
@@ -283,7 +283,6 @@
       readinessTitle: "Readiness",
       statusIntro: "A quick health check for your SRSEII.",
       refresh: "Refresh",
-      updatesTitle: "Updates",
       updatesChecking: "Checking installed packages...",
       updatesAvailable: "Update available",
       updatesAvailablePlural: "Updates available",
@@ -769,12 +768,11 @@
     renderEventLog(Array.isArray(data.events) ? data.events : []);
 
     var overallReady = !!overall.ready;
+    systemStatusReady = overallReady;
     var overallLabel = getLocalizedStatusValue(overall, "label", "labelDe") || (overallReady ? t("overallReady") : t("overallAttention"));
-    var overallBadge = document.getElementById("st-overall-label");
-    if (overallBadge) {
-      overallBadge.textContent = overallLabel;
-      overallBadge.classList.remove("pending", "ok", "warn", "err");
-      overallBadge.classList.add(overallReady ? "ok" : "warn");
+    setOverallAction(overallReady ? "ready" : "error", overallReady ? t("overallReady") : t("problem"), false);
+    if (!overallReady) {
+      setUpdatesNote(overallLabel, true);
     }
 
     // Always revealable; auto-expand only while WLAN is not yet configured.
@@ -784,19 +782,20 @@
       wifiAssistant.open = !network.wifi;
     }
 
-    // Web apps are exposed as app readiness in the backend payload.
-    var mswebappReady = !!(data.apps && data.apps.mswebapp);
-    var railcontrolReady = !!(data.apps && data.apps.railcontrol);
-
-    // Interface use-cases are exposed as dedicated use-case flags.
-    var z21InterfaceReady = !!(data.useCases && data.useCases.z21interface);
-    var centralStationReady = !!(data.useCases && data.useCases.cs2interface);
+    // Prefer explicit readiness fields, but keep compatibility with older status CGI responses.
+    var services = data.services || {};
+    var hasAppReadiness = !!(data.apps && (typeof data.apps.mswebapp === "boolean" || typeof data.apps.railcontrol === "boolean"));
+    var hasUseCaseReadiness = !!(data.useCases && (typeof data.useCases.z21interface === "boolean" || typeof data.useCases.cs2interface === "boolean"));
+    var mswebappReady = (hasAppReadiness ? !!data.apps.mswebapp : !!(data.apps && data.apps.mswebapp)) || !!(services.mswebapp && services.can2lan);
+    var railcontrolReady = (hasAppReadiness ? !!data.apps.railcontrol : !!(data.apps && data.apps.railcontrol)) || !!(services.railcontrol && services.can2lan);
+    var z21InterfaceReady = (hasUseCaseReadiness ? !!data.useCases.z21interface : false) || !!(services.z21emu && services.can2lan);
+    var centralStationReady = (hasUseCaseReadiness ? !!data.useCases.cs2interface : false) || !!services.can2lan;
 
     // Technical services remain separate and are shown only in the diagnostics list.
-    var mswebappService = !!(data.services && data.services.mswebapp);
-    var railcontrolService = !!(data.services && data.services.railcontrol);
-    var z21Service = !!(data.services && data.services.z21emu);
-    var can2lanService = !!(data.services && data.services.can2lan);
+    var mswebappService = !!services.mswebapp;
+    var railcontrolService = !!services.railcontrol;
+    var z21Service = !!services.z21emu;
+    var can2lanService = !!services.can2lan;
 
     setFeatureButtonState(mswebappLink, mswebappReady ? "ready" : "setup", t("open"));
     setFeatureButtonState(railcontrolLink, railcontrolReady ? "ready" : "setup", t("open"));
@@ -834,14 +833,14 @@
     updatesNote.classList.toggle("err", !!isError);
   }
 
-  function setUpdatePill(state, text) {
-    var pill = document.getElementById("st-updates");
-    if (!pill) {
+  function setOverallAction(state, text, enabled) {
+    if (!updatePackagesButton) {
       return;
     }
-    pill.classList.remove("pending", "ok", "err", "warn");
-    pill.classList.add("pill", state);
-    pill.textContent = text;
+    updatePackagesButton.classList.remove("overall-action-ready", "overall-action-error", "overall-action-update", "overall-action-pending");
+    updatePackagesButton.classList.add("overall-action-" + state);
+    updatePackagesButton.textContent = text;
+    updatePackagesButton.disabled = !enabled;
   }
 
   function fetchUpdateData(method) {
@@ -862,22 +861,26 @@
     var isAvailable = data.status === "updates-available" || updateCount > 0;
 
     if (data.status === "busy") {
-      setUpdatePill("warn", t("updateChecking"));
+      setOverallAction("pending", t("updateChecking"), false);
       setUpdatesNote(data.message || t("updateChecking"), false);
     } else if (data.status === "up-to-date" || (!isAvailable && data.ok)) {
-      setUpdatePill("ok", t("upToDate"));
+      if (systemStatusReady) {
+        setOverallAction("ready", t("overallReady"), false);
+      } else {
+        setOverallAction("error", t("problem"), false);
+      }
       setUpdatesNote(t("upToDate"), false);
     } else if (isAvailable) {
       var updateLabel = updateCount + " " + (updateCount === 1 ? t("updatesAvailable") : t("updatesAvailablePlural"));
-      setUpdatePill("warn", updateLabel);
+      if (systemStatusReady) {
+        setOverallAction("update", t("updatePackages"), true);
+      } else {
+        setOverallAction("error", t("problem"), false);
+      }
       setUpdatesNote(updateLabel, false);
     } else {
-      setPill("st-updates", false, t("upToDate"), t("problem"));
+      setOverallAction("error", t("problem"), false);
       setUpdatesNote(data.message || t("updateFailed"), true);
-    }
-
-    if (updatePackagesButton) {
-      updatePackagesButton.disabled = !isAvailable || !data.ok;
     }
     return isAvailable;
   }
@@ -890,6 +893,7 @@
     if (updatePackagesButton) {
       updatePackagesButton.disabled = true;
     }
+    setOverallAction("pending", t("updateChecking"), false);
     setUpdatesNote(t("updatesChecking"), false);
 
     updateCheckPromise = fetchUpdateData("GET")
@@ -898,7 +902,7 @@
         return data;
       })
       .catch(function (error) {
-        setUpdatePill("err", t("problem"));
+        setOverallAction("error", t("problem"), false);
         setUpdatesNote(t("updateFailed") + " " + error.message, true);
         return null;
       })
@@ -918,6 +922,7 @@
     if (updatePackagesButton) {
       updatePackagesButton.disabled = true;
     }
+    setOverallAction("pending", t("updateRunning"), false);
     setUpdatesNote(t("updateRunning"), false);
 
     fetchUpdateData("POST")
@@ -926,11 +931,11 @@
           throw new Error(data.message || t("updateFailed"));
         }
         setUpdatesNote(t("updateDone"), false);
-        setUpdatePill("ok", t("upToDate"));
         updateOperationInFlight = false;
         return loadStatus();
       })
       .catch(function (error) {
+        setOverallAction("error", t("problem"), false);
         setUpdatesNote(t("updateFailed") + " " + error.message, true);
         updateOperationInFlight = false;
         checkUpdates();
@@ -938,7 +943,8 @@
   }
 
   function fetchStatusData() {
-    return fetch("/cgi-bin/srseii/status", { cache: "no-store" })
+    var statusUrl = "/cgi-bin/srseii/status?ts=" + Date.now();
+    return fetch(statusUrl, { cache: "no-store" })
       .then(function (response) {
         if (!response.ok) {
           throw new Error("HTTP " + response.status);
@@ -1179,6 +1185,7 @@
         setNetworkNote(getLocalizedStatusValue(network, "message", "messageDe") || t("statusLoaded"));
       })
       .catch(function (error) {
+        setOverallAction("error", t("problem"), false);
         setFeatureButtonState(mswebappLink, "error");
         setFeatureButtonState(railcontrolLink, "error");
         setFeatureButtonState(z21emuGuideButton, "error");
