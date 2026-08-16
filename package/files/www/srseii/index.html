@@ -83,29 +83,41 @@
       <p class="status-note" id="network-note" data-i18n="statusLoading">Loading status...</p>
     </section>
 
-    <section class="status" aria-label="Status">
-      <div class="status-header">
+    <section class="feature-block" aria-label="Status">
+      <div class="feature-header">
         <h2 data-i18n="statusTitle">Status</h2>
+        <p class="feature-intro" data-i18n="statusIntro">Is your SRSEII ready?</p>
       </div>
 
-      <div class="status-grid compact-status-grid">
-        <article class="status-card">
-          <h3 data-i18n="systemTitle">System</h3>
-          <ul>
-            <li><span class="label">OpenWrt</span><span id="st-openwrt-state" class="pill pending" data-i18n="loading">loading</span></li>
-          </ul>
+      <div class="feature-group">
+        <h3 data-i18n="readinessTitle">Readiness</h3>
+        <article class="feature-card">
+          <div class="feature-copy">
+            <h4 data-i18n="overallStatus">Overall status</h4>
+          </div>
+          <div class="feature-actions">
+            <span class="pill pending overall-status" id="st-overall-label" data-i18n="loading">loading</span>
+          </div>
         </article>
 
-        <article class="status-card">
-          <h3 data-i18n="modelRailwayBaseFunctionsTitle">Model railway base functions</h3>
-          <ul>
-            <li><span class="label">Gleisbox CAN connection</span><span id="st-can2lan-status" class="pill pending" data-i18n="loading">loading</span></li>
-          </ul>
+        <article class="feature-card">
+          <div class="feature-copy">
+            <h4 data-i18n="systemTitle">System</h4>
+            <p data-i18n="systemDesc">OpenWrt is running smoothly and provides the basic functions.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-openwrt-state" class="pill pending" data-i18n="loading">loading</span>
+          </div>
         </article>
 
-        <article class="status-card status-card-wide">
-          <h3 data-i18n="overallStatus">Overall status</h3>
-          <p class="overall-status" id="st-overall-label" data-i18n="loading">loading</p>
+        <article class="feature-card">
+          <div class="feature-copy">
+            <h4 data-i18n="modelRailwayBaseFunctionsTitle">Model railway base functions</h4>
+            <p data-i18n="modelRailwayBaseFunctionsDesc">The connection to the track box is active.</p>
+          </div>
+          <div class="feature-actions">
+            <span id="st-can2lan-status" class="pill pending" data-i18n="loading">loading</span>
+          </div>
         </article>
       </div>
 

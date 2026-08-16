@@ -85,12 +85,15 @@
       luciDesc: "Erweiterte OpenWrt-Einstellungen.",
       open: "Öffnen",
       statusTitle: "Status",
+      readinessTitle: "Betriebsbereitschaft",
+      statusIntro: "Ist dein SRSEII bereit?",
       refresh: "Aktualisieren",
       networkSectionTitle: "Netzwerk",
       lanStatusTitle: "LAN-Verbindung",
       wifiStatusTitle: "WLAN-Verbindung",
       statusLabel: "Status",
       systemTitle: "System",
+      systemDesc: "OpenWrt läuft sauber und stellt die Basisfunktionen bereit.",
       hostnameLabel: "Hostname",
       modelLabel: "Modell",
       networkTitle: "Netzwerk",
@@ -101,6 +104,7 @@
       appsTitle: "Apps",
       servicesTitle: "Dienste",
       modelRailwayBaseFunctionsTitle: "Modellbahn Basisfunktionen",
+      modelRailwayBaseFunctionsDesc: "Die Verbindung zur Gleisbox ist aktiv.",
       overallStatus: "Gesamtstatus",
       technicalDetailsTitle: "Technische Details",
       modelRailwayFunctionsTitle: "Modellbahn-Funktionen",
@@ -219,12 +223,15 @@
       luciDesc: "Advanced OpenWrt settings.",
       open: "Open",
       statusTitle: "Status",
+      readinessTitle: "Readiness",
+      statusIntro: "Is your SRSEII ready?",
       refresh: "Refresh",
       networkSectionTitle: "Network",
       lanStatusTitle: "LAN connection",
       wifiStatusTitle: "Wifi connection",
       statusLabel: "Status",
       systemTitle: "System",
+      systemDesc: "OpenWrt is running correctly and provides the system foundation.",
       hostnameLabel: "Hostname",
       modelLabel: "Model",
       networkTitle: "Network",
@@ -235,6 +242,7 @@
       appsTitle: "Apps",
       servicesTitle: "Services",
       modelRailwayBaseFunctionsTitle: "Model railway base functions",
+      modelRailwayBaseFunctionsDesc: "The connection to the Gleisbox is active.",
       overallStatus: "Overall status",
       technicalDetailsTitle: "Technical details",
       modelRailwayFunctionsTitle: "Model railway functions",
@@ -644,7 +652,7 @@
     setText("net-lan-ip", localizeStatusFallback(network.lanIp || t("notAvailable")));
     setText("net-wifi-ssid", localizeStatusFallback(network.ssid || t("unknown")));
     setText("net-wifi-ip", localizeStatusFallback(network.wifiIp || t("notAvailable")));
-    setPill("st-openwrt-state", !!openwrt.ok, t("ok"), t("check"));
+    setPill("st-openwrt-state", !!openwrt.ok, t("ready"), t("notReady"));
     setPill("st-can2lan-status", !!can2lan.active, t("ready"), t("notReady"));
 
     renderEventLog(Array.isArray(data.events) ? data.events : []);
@@ -654,7 +662,7 @@
     var overallBadge = document.getElementById("st-overall-label");
     if (overallBadge) {
       overallBadge.textContent = overallLabel;
-      overallBadge.classList.remove("ok", "warn", "err");
+      overallBadge.classList.remove("pending", "ok", "warn", "err");
       overallBadge.classList.add(overallReady ? "ok" : "warn");
     }
 
