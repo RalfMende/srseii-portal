@@ -338,8 +338,28 @@
   };
 
   function detectLanguage() {
-    var browserLang = (navigator.language || navigator.userLanguage || "de").toLowerCase();
+    var browserLang = (navigator.language || navigator.userLanguage || "en").toLowerCase();
     return browserLang.indexOf("de") === 0 ? "de" : "en";
+  }
+
+  function getLocalizedStatusValue(item, englishKey, germanKey) {
+    if (lang === "de" && item && item[germanKey]) {
+      return String(item[germanKey]);
+    }
+    return item && item[englishKey] ? String(item[englishKey]) : "";
+  }
+
+  function localizeStatusFallback(value) {
+    if (value === "unknown" || value === "unbekannt") {
+      return t("unknown");
+    }
+    if (value === "not available" || value === "nicht verfügbar") {
+      return t("notAvailable");
+    }
+    if (value === "not connected" || value === "nicht verbunden") {
+      return lang === "de" ? "nicht verbunden" : "not connected";
+    }
+    return value;
   }
 
   function t(key) {
@@ -514,7 +534,7 @@
 
     list.innerHTML = "";
 
-    var items = Array.isArray(events) && events.length ? events.slice(0, 5) : [{ level: "info", message: t("noEvents"), time: "-" }];
+    var items = Array.isArray(events) ? events.slice(0, 5) : [];
 
     items.forEach(function (eventItem) {
       var item = document.createElement("li");
@@ -621,16 +641,16 @@
     }
     setPill("net-lan-state", !!network.lan);
     setPill("net-wifi-state", !!network.wifi);
-    setText("net-lan-ip", network.lanIp || t("notAvailable"));
-    setText("net-wifi-ssid", network.ssid || t("unknown"));
-    setText("net-wifi-ip", network.wifiIp || t("notAvailable"));
+    setText("net-lan-ip", localizeStatusFallback(network.lanIp || t("notAvailable")));
+    setText("net-wifi-ssid", localizeStatusFallback(network.ssid || t("unknown")));
+    setText("net-wifi-ip", localizeStatusFallback(network.wifiIp || t("notAvailable")));
     setPill("st-openwrt-state", !!openwrt.ok, t("ok"), t("check"));
     setPill("st-can2lan-status", !!can2lan.active, t("ready"), t("notReady"));
 
     renderEventLog(Array.isArray(data.events) ? data.events : []);
 
     var overallReady = !!overall.ready;
-    var overallLabel = overall.label || (overallReady ? t("overallReady") : t("overallAttention"));
+    var overallLabel = getLocalizedStatusValue(overall, "label", "labelDe") || (overallReady ? t("overallReady") : t("overallAttention"));
     var overallBadge = document.getElementById("st-overall-label");
     if (overallBadge) {
       overallBadge.textContent = overallLabel;
@@ -722,7 +742,7 @@
       return fetchStatusData().then(function (data) {
         var network = applyStatusData(data);
         setStatusNote(t("statusLoaded"));
-        setNetworkNote(network.message || t("statusLoaded"));
+        setNetworkNote(getLocalizedStatusValue(network, "message", "messageDe") || t("statusLoaded"));
 
         if (isWifiConnected(network, expectedSsid)) {
           return true;
@@ -924,7 +944,7 @@
         var network = applyStatusData(data);
 
         setStatusNote(t("statusLoaded"));
-        setNetworkNote(network.message || t("statusLoaded"));
+        setNetworkNote(getLocalizedStatusValue(network, "message", "messageDe") || t("statusLoaded"));
       })
       .catch(function (error) {
         setStatusNote(t("statusLoadError") + " " + error.message);

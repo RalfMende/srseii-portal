@@ -220,34 +220,37 @@ if [ -n "$wifi_ip" ] && [ "$wifi_up" = false ]; then
 fi
 
 if [ "$wifi_up" = false ]; then
-	ssid_value="nicht verbunden"
+	ssid_value="not connected"
 	wifi_ip=""
 fi
 
-[ -n "$ssid_value" ] || ssid_value="unbekannt"
+[ -n "$ssid_value" ] || ssid_value="unknown"
 
 ip_value="$(ip -o -4 addr show scope global 2>/dev/null | awk '{print $4}' | cut -d/ -f1 | head -n 1 || true)"
-[ -n "$ip_value" ] || ip_value="nicht verfügbar"
+[ -n "$ip_value" ] || ip_value="not available"
 
 primary_ip="$lan_ip"
 if [ -z "$primary_ip" ]; then
 	primary_ip="$wifi_ip"
 fi
 [ -n "$primary_ip" ] || primary_ip="$ip_value"
-[ -n "$primary_ip" ] || primary_ip="nicht verfügbar"
-
-status_message="Keine aktive Netzwerkverbindung."
-if [ "$lan_up" = true ] || [ "$wifi_up" = true ]; then
-	if [ "$primary_ip" = "nicht verfügbar" ]; then
-		status_message="Verbindung vorhanden, aber keine IP-Adresse gefunden."
-	else
-		status_message="Netzwerkverbindung verfügbar."
-	fi
-fi
+[ -n "$primary_ip" ] || primary_ip="not available"
 
 network_available=false
 if [ "$lan_up" = true ] || [ "$wifi_up" = true ]; then
 	network_available=true
+fi
+
+status_message="No active network connection."
+status_message_de="Keine aktive Netzwerkverbindung."
+if [ "$network_available" = true ]; then
+	if [ "$primary_ip" = "not available" ]; then
+		status_message="Connection available, but no IP address was found."
+		status_message_de="Verbindung vorhanden, aber keine IP-Adresse gefunden."
+	else
+		status_message="Network connection available."
+		status_message_de="Netzwerkverbindung verfügbar."
+	fi
 fi
 
 openwrt_ok=false
@@ -357,10 +360,12 @@ if [ "$openwrt_ok" = true ] && [ "$network_available" = true ] && [ "$can2lan_se
 fi
 
 overall_status="problem"
-overall_label="SRSEII benötigt Aufmerksamkeit"
+overall_label="SRSEII needs attention"
+overall_label_de="SRSEII benötigt Aufmerksamkeit"
 if [ "$overall_ready" = true ]; then
 	overall_status="ready"
-	overall_label="SRSEII ist bereit"
+	overall_label="SRSEII is ready"
+	overall_label_de="SRSEII ist bereit"
 fi
 
 events_json=""
@@ -374,30 +379,20 @@ add_event() {
 	events_json="${events_json}{\"level\":\"$(json_escape "$level")\",\"message\":\"$(json_escape "$message")\",\"time\":\"$(json_escape "$timestamp")\"}"
 }
 
-if [ "$openwrt_ok" = true ]; then
-	add_event "info" "OpenWrt läuft sauber."
-else
-	add_event "warning" "OpenWrt-Basisstatus konnte nicht verifiziert werden."
+if [ "$openwrt_ok" = false ]; then
+	add_event "warning" "OpenWrt base status could not be verified."
 fi
 
-if [ "$network_available" = true ]; then
-	add_event "info" "Netzwerkverbindung verfügbar."
-else
-	add_event "warning" "Keine aktive Netzwerkverbindung."
+if [ "$network_available" = false ]; then
+	add_event "warning" "No active network connection."
+elif [ "$primary_ip" = "not available" ]; then
+	add_event "warning" "Connection available, but no IP address was found."
 fi
 
-if [ "$can2lan_service_rc" -eq 0 ]; then
-	add_event "info" "Gleisbox CAN-Verbindung bereit."
-else
-	add_event "warning" "Gleisbox CAN-Verbindung nicht aktiv."
-fi
-
-if [ "$overall_ready" = true ]; then
-	add_event "info" "SRSEII ist bereit."
-else
-	add_event "warning" "SRSEII benötigt Aufmerksamkeit."
+if [ "$can2lan_service_rc" -ne 0 ]; then
+	add_event "warning" "Track box CAN connection is inactive."
 fi
 
 cat <<EOF
-{"hostname":"$(json_escape "$hostname_value")","model":"$(json_escape "$model_value")","openwrt":{"ok":$openwrt_ok},"network":{"available":$network_available,"lan":$lan_up,"wifi":$wifi_up,"ssid":"$(json_escape "$ssid_value")","ip":"$(json_escape "$primary_ip")","lanIp":"$(json_escape "$lan_ip")","wifiIp":"$(json_escape "$wifi_ip")","wifiInterface":"$(json_escape "$wifi_iface")","message":"$(json_escape "$status_message")"},"can2lan":{"active":$can2lan_service_value},"overall":{"ready":$overall_ready,"status":"$(json_escape "$overall_status")","label":"$(json_escape "$overall_label")"},"events":[${events_json}],"apps":{"mswebapp":$mswebapp_ready_value,"railcontrol":$railcontrol_ready_value},"useCases":{"z21interface":$z21interface_ready_value,"cs2interface":$cs2interface_ready_value},"services":{"mswebapp":$mswebapp_service_value,"railcontrol":$railcontrol_service_value,"z21emu":$z21emu_service_value,"can2lan":$can2lan_service_value,"clone-ms2-loco":$clone_ms2_loco_service_value,"maecanserver":$maecanserver_service_value,"ms2-loco-list":$ms2_loco_list_service_value,"wake-up-links88":$wake_up_links88_service_value}}
+{"hostname":"$(json_escape "$hostname_value")","model":"$(json_escape "$model_value")","openwrt":{"ok":$openwrt_ok},"network":{"available":$network_available,"lan":$lan_up,"wifi":$wifi_up,"ssid":"$(json_escape "$ssid_value")","ip":"$(json_escape "$primary_ip")","lanIp":"$(json_escape "$lan_ip")","wifiIp":"$(json_escape "$wifi_ip")","wifiInterface":"$(json_escape "$wifi_iface")","message":"$(json_escape "$status_message")","messageDe":"$(json_escape "$status_message_de")"},"can2lan":{"active":$can2lan_service_value},"overall":{"ready":$overall_ready,"status":"$(json_escape "$overall_status")","label":"$(json_escape "$overall_label")","labelDe":"$(json_escape "$overall_label_de")"},"events":[${events_json}],"apps":{"mswebapp":$mswebapp_ready_value,"railcontrol":$railcontrol_ready_value},"useCases":{"z21interface":$z21interface_ready_value,"cs2interface":$cs2interface_ready_value},"services":{"mswebapp":$mswebapp_service_value,"railcontrol":$railcontrol_service_value,"z21emu":$z21emu_service_value,"can2lan":$can2lan_service_value,"clone-ms2-loco":$clone_ms2_loco_service_value,"maecanserver":$maecanserver_service_value,"ms2-loco-list":$ms2_loco_list_service_value,"wake-up-links88":$wake_up_links88_service_value}}
 EOF
