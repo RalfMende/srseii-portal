@@ -528,36 +528,12 @@ body {
   color: #8a1e2b;
 }
 
-.wifi {
-  margin-top: 1.25rem;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: var(--shadow);
-  padding: 1rem;
+.wifi-details {
+  margin-top: 0.9rem;
 }
 
-.wifi-inline {
-  margin-top: 1rem;
-  background: rgba(255, 255, 255, 0.92);
-}
-
-.wifi-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.7rem;
-  margin-bottom: 0.85rem;
-}
-
-.wifi-header h2 {
-  margin: 0;
-  font-size: 1.18rem;
-}
-
-.wifi-header h3 {
-  margin: 0;
-  font-size: 1.18rem;
+.wifi-details .wifi-grid {
+  margin-top: 0.7rem;
 }
 
 .wifi-grid {
@@ -676,11 +652,6 @@ button.btn[disabled] {
   }
 
   .network-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .wifi-header {
     flex-direction: column;
     align-items: flex-start;
   }

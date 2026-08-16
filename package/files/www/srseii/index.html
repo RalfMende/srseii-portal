@@ -157,34 +157,8 @@
         </article>
       </div>
 
-      <p class="status-note" id="network-note" data-i18n="statusLoading">Status wird geladen...</p>
-    </section>
-
-    <section class="tooling-block" aria-label="Expertenwerkzeuge">
-      <div class="tooling-header">
-        <h2>Expertenwerkzeuge</h2>
-      </div>
-
-      <div class="tooling-grid">
-        <article class="tooling-card">
-          <h3>LuCI (expert mode)</h3>
-          <p>Erweiterte OpenWrt-Einstellungen.</p>
-          <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/">Öffnen</a>
-        </article>
-
-        <article class="tooling-card">
-          <h3>Terminal</h3>
-          <p>Direkter SSH-Zugriff über Port 22.</p>
-          <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/">Öffnen</a>
-        </article>
-      </div>
-    </section>
-
-    <div class="wifi wifi-inline is-hidden" id="wifi-assistant" aria-label="WLAN-Assistent">
-        <div class="wifi-header">
-          <h3 data-i18n="wifiAssistantTitle">WLAN-Assistent</h3>
-          <button class="btn btn-secondary" id="wifi-scan" type="button" data-i18n="wifiScan">WLAN-Scan</button>
-        </div>
+      <details class="status-details wifi-details" id="wifi-assistant">
+        <summary data-i18n="wifiAssistantTitle">WLAN Konfiguration</summary>
 
         <div class="wifi-grid">
           <label for="wifi-network" data-i18n="wifiNetworkLabel">Gefundenes Netzwerk</label>
@@ -213,12 +187,36 @@
         <p class="status-note wifi-manual-hint is-hidden" id="wifi-manual-hint" data-i18n="wifiManualHint">Nur bei versteckten SSIDs oder wenn der Scan das Netzwerk nicht findet.</p>
 
         <div class="wifi-actions">
+          <button class="btn btn-secondary" id="wifi-scan" type="button" data-i18n="wifiScan">WLAN-Scan</button>
           <button class="btn" id="wifi-connect" type="button" data-i18n="wifiConnect">Verbinden</button>
           <button class="btn btn-ghost" id="wifi-manual-toggle" type="button" data-i18n="wifiManualToggleShow">Show Advanced Config</button>
         </div>
 
         <p class="status-note" id="wifi-note" data-i18n="wifiIdle">Bereit.</p>
+      </details>
+
+      <p class="status-note" id="network-note" data-i18n="statusLoading">Status wird geladen...</p>
+    </section>
+
+    <section class="tooling-block" aria-label="Expertenwerkzeuge">
+      <div class="tooling-header">
+        <h2>Expertenwerkzeuge</h2>
       </div>
+
+      <div class="tooling-grid">
+        <article class="tooling-card">
+          <h3>LuCI (expert mode)</h3>
+          <p>Erweiterte OpenWrt-Einstellungen.</p>
+          <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/">Öffnen</a>
+        </article>
+
+        <article class="tooling-card">
+          <h3>Terminal</h3>
+          <p>Direkter SSH-Zugriff über Port 22.</p>
+          <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/">Öffnen</a>
+        </article>
+      </div>
+    </section>
 
     <section class="note" aria-live="polite">
       <strong data-i18n="noteLabel">Hinweis:</strong>

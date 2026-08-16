@@ -27,6 +27,7 @@
   var lang = detectLanguage();
   var manualMode = false;
   var scannedNetworksBySsid = {};
+  var wifiAssistantAutoToggle = false;
 
   var translations = {
     de: {
@@ -110,7 +111,7 @@
       unknown: "unbekannt",
       notAvailable: "nicht verfügbar",
       hostHintPrefix: "RailControl-Ziel",
-      wifiAssistantTitle: "WLAN-Assistent",
+      wifiAssistantTitle: "WLAN Konfiguration",
       wifiScan: "WLAN-Scan",
       wifiNetworkLabel: "Gefundenes Netzwerk",
       wifiNetworkPlaceholder: "Bitte zuerst scan starten",
@@ -223,7 +224,7 @@
       unknown: "unknown",
       notAvailable: "not available",
       hostHintPrefix: "RailControl target",
-      wifiAssistantTitle: "WLAN assistant",
+      wifiAssistantTitle: "WLAN configuration",
       wifiScan: "Scan WLAN",
       wifiNetworkLabel: "Detected network",
       wifiNetworkPlaceholder: "Run a scan first",
@@ -535,9 +536,11 @@
       overallBadge.classList.add(overallReady ? "ok" : "warn");
     }
 
+    // Always revealable; auto-expand only while WLAN is not yet configured.
     var wifiAssistant = document.getElementById("wifi-assistant");
-    if (wifiAssistant) {
-      wifiAssistant.classList.toggle("is-hidden", !!network.wifi);
+    if (wifiAssistant && !wifiAssistant.dataset.userToggled) {
+      wifiAssistantAutoToggle = true;
+      wifiAssistant.open = !network.wifi;
     }
 
     // Web apps are exposed as app readiness in the backend payload.
@@ -893,6 +896,17 @@
   }
   if (wifiConnectButton) {
     wifiConnectButton.addEventListener("click", connectWifi);
+  }
+
+  var wifiAssistantDetails = document.getElementById("wifi-assistant");
+  if (wifiAssistantDetails) {
+    wifiAssistantDetails.addEventListener("toggle", function () {
+      if (wifiAssistantAutoToggle) {
+        wifiAssistantAutoToggle = false;
+        return;
+      }
+      wifiAssistantDetails.dataset.userToggled = "true";
+    });
   }
   applyTranslations();
   setManualMode(false);
