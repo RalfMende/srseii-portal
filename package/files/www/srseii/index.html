@@ -96,25 +96,38 @@
         <article class="status-card">
           <h3 data-i18n="systemTitle">System</h3>
           <ul>
+            <li><span class="label">OpenWrt</span><span id="st-openwrt-state" class="pill pending" data-i18n="loading">wird geladen</span></li>
             <li><span class="label" data-i18n="hostnameLabel">Hostname</span><span id="st-hostname">-</span></li>
             <li><span class="label" data-i18n="modelLabel">Modell</span><span id="st-model">-</span></li>
           </ul>
         </article>
 
         <article class="status-card">
-          <h3 data-i18n="servicesTitle">Dienste</h3>
+          <h3>Modellbahn Basisfunktionen</h3>
           <ul>
-            <li><span class="label">MSWebApp</span><span id="st-mswebapp-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending" data-i18n="loading">wird geladen</span></li>
-            <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">Gleisbox CAN-Verbindung</span><span id="st-can2lan-status" class="pill pending" data-i18n="loading">wird geladen</span></li>
           </ul>
         </article>
+
+        <article class="status-card status-card-wide">
+          <h3>Gesamtstatus</h3>
+          <p class="overall-status" id="st-overall-label">wird geladen</p>
+        </article>
       </div>
+
+      <details class="status-details">
+        <summary>Technische Details</summary>
+        <ul class="status-details-list">
+          <li><span class="label">MSWebApp</span><span id="st-mswebapp-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending" data-i18n="loading">wird geladen</span></li>
+        </ul>
+      </details>
 
       <p class="status-note" id="st-note" data-i18n="statusLoading">Status wird geladen...</p>
     </section>

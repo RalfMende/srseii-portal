@@ -343,19 +343,22 @@
     }
   }
 
-  function setPill(id, isOk) {
+  function setPill(id, isOk, okText, errText) {
     var el = document.getElementById(id);
     if (!el) {
       return;
     }
 
+    var successText = okText || t("active");
+    var failureText = errText || t("inactive");
+
     el.classList.remove("pending", "ok", "err", "warn");
     if (isOk) {
       el.classList.add("pill", "ok");
-      el.textContent = t("active");
+      el.textContent = successText;
     } else {
       el.classList.add("pill", "err");
-      el.textContent = t("inactive");
+      el.textContent = failureText;
     }
   }
 
@@ -508,6 +511,10 @@
     setText("st-model", data.model || t("unknown"));
 
     var network = data.network || {};
+    var openwrt = data.openwrt || {};
+    var can2lan = data.can2lan || {};
+    var overall = data.overall || {};
+
     if (network.ip) {
       updateAppLinks(network.ip);
     }
@@ -516,6 +523,17 @@
     setText("net-lan-ip", network.lanIp || t("notAvailable"));
     setText("net-wifi-ssid", network.ssid || t("unknown"));
     setText("net-wifi-ip", network.wifiIp || t("notAvailable"));
+    setPill("st-openwrt-state", !!openwrt.ok, "OK", "Prüfen");
+    setPill("st-can2lan-status", !!can2lan.active, "Bereit", "Nicht bereit");
+
+    var overallReady = !!overall.ready;
+    var overallLabel = overall.label || (overallReady ? "SRSEII ist bereit" : "SRSEII benötigt Aufmerksamkeit");
+    var overallBadge = document.getElementById("st-overall-label");
+    if (overallBadge) {
+      overallBadge.textContent = overallLabel;
+      overallBadge.classList.remove("ok", "warn", "err");
+      overallBadge.classList.add(overallReady ? "ok" : "warn");
+    }
 
     var wifiAssistant = document.getElementById("wifi-assistant");
     if (wifiAssistant) {

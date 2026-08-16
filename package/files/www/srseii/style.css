@@ -410,6 +410,52 @@ body {
   padding: 0.75rem;
 }
 
+.status-card-wide {
+  min-height: 100%;
+}
+
+.overall-status {
+  margin: 0.4rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.overall-status.ok {
+  color: #0b5725;
+}
+
+.overall-status.warn {
+  color: #6b4a1a;
+}
+
+.status-details {
+  margin-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.8rem;
+}
+
+.status-details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.status-details-list {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.status-details-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 0.28rem 0;
+  border-bottom: 1px solid rgba(26, 32, 44, 0.06);
+}
+
 .status-card h3 {
   margin: 0 0 0.45rem;
   font-size: 1rem;

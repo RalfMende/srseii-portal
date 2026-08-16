@@ -1,7 +1,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=srseii-portal
-PKG_VERSION:=0.5.4
+PKG_VERSION:=0.6.0
 PKG_RELEASE:=1
 
 include $(INCLUDE_DIR)/package.mk
