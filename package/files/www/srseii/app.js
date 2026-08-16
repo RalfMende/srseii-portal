@@ -125,6 +125,8 @@
       loading: "wird geladen",
       active: "aktiv",
       inactive: "inaktiv",
+      connected: "verbunden",
+      notConnected: "nicht verbunden",
       ready: "Bereit",
       setupRequired: "Einrichtung erforderlich",
       notReady: "Nicht bereit",
@@ -266,6 +268,8 @@
       loading: "loading",
       active: "active",
       inactive: "inactive",
+      connected: "connected",
+      notConnected: "not connected",
       ready: "Ready",
       setupRequired: "Setup required",
       notReady: "Not ready",
@@ -476,6 +480,17 @@
     }
   }
 
+  function setNetworkPill(id, isConnected) {
+    var el = document.getElementById(id);
+    if (!el) {
+      return;
+    }
+
+    el.classList.remove("pending", "ok", "err", "warn");
+    el.classList.add("pill", isConnected ? "ok" : "warn");
+    el.textContent = isConnected ? t("connected") : t("notConnected");
+  }
+
   function setAppStatus(id, state) {
     var el = document.getElementById(id);
     if (!el) {
@@ -653,8 +668,8 @@
     if (network.ip) {
       updateAppLinks(network.ip);
     }
-    setPill("net-lan-state", !!network.lan);
-    setPill("net-wifi-state", !!network.wifi);
+    setNetworkPill("net-lan-state", !!network.lan);
+    setNetworkPill("net-wifi-state", !!network.wifi);
     setText("net-lan-ip", localizeStatusFallback(network.lanIp || t("notAvailable")));
     setText("net-wifi-ssid", localizeStatusFallback(network.ssid || t("unknown")));
     setText("net-wifi-ip", localizeStatusFallback(network.wifiIp || t("notAvailable")));

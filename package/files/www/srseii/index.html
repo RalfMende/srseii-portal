@@ -33,23 +33,23 @@
           </div>
 
           <div class="network-grid">
-        <article class="network-card">
-          <h3 data-i18n="lanStatusTitle">LAN connection</h3>
-          <ul>
-            <li><span class="label" data-i18n="statusLabel">Status</span><span id="net-lan-state" class="pill pending" data-i18n="loading">loading</span></li>
-            <li><span class="label" data-i18n="ipLabel">IP</span><span id="net-lan-ip">-</span></li>
-          </ul>
-        </article>
+            <article class="network-card">
+              <div class="network-card-heading">
+                <h3 data-i18n="lanStatusTitle">LAN connection</h3>
+                <span id="net-lan-state" class="pill pending" data-i18n="loading">loading</span>
+              </div>
+              <p class="network-address"><span class="label" data-i18n="ipLabel">IP</span><span id="net-lan-ip">-</span></p>
+            </article>
 
-        <article class="network-card">
-          <h3 data-i18n="wifiStatusTitle">Wifi connection</h3>
-          <ul>
-            <li><span class="label" data-i18n="statusLabel">Status</span><span id="net-wifi-state" class="pill pending" data-i18n="loading">loading</span></li>
-            <li><span class="label" data-i18n="ssidLabel">SSID</span><span id="net-wifi-ssid">-</span></li>
-            <li><span class="label" data-i18n="ipLabel">IP</span><span id="net-wifi-ip">-</span></li>
-          </ul>
-        </article>
-      </div>
+            <article class="network-card">
+              <div class="network-card-heading">
+                <h3 data-i18n="wifiStatusTitle">Wifi connection</h3>
+                <span id="net-wifi-state" class="pill pending" data-i18n="loading">loading</span>
+              </div>
+              <p class="network-address"><span class="label" data-i18n="ssidLabel">SSID</span><span id="net-wifi-ssid">-</span></p>
+              <p class="network-address"><span class="label" data-i18n="ipLabel">IP</span><span id="net-wifi-ip">-</span></p>
+            </article>
+          </div>
 
       <details class="status-details wifi-details" id="wifi-assistant">
         <summary data-i18n="wifiAssistantTitle">Wifi configuration</summary>
