@@ -17,25 +17,25 @@
       <p class="subtitle" data-i18n="heroSubtitle">Smallest Railroad Server Ever II</p>
     </header>
 
-    <section class="network" aria-label="Netzwerk">
+    <section class="network" aria-label="Network">
       <div class="network-header">
-        <h2 data-i18n="networkSectionTitle">Netzwerk</h2>
-        <button class="btn btn-secondary" id="refresh-status" type="button" data-i18n="refresh">Aktualisieren</button>
+        <h2 data-i18n="networkSectionTitle">Network</h2>
+        <button class="btn btn-secondary" id="refresh-status" type="button" data-i18n="refresh">Refresh</button>
       </div>
 
       <div class="network-grid">
         <article class="network-card">
-          <h3 data-i18n="lanStatusTitle">LAN</h3>
+          <h3 data-i18n="lanStatusTitle">LAN connection</h3>
           <ul>
-            <li><span class="label" data-i18n="statusLabel">Status</span><span id="net-lan-state" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label" data-i18n="statusLabel">Status</span><span id="net-lan-state" class="pill pending" data-i18n="loading">loading</span></li>
             <li><span class="label" data-i18n="ipLabel">IP</span><span id="net-lan-ip">-</span></li>
           </ul>
         </article>
 
         <article class="network-card">
-          <h3 data-i18n="wifiStatusTitle">WLAN</h3>
+          <h3 data-i18n="wifiStatusTitle">Wifi connection</h3>
           <ul>
-            <li><span class="label" data-i18n="statusLabel">Status</span><span id="net-wifi-state" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label" data-i18n="statusLabel">Status</span><span id="net-wifi-state" class="pill pending" data-i18n="loading">loading</span></li>
             <li><span class="label" data-i18n="ssidLabel">SSID</span><span id="net-wifi-ssid">-</span></li>
             <li><span class="label" data-i18n="ipLabel">IP</span><span id="net-wifi-ip">-</span></li>
           </ul>
@@ -43,47 +43,47 @@
       </div>
 
       <details class="status-details wifi-details" id="wifi-assistant">
-        <summary data-i18n="wifiAssistantTitle">WLAN Konfiguration</summary>
+        <summary data-i18n="wifiAssistantTitle">Wifi configuration</summary>
 
         <div class="wifi-grid">
-          <label for="wifi-network" data-i18n="wifiNetworkLabel">Gefundenes Netzwerk</label>
+          <label for="wifi-network" data-i18n="wifiNetworkLabel">Detected network</label>
           <select id="wifi-network">
-            <option value="" data-i18n="wifiNetworkPlaceholder">Bitte zuerst scan starten</option>
+            <option value="" data-i18n="wifiNetworkPlaceholder">Run a scan first</option>
           </select>
 
-          <label for="wifi-password" data-i18n="wifiPasswordLabel">Passwort</label>
-          <input id="wifi-password" type="password" autocomplete="new-password" maxlength="63" placeholder="WLAN-Passwort" />
+          <label for="wifi-password" data-i18n="wifiPasswordLabel">Password</label>
+          <input id="wifi-password" type="password" autocomplete="new-password" maxlength="63" placeholder="Wifi password" />
         </div>
 
         <div class="wifi-grid wifi-manual-fields is-hidden" id="wifi-manual-fields">
-          <label for="wifi-ssid" data-i18n="wifiSsidManualLabel">SSID (manuell)</label>
-          <input id="wifi-ssid" type="text" autocomplete="off" maxlength="32" placeholder="z. B. Heimnetz" />
+          <label for="wifi-ssid" data-i18n="wifiSsidManualLabel">SSID (manual)</label>
+          <input id="wifi-ssid" type="text" autocomplete="off" maxlength="32" placeholder="e.g. Home network" />
 
-          <label for="wifi-security" data-i18n="wifiSecurityLabel">Sicherheit</label>
+          <label for="wifi-security" data-i18n="wifiSecurityLabel">Security</label>
           <select id="wifi-security">
-            <option value="auto" data-i18n="wifiSecurityAuto">Automatisch</option>
+            <option value="auto" data-i18n="wifiSecurityAuto">Automatic</option>
             <option value="psk2" data-i18n="wifiSecurityWpa2">WPA2-PSK</option>
-            <option value="psk-mixed" data-i18n="wifiSecurityMixed">WPA/WPA2 gemischt</option>
+            <option value="psk-mixed" data-i18n="wifiSecurityMixed">WPA/WPA2 mixed</option>
             <option value="sae" data-i18n="wifiSecurityWpa3">WPA3-SAE</option>
-            <option value="none" data-i18n="wifiSecurityOpen">Offen (kein Passwort)</option>
+            <option value="none" data-i18n="wifiSecurityOpen">Open (no password)</option>
           </select>
         </div>
 
-        <p class="status-note wifi-manual-hint is-hidden" id="wifi-manual-hint" data-i18n="wifiManualHint">Nur bei versteckten SSIDs oder wenn der Scan das Netzwerk nicht findet.</p>
+        <p class="status-note wifi-manual-hint is-hidden" id="wifi-manual-hint" data-i18n="wifiManualHint">Use this only for hidden SSIDs or if the scan does not list the network.</p>
 
         <div class="wifi-actions">
-          <button class="btn btn-secondary" id="wifi-scan" type="button" data-i18n="wifiScan">WLAN-Scan</button>
-          <button class="btn" id="wifi-connect" type="button" data-i18n="wifiConnect">Verbinden</button>
-          <button class="btn btn-ghost" id="wifi-manual-toggle" type="button" data-i18n="wifiManualToggleShow">Show Advanced Config</button>
+          <button class="btn btn-secondary" id="wifi-scan" type="button" data-i18n="wifiScan">Scan Wifi</button>
+          <button class="btn" id="wifi-connect" type="button" data-i18n="wifiConnect">Connect</button>
+          <button class="btn btn-ghost" id="wifi-manual-toggle" type="button" data-i18n="wifiManualToggleShow">Show advanced configuration</button>
         </div>
 
-        <p class="status-note" id="wifi-note" data-i18n="wifiIdle">Bereit.</p>
+        <p class="status-note" id="wifi-note" data-i18n="wifiIdle">Ready.</p>
       </details>
 
-      <p class="status-note" id="network-note" data-i18n="statusLoading">Status wird geladen...</p>
+      <p class="status-note" id="network-note" data-i18n="statusLoading">Loading status...</p>
     </section>
 
-    <section class="status" aria-label="Systemstatus">
+    <section class="status" aria-label="Status">
       <div class="status-header">
         <h2 data-i18n="statusTitle">Status</h2>
       </div>
@@ -92,178 +92,178 @@
         <article class="status-card">
           <h3 data-i18n="systemTitle">System</h3>
           <ul>
-            <li><span class="label">OpenWrt</span><span id="st-openwrt-state" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">OpenWrt</span><span id="st-openwrt-state" class="pill pending" data-i18n="loading">loading</span></li>
           </ul>
         </article>
 
         <article class="status-card">
-          <h3 data-i18n="modelRailwayBaseFunctionsTitle">Modellbahn Basisfunktionen</h3>
+          <h3 data-i18n="modelRailwayBaseFunctionsTitle">Model railway base functions</h3>
           <ul>
-            <li><span class="label">Gleisbox CAN-Verbindung</span><span id="st-can2lan-status" class="pill pending" data-i18n="loading">wird geladen</span></li>
+            <li><span class="label">Gleisbox CAN connection</span><span id="st-can2lan-status" class="pill pending" data-i18n="loading">loading</span></li>
           </ul>
         </article>
 
         <article class="status-card status-card-wide">
-          <h3 data-i18n="overallStatus">Gesamtstatus</h3>
-          <p class="overall-status" id="st-overall-label" data-i18n="loading">wird geladen</p>
+          <h3 data-i18n="overallStatus">Overall status</h3>
+          <p class="overall-status" id="st-overall-label" data-i18n="loading">loading</p>
         </article>
       </div>
 
       <details class="status-details">
-        <summary data-i18n="technicalDetailsTitle">Technische Details</summary>
+        <summary data-i18n="technicalDetailsTitle">Technical details</summary>
         <ul class="status-details-list">
           <li><span class="label">Hostname</span><span id="st-hostname">-</span></li>
-          <li><span class="label">Modell</span><span id="st-model">-</span></li>
-          <li><span class="label">MSWebApp</span><span id="st-mswebapp-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">Z21-Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending" data-i18n="loading">wird geladen</span></li>
-          <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending" data-i18n="loading">wird geladen</span></li>
+          <li><span class="label">Model</span><span id="st-model">-</span></li>
+          <li><span class="label">MSWebApp</span><span id="st-mswebapp-svc" class="pill pending" data-i18n="loading">loading</span></li>
+          <li><span class="label">RailControl</span><span id="st-railcontrol-svc" class="pill pending" data-i18n="loading">loading</span></li>
+          <li><span class="label">Z21 Emulator</span><span id="st-z21emu" class="pill pending" data-i18n="loading">loading</span></li>
+          <li><span class="label">CAN2LAN</span><span id="st-can2lan" class="pill pending" data-i18n="loading">loading</span></li>
+          <li><span class="label">clone-ms2-loco</span><span id="st-clone-ms2-loco" class="pill pending" data-i18n="loading">loading</span></li>
+          <li><span class="label">maecanserver</span><span id="st-maecanserver" class="pill pending" data-i18n="loading">loading</span></li>
+          <li><span class="label">ms2-loco-list</span><span id="st-ms2-loco-list" class="pill pending" data-i18n="loading">loading</span></li>
+          <li><span class="label">wake-up-links88</span><span id="st-wake-up-links88" class="pill pending" data-i18n="loading">loading</span></li>
         </ul>
       </details>
 
-      <p class="status-note" id="st-note" data-i18n="statusLoading">Status wird geladen...</p>
+      <p class="status-note" id="st-note" data-i18n="statusLoading">Loading status...</p>
     </section>
 
-    <section class="feature-block" aria-label="Modellbahn-Funktionen">
+    <section class="feature-block" aria-label="Model railway functions">
       <div class="feature-header">
-        <h2 data-i18n="modelRailwayFunctionsTitle">Modellbahn-Funktionen</h2>
-        <p class="feature-intro" data-i18n="modelRailwayFunctionsIntro">Wie möchtest du deine Modellbahn steuern?</p>
+        <h2 data-i18n="modelRailwayFunctionsTitle">Model railway functions</h2>
+        <p class="feature-intro" data-i18n="modelRailwayFunctionsIntro">How would you like to control your model railway?</p>
       </div>
 
       <div class="feature-group">
-        <h3 data-i18n="browserDirectTitle">DIREKT IM BROWSER</h3>
+        <h3 data-i18n="browserDirectTitle">DIRECTLY IN THE BROWSER</h3>
 
         <article class="feature-card" style="--delay: 0ms;">
           <div class="feature-copy">
             <h4 data-i18n="mswebappTitle">Mobile Station Web App</h4>
-            <p data-i18n="mswebappDesc">Loks und Weichen direkt im Browser.</p>
+            <p data-i18n="mswebappDesc">Control locomotives and turnouts.</p>
           </div>
           <div class="feature-actions">
-            <span id="st-mswebapp-feature" class="pill pending">wird geladen</span>
-            <a class="btn btn-secondary" id="mswebapp-link" href="/srseii/" data-i18n="open">Öffnen</a>
+            <span id="st-mswebapp-feature" class="pill pending">loading</span>
+            <a class="btn btn-secondary" id="mswebapp-link" href="/srseii/" data-i18n="open">Open</a>
           </div>
         </article>
 
         <article class="feature-card" style="--delay: 90ms;">
           <div class="feature-copy">
             <h4 data-i18n="railcontrolTitle">RailControl</h4>
-            <p data-i18n="railcontrolDesc">Modellbahnsteuerung im Browser.</p>
+            <p data-i18n="railcontrolDesc">Model railway control in the browser.</p>
           </div>
           <div class="feature-actions">
-            <span id="st-railcontrol-feature" class="pill pending">wird geladen</span>
-            <a class="btn btn-secondary" id="railcontrol-link" href="/srseii/" data-i18n="open">Öffnen</a>
+            <span id="st-railcontrol-feature" class="pill pending">loading</span>
+            <a class="btn btn-secondary" id="railcontrol-link" href="/srseii/" data-i18n="open">Open</a>
           </div>
         </article>
       </div>
 
       <div class="feature-group">
-        <h3 data-i18n="smartphoneTabletTitle">MIT SMARTPHONE / TABLET</h3>
+        <h3 data-i18n="smartphoneTabletTitle">WITH SMARTPHONE / TABLET</h3>
 
         <article class="feature-card" style="--delay: 180ms;">
           <div class="feature-copy">
-            <h4 data-i18n="z21UseCaseTitle">Z21-kompatible Schnittstelle</h4>
-            <p data-i18n="z21UseCaseShort">Mit einer kompatiblen Z21-App oder WLAN-Maus steuern.</p>
+            <h4 data-i18n="z21UseCaseTitle">Z21-compatible interface</h4>
+            <p data-i18n="z21UseCaseShort">Connect using the Z21 app or Z21 Wifi Mouse.</p>
           </div>
           <div class="feature-actions">
-            <span id="st-z21emu-feature" class="pill pending">wird geladen</span>
-            <button class="btn btn-secondary" id="z21emu-guide-button" type="button" data-i18n="z21GuideButton">Anleitung</button>
+            <span id="st-z21emu-feature" class="pill pending">loading</span>
+            <button class="btn btn-secondary" id="z21emu-guide-button" type="button" data-i18n="z21GuideButton">Instructions</button>
           </div>
         </article>
 
         <article class="feature-card" style="--delay: 270ms;">
           <div class="feature-copy">
-            <h4 data-i18n="centralStationTitle">Kompatibles Interface</h4>
-            <p data-i18n="centralStationDesc">Mit einer kompatiblen externen Steuer-App verbinden.</p>
+            <h4 data-i18n="centralStationTitle">Central Station 2 compatible interface</h4>
+            <p data-i18n="centralStationDesc">Connect using compatible apps such as RemoteCS, RailControl Pro, or Mobile Station Wifi.</p>
           </div>
           <div class="feature-actions">
-            <span id="st-central-station-feature" class="pill pending">wird geladen</span>
-            <button class="btn btn-secondary" id="central-station-guide-button" type="button" data-i18n="centralStationGuideButton">Anleitung</button>
+            <span id="st-central-station-feature" class="pill pending">loading</span>
+            <button class="btn btn-secondary" id="central-station-guide-button" type="button" data-i18n="centralStationGuideButton">Instructions</button>
           </div>
         </article>
       </div>
 
       <div class="feature-group">
-        <h3 data-i18n="pcControlTitle">MIT PC-STEUERUNG</h3>
+        <h3 data-i18n="pcControlTitle">WITH PC CONTROL</h3>
 
         <article class="feature-card" style="--delay: 360ms;">
           <div class="feature-copy">
             <h4 data-i18n="itrainTitle">iTrain</h4>
-            <p data-i18n="itrainDesc">PC-basierte Modellbahnsteuerung mit eigener Einrichtung.</p>
+            <p data-i18n="itrainDesc">PC-based model railway control requiring a dedicated setup.</p>
           </div>
           <div class="feature-actions">
-            <span id="st-itrain-feature" class="pill warn">Einrichtung erforderlich</span>
-            <button class="btn btn-ghost" id="itrain-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+            <span id="st-itrain-feature" class="pill warn">Setup required</span>
+            <button class="btn btn-ghost" id="itrain-guide-button" type="button" data-i18n="setupButton">Set up</button>
           </div>
         </article>
 
         <article class="feature-card" style="--delay: 450ms;">
           <div class="feature-copy">
             <h4 data-i18n="winDigipetTitle">Win-Digipet</h4>
-            <p data-i18n="winDigipetDesc">Desktop-Anbindung mit eigener SRSEII-Konfiguration.</p>
+            <p data-i18n="winDigipetDesc">Desktop connectivity with its own SRSEII configuration.</p>
           </div>
           <div class="feature-actions">
-            <span id="st-win-digipet-feature" class="pill warn">Einrichtung erforderlich</span>
-            <button class="btn btn-ghost" id="win-digipet-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+            <span id="st-win-digipet-feature" class="pill warn">Setup required</span>
+            <button class="btn btn-ghost" id="win-digipet-guide-button" type="button" data-i18n="setupButton">Set up</button>
           </div>
         </article>
 
         <article class="feature-card" style="--delay: 540ms;">
           <div class="feature-copy">
             <h4 data-i18n="rocrailTitle">Rocrail</h4>
-            <p data-i18n="rocrailDesc">PC-Steuerung, je nach Setup separat einzurichten.</p>
+            <p data-i18n="rocrailDesc">PC control software that must be configured separately.</p>
           </div>
           <div class="feature-actions">
-            <span id="st-rocrail-feature" class="pill warn">Einrichtung erforderlich</span>
-            <button class="btn btn-ghost" id="rocrail-guide-button" type="button" data-i18n="setupButton">Einrichten</button>
+            <span id="st-rocrail-feature" class="pill warn">Setup required</span>
+            <button class="btn btn-ghost" id="rocrail-guide-button" type="button" data-i18n="setupButton">Set up</button>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="status" aria-label="Ereignisse">
+    <section class="status" aria-label="Events">
       <div class="status-header">
-        <h2 data-i18n="eventsTitle">Ereignisse</h2>
+        <h2 data-i18n="eventsTitle">Events</h2>
       </div>
       <ul class="event-log" id="event-log-list">
-        <li data-i18n="noEvents">Keine Ereignisse.</li>
+        <li data-i18n="noEvents">No events.</li>
       </ul>
     </section>
 
-    <section class="tooling-block" aria-label="Expertenwerkzeuge">
+    <section class="tooling-block" aria-label="Expert tools">
       <div class="feature-header">
-        <h2 data-i18n="expertToolsTitle">Expertenwerkzeuge</h2>
+        <h2 data-i18n="expertToolsTitle">Expert tools</h2>
       </div>
 
       <div class="feature-group">
         <article class="feature-card" style="--delay: 0ms;">
           <div class="feature-copy">
             <h4 data-i18n="luciTitle">LuCI (expert mode)</h4>
-            <p data-i18n="luciDesc">Erweiterte OpenWrt-Einstellungen.</p>
+            <p data-i18n="luciDesc">Advanced OpenWrt settings.</p>
           </div>
           <div class="feature-actions">
-            <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/" data-i18n="open">Öffnen</a>
+            <a class="btn btn-secondary" id="luci-link" href="/cgi-bin/luci/" data-i18n="open">Open</a>
           </div>
         </article>
 
         <article class="feature-card" style="--delay: 90ms;">
           <div class="feature-copy">
             <h4 data-i18n="sshTerminalTitle">SSH / Terminal</h4>
-            <p data-i18n="sshTerminalDesc">Direkter Zugriff auf die Shell über Port 22.</p>
+            <p data-i18n="sshTerminalDesc">Direct access to the shell via port 22.</p>
           </div>
           <div class="feature-actions">
-            <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/" data-i18n="open">Öffnen</a>
+            <a class="btn btn-secondary" id="terminal-link" href="http://127.0.0.1:22/" data-i18n="open">Open</a>
           </div>
         </article>
       </div>
     </section>
 
     <section class="note" aria-live="polite">
-      <strong data-i18n="noteLabel">Hinweis:</strong>
-      <span data-i18n="noteText">Diese Version startet unter <code>/srseii/</code>. Die Root-Seite bleibt vorerst unverändert.</span>
+      <strong data-i18n="noteLabel">Note:</strong>
+      <span data-i18n="noteText">This version starts under <code>/srseii/</code>. The root page remains unchanged for now.</span>
       <span id="host-hint"></span>
     </section>
   </main>
@@ -271,40 +271,40 @@
   <dialog class="modal" id="z21emu-guide-dialog" aria-labelledby="z21emu-guide-title">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="z21emu-guide-title" data-i18n="z21GuideTitle">Z21 verbinden</h2>
-        <button class="modal-close" id="z21emu-guide-close" type="button" aria-label="Schließen" data-i18n-aria-label="close">×</button>
+        <h2 id="z21emu-guide-title" data-i18n="z21GuideTitle">Connect Z21</h2>
+        <button class="modal-close" id="z21emu-guide-close" type="button" aria-label="Close" data-i18n-aria-label="close">×</button>
       </div>
 
       <section class="guide-section">
-        <h3 data-i18n="z21AppTitle">1. Z21-App verbinden</h3>
+        <h3 data-i18n="z21AppTitle">1. Connect the Z21 app</h3>
         <ol>
-          <li data-i18n="z21AppStep1">Smartphone/Tablet mit dem WLAN der Z21 verbinden.</li>
-          <li data-i18n="z21AppStep2">Z21-App öffnen.</li>
-          <li data-i18n="z21AppStep3">Im Menü zu Einstellungen > Z21-Einstellungen > IP-Adresse gehen.</li>
-          <li><span data-i18n="z21AppStep4">Als IP-Adresse die folgende Adresse eintragen:</span> <strong id="z21emu-guide-ip">-</strong></li>
-          <li data-i18n="z21AppStep5">Erneut mit Z21 verbinden drücken.</li>
+          <li data-i18n="z21AppStep1">Connect your smartphone or tablet to the Z21 Wifi.</li>
+          <li data-i18n="z21AppStep2">Open the Z21 app.</li>
+          <li data-i18n="z21AppStep3">In the menu, go to Settings > Z21 Settings > IP Address.</li>
+          <li><span data-i18n="z21AppStep4">Enter the following IP address:</span> <strong id="z21emu-guide-ip">-</strong></li>
+          <li data-i18n="z21AppStep5">Press Connect to Z21 again.</li>
         </ol>
       </section>
 
       <section class="guide-section">
-        <h3 data-i18n="z21MouseTitle">2. WLAN-Maus verbinden</h3>
+        <h3 data-i18n="z21MouseTitle">2. Connect the Wifi mouse</h3>
         <ol>
-          <li data-i18n="z21MouseStep1">Display zeigt SSID -> Weiter mit *OK Taste.</li>
-          <li data-i18n="z21MouseStep2">Display zeigt SEARCH -> Weiter mit *OK Taste.</li>
-          <li data-i18n="z21MouseStep3">Mit den Pfeiltasten das gewünschte WLAN-Netz auswählen.</li>
-          <li><span data-i18n="z21MouseStep4">Display zeigt PWD -> Weiter mit *OK Taste.</span> <strong id="z21emu-guide-ip-mouse">-</strong></li>
-          <li data-i18n="z21MouseStep5">WLAN-Passwort eingeben. -> Weiter mit *OK Taste.</li>
+          <li data-i18n="z21MouseStep1">Display shows SSID -> Continue with *OK button.</li>
+          <li data-i18n="z21MouseStep2">Display shows SEARCH -> Continue with *OK button.</li>
+          <li data-i18n="z21MouseStep3">Use the arrow keys to select the desired Wifi network.</li>
+          <li><span data-i18n="z21MouseStep4">Display shows PWD -> Continue with *OK button.</span> <strong id="z21emu-guide-ip-mouse">-</strong></li>
+          <li data-i18n="z21MouseStep5">Enter the Wifi password -> Continue with *OK button.</li>
         </ol>
       </section>
 
       <section class="guide-section guide-note">
-        <h3 data-i18n="z21ImportantTitle">Wichtig</h3>
-        <p data-i18n="z21ImportantText">Smartphone/Tablet bzw. WLAN-Maus müssen sich im gleichen Netzwerk wie die Z21 befinden.</p>
+        <h3 data-i18n="z21ImportantTitle">Important</h3>
+        <p data-i18n="z21ImportantText">The smartphone, tablet, or Wifi mouse must be connected to the same network as the Z21.</p>
       </section>
 
       <section class="guide-section guide-note">
-        <h3 data-i18n="z21AppNoteTitle">Hinweis zur Z21 App</h3>
-        <p data-i18n="z21AppNoteText">Die Z21-App kann kostenlos installiert und getestet werden. In der kostenlosen Version ist die Steuerung jedoch auf eine Lokomotive beschränkt. Für die Steuerung mehrerer Lokomotiven muss die Z21-Vollversion als In-App-Kauf freigeschaltet werden.</p>
+        <h3 data-i18n="z21AppNoteTitle">Note on the Z21 app</h3>
+        <p data-i18n="z21AppNoteText">The Z21 app can be installed and tested free of charge. In the free version, control is limited to one locomotive. To control multiple locomotives, the full Z21 version must be unlocked through an in-app purchase.</p>
       </section>
     </div>
   </dialog>
@@ -312,21 +312,21 @@
   <dialog class="modal" id="central-station-guide-dialog" aria-labelledby="central-station-guide-title">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 id="central-station-guide-title" data-i18n="centralStationGuideTitle">Central-Station-Schnittstelle verbinden</h2>
-        <button class="modal-close" id="central-station-guide-close" type="button" aria-label="Schließen" data-i18n-aria-label="close">×</button>
+        <h2 id="central-station-guide-title" data-i18n="centralStationGuideTitle">Connect the Central Station interface</h2>
+        <button class="modal-close" id="central-station-guide-close" type="button" aria-label="Close" data-i18n-aria-label="close">×</button>
       </div>
       <section class="guide-section">
-        <h3 data-i18n="centralStationGuideStepsTitle">So verbindest du dein Gerät</h3>
+        <h3 data-i18n="centralStationGuideStepsTitle">Connect your device</h3>
         <ol>
-          <li data-i18n="centralStationStep1">Gerät oder App mit demselben Netzwerk wie den SRSEII verbinden.</li>
-          <li data-i18n="centralStationStep2">Eine kompatible Steuer-App öffnen.</li>
-          <li data-i18n="centralStationStep3">Als Zentrale oder Server die Central-Station-Schnittstelle auswählen.</li>
-          <li><span data-i18n="centralStationStep4">Die folgende SRSEII-IP-Adresse eintragen:</span> <strong id="central-station-guide-ip">-</strong></li>
+          <li data-i18n="centralStationStep1">Connect the device or app to the same network as the SRSEII.</li>
+          <li data-i18n="centralStationStep2">Open a compatible control app.</li>
+          <li data-i18n="centralStationStep3">Select the Central Station interface as the central station or server.</li>
+          <li><span data-i18n="centralStationStep4">Enter the following SRSEII IP address:</span> <strong id="central-station-guide-ip">-</strong></li>
         </ol>
       </section>
       <section class="guide-section guide-note">
-        <h3 data-i18n="centralStationExamplesTitle">Beispiele</h3>
-        <p data-i18n="centralStationExamplesText">RemoteCS, RailControl Pro und Mobile Station WLAN können als kompatible Clients verwendet werden, sofern ihre Schnittstellenkonfiguration dies unterstützt.</p>
+        <h3 data-i18n="centralStationExamplesTitle">Examples</h3>
+        <p data-i18n="centralStationExamplesText">RemoteCS, RailControl Pro, and Mobile Station Wifi may be used as compatible clients when their interface configuration supports it.</p>
       </section>
     </div>
   </dialog>
