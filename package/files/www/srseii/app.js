@@ -427,6 +427,27 @@
     note.textContent = text;
   }
 
+  function renderEventLog(events) {
+    var list = document.getElementById("event-log-list");
+    if (!list) {
+      return;
+    }
+
+    list.innerHTML = "";
+
+    var items = Array.isArray(events) && events.length ? events.slice(0, 5) : [{ level: "info", message: "Keine Ereignisse.", time: "-" }];
+
+    items.forEach(function (eventItem) {
+      var item = document.createElement("li");
+      var level = eventItem && eventItem.level ? String(eventItem.level).toLowerCase() : "info";
+      var message = eventItem && eventItem.message ? String(eventItem.message) : "Keine Ereignisse.";
+      var time = eventItem && eventItem.time ? String(eventItem.time) : "-";
+      item.className = "event-item " + level;
+      item.innerHTML = '<span class="event-level">' + level + '</span><span class="event-message">' + message + '</span><span class="event-time">' + time + '</span>';
+      list.appendChild(item);
+    });
+  }
+
   function setNetworkNote(text) {
     var note = document.getElementById("network-note");
     if (!note) {
@@ -526,6 +547,8 @@
     setText("net-wifi-ip", network.wifiIp || t("notAvailable"));
     setPill("st-openwrt-state", !!openwrt.ok, "OK", "Prüfen");
     setPill("st-can2lan-status", !!can2lan.active, "Bereit", "Nicht bereit");
+
+    renderEventLog(Array.isArray(data.events) ? data.events : []);
 
     var overallReady = !!overall.ready;
     var overallLabel = overall.label || (overallReady ? "SRSEII ist bereit" : "SRSEII benötigt Aufmerksamkeit");
