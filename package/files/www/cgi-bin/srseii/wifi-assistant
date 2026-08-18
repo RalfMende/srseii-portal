@@ -149,17 +149,22 @@ disable_other_sta_on_same_device() {
 }
 
 scan_networks() {
-	# Ensure wireless stack is initialized before scan on factory-like states.
-	if command -v wifi >/dev/null 2>&1; then
-		wifi up >/dev/null 2>&1 || true
-	fi
-
 	scan_file="/tmp/srseii-scan.$$.tsv"
 	: >"$scan_file"
 	trap 'rm -f "$scan_file"' EXIT INT TERM
 
 	interfaces=""
 	if command -v iw >/dev/null 2>&1; then
+		interfaces="$(iw dev 2>/dev/null | awk '/^[[:space:]]*Interface / {print $2}' || true)"
+	fi
+
+	# Only (re)initialize the wireless stack if no interface exists yet
+	# (factory-like state). Calling "wifi up" while an interface is already
+	# associated bounces the radio (deauth + reassociate), which drops the
+	# very WLAN link a browser may be using to reach this CGI, causing
+	# "NetworkError" in the browser even though the scan itself would work.
+	if [ -z "$interfaces" ] && command -v wifi >/dev/null 2>&1; then
+		wifi up >/dev/null 2>&1 || true
 		interfaces="$(iw dev 2>/dev/null | awk '/^[[:space:]]*Interface / {print $2}' || true)"
 	fi
 
