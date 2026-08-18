@@ -879,8 +879,8 @@
     var hasUseCaseReadiness = !!(data.useCases && (typeof data.useCases.z21interface === "boolean" || typeof data.useCases.cs2interface === "boolean"));
     var mswebappReady = (hasAppReadiness ? !!data.apps.mswebapp : !!(data.apps && data.apps.mswebapp)) || !!(services.mswebapp && services.can2lan);
     var railcontrolReady = (hasAppReadiness ? !!data.apps.railcontrol : !!(data.apps && data.apps.railcontrol)) || !!(services.railcontrol && services.can2lan);
-    var z21InterfaceReady = (hasUseCaseReadiness ? !!data.useCases.z21interface : false) || !!(services.z21emu && services.can2lan);
-    var centralStationReady = (hasUseCaseReadiness ? !!data.useCases.cs2interface : false) || !!services.can2lan;
+    var z21InterfaceReady = hasUseCaseReadiness ? !!data.useCases.z21interface : !!(services.z21emu && services.can2lan);
+    var centralStationReady = hasUseCaseReadiness ? !!data.useCases.cs2interface : !!services.can2lan;
 
     // Technical services remain separate and are shown only in the diagnostics list.
     var mswebappService = !!services.mswebapp;
@@ -890,8 +890,8 @@
 
     setFeatureButtonState(mswebappLink, mswebappReady ? "ready" : "setup", t("open"), "mswebapp");
     setFeatureButtonState(railcontrolLink, railcontrolReady ? "ready" : "setup", t("open"), "railcontrol");
-    setFeatureButtonState(z21emuGuideButton, z21InterfaceReady ? "ready" : "setup", t("z21GuideButton"), "z21interface", t("z21GuideButton"));
-    setFeatureButtonState(centralStationGuideButton, centralStationReady ? "ready" : "setup", t("centralStationGuideButton"), "cs2interface", t("centralStationGuideButton"));
+    setFeatureButtonState(z21emuGuideButton, z21InterfaceReady ? "ready" : "setup", t("z21GuideButton"), "z21interface", t("setupRequired"));
+    setFeatureButtonState(centralStationGuideButton, centralStationReady ? "ready" : "setup", t("centralStationGuideButton"), "cs2interface", t("setupRequired"));
     setFeatureButtonState(document.getElementById("itrain-guide-button"), "setup", t("setupButton"), "itrain", t("setupButton"));
     setFeatureButtonState(document.getElementById("win-digipet-guide-button"), "setup", t("setupButton"), "win-digipet", t("setupButton"));
     setFeatureButtonState(document.getElementById("rocrail-guide-button"), "setup", t("setupButton"), "rocrail", t("setupButton"));
