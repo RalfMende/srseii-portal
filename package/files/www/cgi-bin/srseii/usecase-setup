@@ -1,0 +1,101 @@
+#!/bin/sh
+
+set -eu
+
+echo "Content-Type: application/json"
+echo "Cache-Control: no-store"
+echo ""
+
+json_escape() {
+	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+json_error() {
+	message="$1"
+	printf '{"ok":false,"message":"%s"}\n' "$(json_escape "$message")"
+	exit 0
+}
+
+json_ok() {
+	message="$1"
+	usecase="$2"
+	printf '{"ok":true,"message":"%s","usecase":"%s"}\n' "$(json_escape "$message")" "$(json_escape "$usecase")"
+}
+
+url_decode() {
+	encoded="$1"
+	replaced="$(printf '%s' "$encoded" | sed 's/+$/ /; s/+/ /g; s/%/\\x/g')"
+	printf '%b' "$replaced"
+}
+
+read_post_body() {
+	if [ "${REQUEST_METHOD:-GET}" != "POST" ]; then
+		printf ''
+		return
+	fi
+
+	length="${CONTENT_LENGTH:-0}"
+	case "$length" in
+		''|*[!0-9]*)
+			length=0
+			;;
+	esac
+
+	if [ "$length" -le 0 ]; then
+		printf ''
+		return
+	fi
+
+	dd bs=1 count="$length" 2>/dev/null || true
+}
+
+get_kv_param() {
+	source_string="$1"
+	key="$2"
+
+	if [ -z "$source_string" ]; then
+		printf ''
+		return
+	fi
+
+	value_enc="$(printf '%s' "$source_string" | tr '&' '\n' | sed -n "s/^$key=//p" | head -n 1)"
+	if [ -z "$value_enc" ]; then
+		printf ''
+		return
+	fi
+
+	url_decode "$value_enc"
+}
+
+setup_script="/usr/sbin/srseii-setup-usecase"
+
+body="$(read_post_body)"
+usecase="$(get_kv_param "$body" "usecase")"
+[ -n "$usecase" ] || usecase="${QUERY_STRING:-}"
+
+case "$usecase" in
+	"")
+		json_error "Missing usecase parameter."
+		;;
+	mswebapp|railcontrol|z21interface|cs2interface|itrain|win-digipet|rocrail|all)
+		;;
+	*)
+		json_error "Unknown usecase: $usecase"
+		;;
+esac
+
+if [ ! -x "$setup_script" ]; then
+	json_error "Setup script not found: $setup_script"
+fi
+
+# Keep the setup script's own stdout/stderr out of the HTTP response so it stays valid JSON.
+setup_log="/tmp/srseii-setup-usecase.$$.log"
+
+if "$setup_script" "$usecase" >"$setup_log" 2>&1; then
+	rm -f "$setup_log"
+	json_ok "Setup completed" "$usecase"
+else
+	detail="$(tail -n 5 "$setup_log" 2>/dev/null | tr '\n' ' ')"
+	rm -f "$setup_log"
+	json_error "Setup failed for usecase: $usecase. $detail"
+fi

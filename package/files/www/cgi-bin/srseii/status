@@ -20,6 +20,12 @@ bool_from_rc() {
 	fi
 }
 
+if [ -f /usr/sbin/srseii-setup-usecase ]; then
+	SRSEII_SETUP_USECASE_SOURCED=1
+	. /usr/sbin/srseii-setup-usecase
+	unset SRSEII_SETUP_USECASE_SOURCED
+fi
+
 is_pkg_installed() {
 	opkg status "$1" 2>/dev/null | grep -q '^Status: .* installed$'
 }
@@ -279,32 +285,80 @@ if [ "$openwrt_ok" = false ] && [ -f /etc/openwrt_release ]; then
 fi
 
 mswebapp_pkg_rc=1
-if is_pkg_installed mswebapp; then
+mswebapp_pkg_ok=true
+for item in $(get_usecase_pkgs mswebapp 2>/dev/null || printf ''); do
+	if is_pkg_installed "$item"; then
+		continue
+	fi
+	mswebapp_pkg_ok=false
+	break
+done
+if [ "$mswebapp_pkg_ok" = true ]; then
 	mswebapp_pkg_rc=0
 fi
 
 mswebapp_service_rc=1
-if is_service_running mswebapp; then
+mswebapp_service_ok=true
+for item in $(get_usecase_services mswebapp 2>/dev/null || printf ''); do
+	if is_service_running "$item"; then
+		continue
+	fi
+	mswebapp_service_ok=false
+	break
+done
+if [ "$mswebapp_service_ok" = true ]; then
 	mswebapp_service_rc=0
 fi
 
 railcontrol_pkg_rc=1
-if is_pkg_installed railcontrol; then
+railcontrol_pkg_ok=true
+for item in $(get_usecase_pkgs railcontrol 2>/dev/null || printf ''); do
+	if is_pkg_installed "$item"; then
+		continue
+	fi
+	railcontrol_pkg_ok=false
+	break
+done
+if [ "$railcontrol_pkg_ok" = true ]; then
 	railcontrol_pkg_rc=0
 fi
 
 railcontrol_service_rc=1
-if is_service_running railcontrol; then
+railcontrol_service_ok=true
+for item in $(get_usecase_services railcontrol 2>/dev/null || printf ''); do
+	if is_service_running "$item"; then
+		continue
+	fi
+	railcontrol_service_ok=false
+	break
+done
+if [ "$railcontrol_service_ok" = true ]; then
 	railcontrol_service_rc=0
 fi
 
 z21emu_pkg_rc=1
-if is_pkg_installed z21emu; then
+z21emu_pkg_ok=true
+for item in $(get_usecase_pkgs z21interface 2>/dev/null || printf ''); do
+	if is_pkg_installed "$item"; then
+		continue
+	fi
+	z21emu_pkg_ok=false
+	break
+done
+if [ "$z21emu_pkg_ok" = true ]; then
 	z21emu_pkg_rc=0
 fi
 
 z21emu_service_rc=1
-if is_service_running z21emu; then
+z21emu_service_ok=true
+for item in $(get_usecase_services z21interface 2>/dev/null || printf ''); do
+	if is_service_running "$item"; then
+		continue
+	fi
+	z21emu_service_ok=false
+	break
+done
+if [ "$z21emu_service_ok" = true ]; then
 	z21emu_service_rc=0
 fi
 

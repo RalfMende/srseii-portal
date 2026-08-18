@@ -583,12 +583,17 @@
     el.textContent = t("problem");
   }
 
-  function setFeatureLinkState(linkEl, ready, url) {
+  function setFeatureLinkState(linkEl, ready, url, useCaseName) {
     if (!linkEl) {
       return;
     }
 
+    if (useCaseName) {
+      linkEl.dataset.usecase = useCaseName;
+    }
+
     if (ready) {
+      linkEl.dataset.ready = "true";
       linkEl.classList.remove("is-disabled");
       linkEl.setAttribute("aria-disabled", "false");
       linkEl.removeAttribute("tabindex");
@@ -597,6 +602,17 @@
       return;
     }
 
+    if (useCaseName) {
+      linkEl.dataset.ready = "false";
+      linkEl.classList.remove("is-disabled");
+      linkEl.setAttribute("aria-disabled", "false");
+      linkEl.removeAttribute("tabindex");
+      linkEl.style.pointerEvents = "auto";
+      linkEl.href = "#";
+      return;
+    }
+
+    linkEl.dataset.ready = "false";
     linkEl.classList.add("is-disabled");
     linkEl.setAttribute("aria-disabled", "true");
     linkEl.setAttribute("tabindex", "-1");
@@ -609,21 +625,96 @@
     };
   }
 
-  function setFeatureButtonState(buttonEl, state, readyText) {
+  function setFeatureButtonState(buttonEl, state, readyText, useCaseName, setupText) {
     if (!buttonEl) {
       return;
     }
 
+    if (useCaseName) {
+      buttonEl.dataset.usecase = useCaseName;
+    }
+
     buttonEl.classList.remove("feature-state-setup", "feature-state-error", "feature-state-unavailable");
     if (state === "ready") {
+      buttonEl.dataset.ready = "true";
       buttonEl.disabled = false;
       buttonEl.textContent = readyText;
       return;
     }
 
+    if (state === "setup") {
+      buttonEl.dataset.ready = "false";
+      buttonEl.disabled = false;
+      buttonEl.classList.add("feature-state-setup");
+      buttonEl.textContent = setupText !== undefined ? setupText : t("setupRequired");
+      return;
+    }
+
+    buttonEl.dataset.ready = "false";
     buttonEl.disabled = true;
     buttonEl.classList.add("feature-state-" + state);
     buttonEl.textContent = state === "error" ? t("problem") : state === "unavailable" ? t("notAvailable") : t("setupRequired");
+  }
+
+  function runUseCaseSetup(useCaseName) {
+    if (!useCaseName) {
+      return Promise.resolve(null);
+    }
+
+    var params = new URLSearchParams();
+    params.set("usecase", useCaseName);
+
+    setStatusNote("Setup wird gestartet...");
+    setModelRailwayNote("", false);
+
+    return fetch("/cgi-bin/srseii/usecase-setup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+      },
+      body: params.toString(),
+      cache: "no-store"
+    }).then(function (response) {
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+      }
+      return response.text().then(function (text) {
+        try {
+          return JSON.parse(text);
+        } catch (parseError) {
+          parseError.rawResponse = text;
+          throw parseError;
+        }
+      });
+    }).then(function (data) {
+      if (!data || !data.ok) {
+        throw new Error(data && data.message ? data.message : "Use-case setup failed");
+      }
+      return loadStatus().then(function () {
+        setStatusNote("Setup abgeschlossen.");
+      });
+    }).catch(function (error) {
+      var extra = error.rawResponse ? " Response: " + error.rawResponse : "";
+      setStatusNote("Setup fehlgeschlagen: " + error.message + extra);
+      setModelRailwayNote("Setup fehlgeschlagen: " + error.message + extra, true);
+      return null;
+    });
+  }
+
+  function bindUseCaseAction(element, useCaseName) {
+    if (!element || !useCaseName) {
+      return;
+    }
+
+    element.addEventListener("click", function (event) {
+      if (element.dataset.ready === "true") {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      runUseCaseSetup(useCaseName);
+      return false;
+    }, true);
   }
 
   function setModelRailwayNote(text, isError) {
@@ -797,18 +888,18 @@
     var z21Service = !!services.z21emu;
     var can2lanService = !!services.can2lan;
 
-    setFeatureButtonState(mswebappLink, mswebappReady ? "ready" : "setup", t("open"));
-    setFeatureButtonState(railcontrolLink, railcontrolReady ? "ready" : "setup", t("open"));
-    setFeatureButtonState(z21emuGuideButton, z21InterfaceReady ? "ready" : "setup", t("z21GuideButton"));
-    setFeatureButtonState(centralStationGuideButton, centralStationReady ? "ready" : "setup", t("centralStationGuideButton"));
-    setFeatureButtonState(document.getElementById("itrain-guide-button"), "setup", t("setupButton"));
-    setFeatureButtonState(document.getElementById("win-digipet-guide-button"), "setup", t("setupButton"));
-    setFeatureButtonState(document.getElementById("rocrail-guide-button"), "setup", t("setupButton"));
+    setFeatureButtonState(mswebappLink, mswebappReady ? "ready" : "setup", t("open"), "mswebapp");
+    setFeatureButtonState(railcontrolLink, railcontrolReady ? "ready" : "setup", t("open"), "railcontrol");
+    setFeatureButtonState(z21emuGuideButton, z21InterfaceReady ? "ready" : "setup", t("z21GuideButton"), "z21interface", t("z21GuideButton"));
+    setFeatureButtonState(centralStationGuideButton, centralStationReady ? "ready" : "setup", t("centralStationGuideButton"), "cs2interface", t("centralStationGuideButton"));
+    setFeatureButtonState(document.getElementById("itrain-guide-button"), "setup", t("setupButton"), "itrain", t("setupButton"));
+    setFeatureButtonState(document.getElementById("win-digipet-guide-button"), "setup", t("setupButton"), "win-digipet", t("setupButton"));
+    setFeatureButtonState(document.getElementById("rocrail-guide-button"), "setup", t("setupButton"), "rocrail", t("setupButton"));
 
     setModelRailwayNote("", false);
 
-    setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + ":6020/");
-    setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + ":8082/");
+    setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + ":6020/", "mswebapp");
+    setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + ":8082/", "railcontrol");
 
     setZ21GuideIp(network.ip);
     setCentralStationGuideIp(network.ip);
@@ -1177,7 +1268,7 @@
     setStatusNote(t("statusLoading"));
     setNetworkNote(t("statusLoading"));
 
-    fetchStatusData()
+    var statusPromise = fetchStatusData()
       .then(function (data) {
         var network = applyStatusData(data);
 
@@ -1199,7 +1290,16 @@
       });
 
     checkUpdates();
+    return statusPromise;
   }
+
+  bindUseCaseAction(mswebappLink, "mswebapp");
+  bindUseCaseAction(railcontrolLink, "railcontrol");
+  bindUseCaseAction(z21emuGuideButton, "z21interface");
+  bindUseCaseAction(centralStationGuideButton, "cs2interface");
+  bindUseCaseAction(document.getElementById("itrain-guide-button"), "itrain");
+  bindUseCaseAction(document.getElementById("win-digipet-guide-button"), "win-digipet");
+  bindUseCaseAction(document.getElementById("rocrail-guide-button"), "rocrail");
 
   if (refreshButton) {
     refreshButton.addEventListener("click", loadStatus);
