@@ -14,20 +14,20 @@ define Package/srseii-portal
 endef
 
 define Package/srseii-portal/description
- Lightweight SRSEII launcher portal under /srseii/.
+ Lightweight SRSEII launcher portal.
 endef
 
 define Build/Compile
 endef
 
 define Package/srseii-portal/install
-	$(INSTALL_DIR) $(1)/www/srseii
-	$(CP) ./files/www/srseii-portal/* $(1)/www/srseii/
-  $(INSTALL_DIR) $(1)/www/cgi-bin/srseii
-  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/status $(1)/www/cgi-bin/srseii/status
-  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/update $(1)/www/cgi-bin/srseii/update
-  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/wifi-assistant $(1)/www/cgi-bin/srseii/wifi-assistant
-  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/usecase-setup $(1)/www/cgi-bin/srseii/usecase-setup
+  $(INSTALL_DIR) $(1)/www/srseii-portal
+  $(CP) ./files/www/srseii-portal/* $(1)/www/srseii-portal/
+  $(INSTALL_DIR) $(1)/www/cgi-bin/srseii-portal
+  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/status $(1)/www/cgi-bin/srseii-portal/status
+  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/update $(1)/www/cgi-bin/srseii-portal/update
+  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/wifi-assistant $(1)/www/cgi-bin/srseii-portal/wifi-assistant
+  $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/usecase-setup $(1)/www/cgi-bin/srseii-portal/usecase-setup
   $(INSTALL_DIR) $(1)/usr/sbin
   $(INSTALL_BIN) ./files/usr/sbin/srseii-activate-root-portal $(1)/usr/sbin/srseii-activate-root-portal
   $(INSTALL_BIN) ./files/usr/sbin/srseii-restore-root-luci $(1)/usr/sbin/srseii-restore-root-luci

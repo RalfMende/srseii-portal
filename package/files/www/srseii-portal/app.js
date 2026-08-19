@@ -658,7 +658,7 @@
     setStatusNote("Setup wird gestartet...");
     setModelRailwayNote("", false);
 
-    return fetch("/cgi-bin/srseii/usecase-setup", {
+    return fetch("/cgi-bin/srseii-portal/usecase-setup", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
@@ -927,7 +927,7 @@
 
   function fetchUpdateData(method) {
     var options = { method: method || "GET", cache: "no-store" };
-    var url = "/cgi-bin/srseii/update?action=" + (method === "POST" ? "update" : "check");
+    var url = "/cgi-bin/srseii-portal/update?action=" + (method === "POST" ? "update" : "check");
 
     return fetch(url, options).then(function (response) {
       if (!response.ok) {
@@ -1025,7 +1025,7 @@
   }
 
   function fetchStatusData() {
-    var statusUrl = "/cgi-bin/srseii/status?ts=" + Date.now();
+    var statusUrl = "/cgi-bin/srseii-portal/status?ts=" + Date.now();
     return fetch(statusUrl, { cache: "no-store" })
       .then(function (response) {
         if (!response.ok) {
@@ -1129,7 +1129,7 @@
       params.set(key, payload[key]);
     });
 
-    return fetch("/cgi-bin/srseii/wifi-assistant", {
+    return fetch("/cgi-bin/srseii-portal/wifi-assistant", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
@@ -1155,7 +1155,7 @@
     setWifiNote(t("wifiScanning"), false);
     toggleWifiActions(true, false);
 
-    fetch("/cgi-bin/srseii/wifi-assistant?action=scan", { cache: "no-store" })
+    fetch("/cgi-bin/srseii-portal/wifi-assistant?action=scan", { cache: "no-store" })
       .then(function (response) {
         if (!response.ok) {
           throw new Error("HTTP " + response.status);
