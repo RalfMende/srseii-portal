@@ -1,6 +1,6 @@
 from pathlib import Path
 
-script = Path('package/files/www/cgi-bin/srseii/status').read_text(encoding='utf-8')
+script = Path('package/files/www/cgi-bin/srseii-portal/status').read_text(encoding='utf-8')
 required = ['"openwrt"', '"can2lan"', '"network"', '"overall"', '"events"']
 missing = [item for item in required if item not in script]
 if missing:
