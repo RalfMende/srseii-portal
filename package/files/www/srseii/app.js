@@ -16,7 +16,6 @@
   var luciLink = document.getElementById("luci-link");
   var terminalLink = document.getElementById("terminal-link");
   var hostHint = document.getElementById("host-hint");
-  var refreshButton = document.getElementById("refresh-status");
   var updatePackagesButton = document.getElementById("update-packages");
   var updatesNote = document.getElementById("updates-note");
   var wifiScanButton = document.getElementById("wifi-scan");
@@ -507,10 +506,6 @@
         el.setAttribute("aria-label", translations[lang][ariaLabelKey]);
       }
     });
-
-    if (refreshButton) {
-      refreshButton.textContent = t("refresh");
-    }
 
     updateAppLinks(host);
 
@@ -1300,10 +1295,6 @@
   bindUseCaseAction(document.getElementById("itrain-guide-button"), "itrain");
   bindUseCaseAction(document.getElementById("win-digipet-guide-button"), "win-digipet");
   bindUseCaseAction(document.getElementById("rocrail-guide-button"), "rocrail");
-
-  if (refreshButton) {
-    refreshButton.addEventListener("click", loadStatus);
-  }
 
   if (updatePackagesButton) {
     updatePackagesButton.addEventListener("click", updatePackages);
