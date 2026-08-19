@@ -336,20 +336,20 @@ if [ "$railcontrol_service_ok" = true ]; then
 	railcontrol_service_rc=0
 fi
 
-z21emu_pkg_rc=1
-z21emu_pkg_ok=true
+z21interface_pkg_rc=1
+z21interface_pkg_ok=true
 for item in $(get_usecase_pkgs z21interface 2>/dev/null || printf ''); do
 	if is_pkg_installed "$item"; then
 		continue
 	fi
-	z21emu_pkg_ok=false
+	z21interface_pkg_ok=false
 	break
 done
-if [ "$z21emu_pkg_ok" = true ]; then
-	z21emu_pkg_rc=0
+if [ "$z21interface_pkg_ok" = true ]; then
+	z21interface_pkg_rc=0
 fi
 
-z21emu_service_rc=1
+z21interface_service_rc=1
 z21emu_service_ok=true
 for item in $(get_usecase_services z21interface 2>/dev/null || printf ''); do
 	if is_service_running "$item"; then
@@ -359,7 +359,7 @@ for item in $(get_usecase_services z21interface 2>/dev/null || printf ''); do
 	break
 done
 if [ "$z21emu_service_ok" = true ]; then
-	z21emu_service_rc=0
+	z21interface_service_rc=0
 fi
 
 can2lan_service_rc=1
@@ -388,17 +388,17 @@ if is_service_running wake-up-links88; then
 fi
 
 mswebapp_ready_rc=1
-if [ "$mswebapp_pkg_rc" -eq 0 ] && [ "$mswebapp_service_rc" -eq 0 ] && [ "$can2lan_service_rc" -eq 0 ] && [ "$clone_ms2_loco_service_rc" -eq 0 ]; then
+if [ "$mswebapp_pkg_rc" -eq 0 ] && [ "$mswebapp_service_rc" -eq 0 ]; then
 	mswebapp_ready_rc=0
 fi
 
 railcontrol_ready_rc=1
-if [ "$railcontrol_pkg_rc" -eq 0 ] && [ "$railcontrol_service_rc" -eq 0 ] && [ "$can2lan_service_rc" -eq 0 ] && [ "$clone_ms2_loco_service_rc" -eq 0 ]; then
+if [ "$railcontrol_pkg_rc" -eq 0 ] && [ "$railcontrol_service_rc" -eq 0 ]; then
 	railcontrol_ready_rc=0
 fi
 
 z21interface_ready_rc=1
-if [ "$z21emu_pkg_rc" -eq 0 ] && [ "$z21emu_service_rc" -eq 0 ] && [ "$can2lan_service_rc" -eq 0 ]; then
+if [ "$z21interface_pkg_rc" -eq 0 ] && [ "$z21interface_service_rc" -eq 0 ]; then
 	z21interface_ready_rc=0
 fi
 
@@ -413,8 +413,8 @@ mswebapp_ready_value="$(bool_from_rc "$mswebapp_ready_rc")"
 railcontrol_pkg_value="$(bool_from_rc "$railcontrol_pkg_rc")"
 railcontrol_service_value="$(bool_from_rc "$railcontrol_service_rc")"
 railcontrol_ready_value="$(bool_from_rc "$railcontrol_ready_rc")"
-z21emu_pkg_value="$(bool_from_rc "$z21emu_pkg_rc")"
-z21emu_service_value="$(bool_from_rc "$z21emu_service_rc")"
+z21emu_pkg_value="$(bool_from_rc "$z21interface_pkg_rc")"
+z21emu_service_value="$(bool_from_rc "$z21interface_service_rc")"
 z21interface_ready_value="$(bool_from_rc "$z21interface_ready_rc")"
 cs2interface_ready_value="$(bool_from_rc "$cs2interface_ready_rc")"
 can2lan_service_value="$(bool_from_rc "$can2lan_service_rc")"
