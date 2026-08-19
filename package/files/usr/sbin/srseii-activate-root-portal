@@ -2,7 +2,7 @@
 set -eu
 
 ROOT_INDEX="/www/index.html"
-TEMPLATE="/usr/share/srseii/root-index.html"
+TEMPLATE="/www/srseii/index.html"
 BACKUP="/www/index.luci.backup.html"
 
 if [ ! -f "$TEMPLATE" ]; then

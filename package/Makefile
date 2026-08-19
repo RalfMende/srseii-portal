@@ -22,14 +22,12 @@ endef
 
 define Package/srseii-portal/install
 	$(INSTALL_DIR) $(1)/www/srseii
-	$(CP) ./files/www/srseii/* $(1)/www/srseii/
+	$(CP) ./files/www/srseii-portal/* $(1)/www/srseii/
   $(INSTALL_DIR) $(1)/www/cgi-bin/srseii
   $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/status $(1)/www/cgi-bin/srseii/status
   $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/update $(1)/www/cgi-bin/srseii/update
   $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/wifi-assistant $(1)/www/cgi-bin/srseii/wifi-assistant
   $(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/usecase-setup $(1)/www/cgi-bin/srseii/usecase-setup
-  $(INSTALL_DIR) $(1)/usr/share/srseii
-  $(INSTALL_DATA) ./files/usr/share/srseii/root-index.html $(1)/usr/share/srseii/root-index.html
   $(INSTALL_DIR) $(1)/usr/sbin
   $(INSTALL_BIN) ./files/usr/sbin/srseii-activate-root-portal $(1)/usr/sbin/srseii-activate-root-portal
   $(INSTALL_BIN) ./files/usr/sbin/srseii-restore-root-luci $(1)/usr/sbin/srseii-restore-root-luci

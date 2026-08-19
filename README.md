@@ -42,7 +42,6 @@ Die Umstellung der Root-URL auf das Portal wird bewusst separat und kontrolliert
 ## Repository-Struktur
 
 - `package/Makefile` OpenWrt-Paketdefinition
-- `package/files/www/srseii/` Portal-Frontend
-- `package/files/usr/share/srseii/root-index.html` vorbereitete Root-Startseite (optional)
-- `package/files/usr/sbin/srseii-activate-root-portal` kontrollierte Aktivierung der Root-Startseite
+- `package/files/www/srseii-portal/` Portal-Frontend
+- `package/files/usr/sbin/srseii-activate-root-portal` kontrollierte Aktivierung der Root-Startseite (kopiert die installierte Portalseite nach `/www/index.html`)
 - `package/files/usr/sbin/srseii-restore-root-luci` Wiederherstellung der vorherigen Root-Seite
