@@ -77,7 +77,7 @@ case "$usecase" in
 	"")
 		json_error "Missing usecase parameter."
 		;;
-	mswebapp|railcontrol|z21interface|cs2interface|itrain|win-digipet|rocrail|all)
+	mswebapp|railcontrol|z21interface|cs2interface|itrain|windigipet|rocrail|all)
 		;;
 	*)
 		json_error "Unknown usecase: $usecase"

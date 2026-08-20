@@ -9,6 +9,15 @@
   var centralStationGuideButton = document.getElementById("central-station-guide-button");
   var centralStationGuideDialog = document.getElementById("central-station-guide-dialog");
   var centralStationGuideCloseButton = document.getElementById("central-station-guide-close");
+  var itrainGuideButton = document.getElementById("itrain-guide-button");
+  var itrainGuideDialog = document.getElementById("itrain-guide-dialog");
+  var itrainGuideCloseButton = document.getElementById("itrain-guide-close");
+  var winDigipetGuideButton = document.getElementById("windigipet-guide-button");
+  var winDigipetGuideDialog = document.getElementById("windigipet-guide-dialog");
+  var winDigipetGuideCloseButton = document.getElementById("windigipet-guide-close");
+  var rocrailGuideButton = document.getElementById("rocrail-guide-button");
+  var rocrailGuideDialog = document.getElementById("rocrail-guide-dialog");
+  var rocrailGuideCloseButton = document.getElementById("rocrail-guide-close");
   var aboutButton = document.getElementById("about-button");
   var aboutDialog = document.getElementById("about-dialog");
   var aboutCloseButton = document.getElementById("about-close");
@@ -100,7 +109,34 @@
       winDigipetTitle: "Win-Digipet",
       winDigipetDesc: "Verwende den SRSEII als Mini-Zentrale für die Win-Digipet-Software.",
       rocrailTitle: "Rocrail",
-      rocrailDesc: "Verwende den SRSEII als Mini-Zentrale für die Rocrail-Software.",
+      rocrailDesc: "Verwende den SRSEII als Rocrail-Server.",
+      itrainGuideButton: "Anleitung",
+      itrainGuideTitle: "iTrain verbinden",
+      itrainStepsTitle: "So verbindest du deinen PC",
+      itrainStep1: "PC mit demselben Netzwerk wie den SRSEII verbinden.",
+      itrainStep2: "iTrain öffnen und eine neue Zentrale/Schnittstelle hinzufügen.",
+      itrainStep3: "Den SRSEII als CAN-basierte Zentrale auswählen.",
+      itrainStep4: "Die folgende SRSEII-IP-Adresse eintragen:",
+      itrainNoteTitle: "Hinweis",
+      itrainNoteText: "Details zum genauen Zentralentyp und weiteren Verbindungseinstellungen findest du in der iTrain-Dokumentation.",
+      winDigipetGuideButton: "Anleitung",
+      winDigipetGuideTitle: "Win-Digipet verbinden",
+      winDigipetStepsTitle: "So verbindest du deinen PC",
+      winDigipetStep1: "PC mit demselben Netzwerk wie den SRSEII verbinden.",
+      winDigipetStep2: "Win-Digipet öffnen und eine neue Zentrale/Schnittstelle hinzufügen.",
+      winDigipetStep3: "Den SRSEII als CAN-basierte Zentrale auswählen.",
+      winDigipetStep4: "Die folgende SRSEII-IP-Adresse eintragen:",
+      winDigipetSyncTitle: "Lokliste synchronisieren",
+      winDigipetSyncText: "Um die Lokliste zu synchronisieren, in /etc/init.d/can2lan die Option -g bei can2lan ergänzen, z. B.:",
+      rocrailGuideButton: "Anleitung",
+      rocrailGuideTitle: "Rocrail verbinden",
+      rocrailStepsTitle: "Rocview verbinden",
+      rocrailStep1: "PC mit demselben Netzwerk wie den SRSEII verbinden.",
+      rocrailStep2: "Rocview öffnen und eine neue Serververbindung hinzufügen.",
+      rocrailStep3: "Die folgende SRSEII-IP-Adresse eintragen:",
+      rocrailStep4: "Den für den Rocrail-Server konfigurierten Port verwenden (Standard 8051), falls nicht geändert.",
+      rocrailNoteTitle: "Hinweis",
+      rocrailNoteText: "Der Rocrail-Server läuft direkt auf dem SRSEII; mit Rocview verbindest und konfigurierst du ihn remote.",
       centralStationGuideTitle: "Central-Station-Schnittstelle verbinden",
       centralStationGuideStepsTitle: "So verbindest du dein Gerät",
       centralStationStep1: "Gerät oder App mit demselben Netzwerk wie den SRSEII verbinden.",
@@ -263,7 +299,34 @@
       winDigipetTitle: "Win-Digipet",
       winDigipetDesc: "Use the SRSEII as a mini central for Win-Digipet Software.",
       rocrailTitle: "Rocrail",
-      rocrailDesc: "Use the SRSEII as a mini central for Rocrail Software.",
+      rocrailDesc: "Use the SRSEII as a Rocrail Server.",
+      itrainGuideButton: "Instructions",
+      itrainGuideTitle: "Connect iTrain",
+      itrainStepsTitle: "Connect your PC",
+      itrainStep1: "Connect your PC to the same network as the SRSEII.",
+      itrainStep2: "Open iTrain and add a new command station / interface.",
+      itrainStep3: "Select the SRSEII as a CAN-based command station.",
+      itrainStep4: "Enter the following SRSEII IP address:",
+      itrainNoteTitle: "Note",
+      itrainNoteText: "Refer to the iTrain documentation for the exact command station type and any additional connection settings.",
+      winDigipetGuideButton: "Instructions",
+      winDigipetGuideTitle: "Connect Win-Digipet",
+      winDigipetStepsTitle: "Connect your PC",
+      winDigipetStep1: "Connect your PC to the same network as the SRSEII.",
+      winDigipetStep2: "Open Win-Digipet and add a new command station / interface.",
+      winDigipetStep3: "Select the SRSEII as a CAN-based command station.",
+      winDigipetStep4: "Enter the following SRSEII IP address:",
+      winDigipetSyncTitle: "Locomotive list synchronization",
+      winDigipetSyncText: "To synchronize the locomotive list, add the -g option to can2lan in /etc/init.d/can2lan, e.g.:",
+      rocrailGuideButton: "Instructions",
+      rocrailGuideTitle: "Connect Rocrail",
+      rocrailStepsTitle: "Connect Rocview",
+      rocrailStep1: "Connect your PC to the same network as the SRSEII.",
+      rocrailStep2: "Open Rocview and add a new server connection.",
+      rocrailStep3: "Enter the following SRSEII IP address:",
+      rocrailStep4: "Use the port configured for the Rocrail server (default 8051), unless it was changed.",
+      rocrailNoteTitle: "Note",
+      rocrailNoteText: "The Rocrail server runs directly on the SRSEII; use Rocview to connect to and configure it remotely.",
       centralStationGuideTitle: "Connect the Central Station interface",
       centralStationGuideStepsTitle: "Connect your device",
       centralStationStep1: "Connect the device or app to the same network as the SRSEII.",
@@ -766,6 +829,18 @@
     setText("central-station-guide-ip", value);
   }
 
+  function setItrainGuideIp(ipAddress) {
+    setText("itrain-guide-ip", ipAddress || t("notAvailable"));
+  }
+
+  function setWinDigipetGuideIp(ipAddress) {
+    setText("windigipet-guide-ip", ipAddress || t("notAvailable"));
+  }
+
+  function setRocrailGuideIp(ipAddress) {
+    setText("rocrail-guide-ip", ipAddress || t("notAvailable"));
+  }
+
   function setWifiNote(text, isError) {
     if (!wifiNote) {
       return;
@@ -872,6 +947,9 @@
     var railcontrolReady = (hasAppReadiness ? !!data.apps.railcontrol : !!(data.apps && data.apps.railcontrol)) || !!(services.railcontrol && services.can2lan);
     var z21InterfaceReady = hasUseCaseReadiness ? !!data.useCases.z21interface : !!(services.z21emu && services.can2lan);
     var centralStationReady = hasUseCaseReadiness ? !!data.useCases.cs2interface : !!services.can2lan;
+    var itrainReady = data.useCases ? !!data.useCases.itrain : !!services.can2lan;
+    var winDigipetReady = data.useCases ? !!data.useCases.windigipet : !!services.can2lan;
+    var rocrailReady = data.useCases ? !!data.useCases.rocrail : !!(services.can2lan && services.rocrail);
 
     // Technical services remain separate and are shown only in the diagnostics list.
     var mswebappService = !!services.mswebapp;
@@ -883,9 +961,9 @@
     setFeatureButtonState(railcontrolLink, railcontrolReady ? "ready" : "setup", t("open"), "railcontrol");
     setFeatureButtonState(z21emuGuideButton, z21InterfaceReady ? "ready" : "setup", t("z21GuideButton"), "z21interface", t("setupRequired"));
     setFeatureButtonState(centralStationGuideButton, centralStationReady ? "ready" : "setup", t("centralStationGuideButton"), "cs2interface", t("setupRequired"));
-    setFeatureButtonState(document.getElementById("itrain-guide-button"), "setup", t("setupButton"), "itrain", t("setupButton"));
-    setFeatureButtonState(document.getElementById("win-digipet-guide-button"), "setup", t("setupButton"), "win-digipet", t("setupButton"));
-    setFeatureButtonState(document.getElementById("rocrail-guide-button"), "setup", t("setupButton"), "rocrail", t("setupButton"));
+    setFeatureButtonState(itrainGuideButton, itrainReady ? "ready" : "setup", t("itrainGuideButton"), "itrain", t("setupButton"));
+    setFeatureButtonState(winDigipetGuideButton, winDigipetReady ? "ready" : "setup", t("winDigipetGuideButton"), "windigipet", t("setupButton"));
+    setFeatureButtonState(rocrailGuideButton, rocrailReady ? "ready" : "setup", t("rocrailGuideButton"), "rocrail", t("setupButton"));
 
     setModelRailwayNote("", false);
 
@@ -894,6 +972,9 @@
 
     setZ21GuideIp(network.ip);
     setCentralStationGuideIp(network.ip);
+    setItrainGuideIp(network.ip);
+    setWinDigipetGuideIp(network.ip);
+    setRocrailGuideIp(network.ip);
 
     setPill("st-mswebapp-svc", mswebappService);
     setPill("st-railcontrol-svc", railcontrolService);
@@ -1272,9 +1353,9 @@
         setFeatureButtonState(railcontrolLink, "error");
         setFeatureButtonState(z21emuGuideButton, "error");
         setFeatureButtonState(centralStationGuideButton, "error");
-        setFeatureButtonState(document.getElementById("itrain-guide-button"), "error");
-        setFeatureButtonState(document.getElementById("win-digipet-guide-button"), "error");
-        setFeatureButtonState(document.getElementById("rocrail-guide-button"), "error");
+        setFeatureButtonState(itrainGuideButton, "error");
+        setFeatureButtonState(winDigipetGuideButton, "error");
+        setFeatureButtonState(rocrailGuideButton, "error");
         setStatusNote(t("statusLoadError") + " " + error.message);
         setModelRailwayNote(t("modelRailwayStatusError") + " " + error.message, true);
         setNetworkNote(t("statusLoadError") + " " + error.message);
@@ -1288,9 +1369,9 @@
   bindUseCaseAction(railcontrolLink, "railcontrol");
   bindUseCaseAction(z21emuGuideButton, "z21interface");
   bindUseCaseAction(centralStationGuideButton, "cs2interface");
-  bindUseCaseAction(document.getElementById("itrain-guide-button"), "itrain");
-  bindUseCaseAction(document.getElementById("win-digipet-guide-button"), "win-digipet");
-  bindUseCaseAction(document.getElementById("rocrail-guide-button"), "rocrail");
+  bindUseCaseAction(itrainGuideButton, "itrain");
+  bindUseCaseAction(winDigipetGuideButton, "windigipet");
+  bindUseCaseAction(rocrailGuideButton, "rocrail");
 
   if (updatePackagesButton) {
     updatePackagesButton.addEventListener("click", updatePackages);
@@ -1305,6 +1386,24 @@
   if (centralStationGuideButton && centralStationGuideDialog) {
     centralStationGuideButton.addEventListener("click", function () {
       centralStationGuideDialog.showModal();
+    });
+  }
+
+  if (itrainGuideButton && itrainGuideDialog) {
+    itrainGuideButton.addEventListener("click", function () {
+      itrainGuideDialog.showModal();
+    });
+  }
+
+  if (winDigipetGuideButton && winDigipetGuideDialog) {
+    winDigipetGuideButton.addEventListener("click", function () {
+      winDigipetGuideDialog.showModal();
+    });
+  }
+
+  if (rocrailGuideButton && rocrailGuideDialog) {
+    rocrailGuideButton.addEventListener("click", function () {
+      rocrailGuideDialog.showModal();
     });
   }
 
@@ -1356,6 +1455,48 @@
     z21emuGuideDialog.addEventListener("click", function (event) {
       if (event.target === z21emuGuideDialog) {
         z21emuGuideDialog.close();
+      }
+    });
+  }
+
+  if (itrainGuideCloseButton && itrainGuideDialog) {
+    itrainGuideCloseButton.addEventListener("click", function () {
+      itrainGuideDialog.close();
+    });
+  }
+
+  if (itrainGuideDialog) {
+    itrainGuideDialog.addEventListener("click", function (event) {
+      if (event.target === itrainGuideDialog) {
+        itrainGuideDialog.close();
+      }
+    });
+  }
+
+  if (winDigipetGuideCloseButton && winDigipetGuideDialog) {
+    winDigipetGuideCloseButton.addEventListener("click", function () {
+      winDigipetGuideDialog.close();
+    });
+  }
+
+  if (winDigipetGuideDialog) {
+    winDigipetGuideDialog.addEventListener("click", function (event) {
+      if (event.target === winDigipetGuideDialog) {
+        winDigipetGuideDialog.close();
+      }
+    });
+  }
+
+  if (rocrailGuideCloseButton && rocrailGuideDialog) {
+    rocrailGuideCloseButton.addEventListener("click", function () {
+      rocrailGuideDialog.close();
+    });
+  }
+
+  if (rocrailGuideDialog) {
+    rocrailGuideDialog.addEventListener("click", function (event) {
+      if (event.target === rocrailGuideDialog) {
+        rocrailGuideDialog.close();
       }
     });
   }

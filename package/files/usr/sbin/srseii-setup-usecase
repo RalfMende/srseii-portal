@@ -9,7 +9,7 @@ json_escape() {
 
 usage() {
 	cat <<EOF
-Usage: $SCRIPT_NAME <mswebapp|railcontrol|z21interface|cs2interface|all>
+Usage: $SCRIPT_NAME <mswebapp|railcontrol|z21interface|cs2interface|itrain|windigipet|rocrail|all>
 
 Checks each relevant package and service for a model railway use case,
 installs missing packages with opkg, then enables and starts the service
@@ -104,6 +104,15 @@ get_usecase_pkgs() {
 		cs2interface)
 			printf '%s\n' "can2udp"
 			;;
+		itrain)
+			printf '%s\n' "can2udp"
+			;;
+		windigipet)
+			printf '%s\n' "can2udp"
+			;;
+		rocrail)
+			printf '%s\n' "can2udp" "rocrail"
+			;;
 		*)
 			echo "Unknown use case: $usecase_name" >&2
 			return 1
@@ -127,6 +136,15 @@ get_usecase_services() {
 		cs2interface)
 			printf '%s\n' "can2lan"
 			;;
+		itrain)
+			printf '%s\n' "can2lan"
+			;;
+		windigipet)
+			printf '%s\n' "can2lan"
+			;;
+		rocrail)
+			printf '%s\n' "can2lan" "rocrail"
+			;;
 		*)
 			echo "Unknown use case: $usecase_name" >&2
 			return 1
@@ -149,6 +167,15 @@ get_usecase_requirements() {
 			;;
 		cs2interface)
 			printf '%s\n' "can2udp" "can2lan"
+			;;
+		itrain)
+			printf '%s\n' "can2udp" "can2lan"
+			;;
+		windigipet)
+			printf '%s\n' "can2udp" "can2lan"
+			;;
+		rocrail)
+			printf '%s\n' "can2udp" "rocrail" "can2lan"
 			;;
 		*)
 			echo "Unknown use case: $usecase_name" >&2
@@ -187,12 +214,12 @@ setup_usecase() {
 	usecase_name="$1"
 
 	case "$usecase_name" in
-		mswebapp|railcontrol|z21interface|cs2interface)
+		mswebapp|railcontrol|z21interface|cs2interface|itrain|windigipet|rocrail)
 			pkgs="$(get_usecase_pkgs "$usecase_name")"
 			services="$(get_usecase_services "$usecase_name")"
 			;;
 		all)
-			for entry in mswebapp railcontrol z21interface cs2interface; do
+			for entry in mswebapp railcontrol z21interface cs2interface itrain windigipet rocrail; do
 				setup_usecase "$entry" || return 1
 			done
 			return 0
