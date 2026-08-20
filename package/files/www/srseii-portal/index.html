@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.5.12" />
+  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.5.13" />
 </head>
 <body>
   <main class="layout">
@@ -242,7 +242,7 @@
         <article class="feature-card" style="--delay: 540ms;">
           <div class="feature-copy">
             <h4 data-i18n="rocrailTitle">Rocrail</h4>
-            <p data-i18n="rocrailDesc">Use the SRSEII as a mini central for Rocrail Software.</p>
+            <p data-i18n="rocrailDesc">Use the SRSEII as a Rocrail Server.</p>
           </div>
           <div class="feature-actions">
             <button class="btn btn-secondary" id="rocrail-guide-button" type="button" data-i18n="setupButton">Set up</button>
@@ -381,19 +381,35 @@
         <button class="modal-close" id="itrain-guide-close" type="button" aria-label="Close" data-i18n-aria-label="close">×</button>
       </div>
 
+      <section class="guide-section guide-note">
+        <p data-i18n="itrainIntroText">There is one important distinction: if you have an MS2 connected to the SRSEII, iTrain uses the "Märklin Central Station 2/3" interface. Without an MS2, iTrain provides the dedicated "Gleisbox SRSEII" interface.</p>
+      </section>
+
       <section class="guide-section">
-        <h3 data-i18n="itrainStepsTitle">Connect your PC</h3>
+        <h3 data-i18n="itrainOptionATitle">Option A – SRSEII with MS2</h3>
         <ol>
-          <li data-i18n="itrainStep1">Connect your PC to the same network as the SRSEII.</li>
-          <li data-i18n="itrainStep2">Open iTrain and add a new command station / interface.</li>
-          <li data-i18n="itrainStep3">Select the SRSEII as a CAN-based command station.</li>
-          <li><span data-i18n="itrainStep4">Enter the following SRSEII IP address:</span> <strong id="itrain-guide-ip">-</strong></li>
+          <li data-i18n="itrainOptionAStep1">Start iTrain.</li>
+          <li data-i18n="itrainOptionAStep2">Open Edit → Interfaces.</li>
+          <li data-i18n="itrainOptionAStep3">Add a new interface/command station.</li>
+          <li data-i18n="itrainOptionAStep4">Select: "Märklin Central Station 2/3".</li>
+          <li data-i18n="itrainOptionAStep5">Go to the Connection tab.</li>
+          <li><span data-i18n="itrainOptionAStep6">Enter the following SRSEII IP address in the Host/Address field:</span> <strong id="itrain-guide-ip">-</strong></li>
+          <li data-i18n="itrainOptionAStep7">If available, use "Find" to search for the SRSEII on the network.</li>
+          <li data-i18n="itrainOptionAStep8">Apply/save the settings.</li>
+          <li data-i18n="itrainOptionAStep9">In the Specific tab, do not configure the S88 modules as external CS2 S88 modules if your feedback modules are connected directly via the CAN bus/SRSEII.</li>
+          <li data-i18n="itrainOptionAStep10">Test the connection.</li>
         </ol>
       </section>
 
+      <section class="guide-section">
+        <h3 data-i18n="itrainOptionBTitle">Option B – SRSEII without MS2</h3>
+        <p data-i18n="itrainOptionBText1">Edit → Interfaces → Type: "Gleisbox SRSEII".</p>
+        <p><span data-i18n="itrainOptionBText2">Then enter the following SRSEII IP address under Connection, or use "Find" if available:</span> <strong id="itrain-guide-ip-b">-</strong></p>
+      </section>
+
       <section class="guide-section guide-note">
-        <h3 data-i18n="itrainNoteTitle">Note</h3>
-        <p data-i18n="itrainNoteText">Refer to the iTrain documentation for the exact command station type and any additional connection settings.</p>
+        <h3 data-i18n="itrainNoteTitle">Recommendation</h3>
+        <p data-i18n="itrainNoteText">If you know whether an MS2 is connected to the SRSEII or not, choose the matching option above.</p>
       </section>
     </div>
   </dialog>
@@ -405,20 +421,31 @@
         <button class="modal-close" id="windigipet-guide-close" type="button" aria-label="Close" data-i18n-aria-label="close">×</button>
       </div>
 
+      <section class="guide-section guide-note">
+        <p data-i18n="winDigipetIntroText">Win-Digipet recognizes the SRSEII as a Märklin CS2.</p>
+      </section>
+
       <section class="guide-section">
-        <h3 data-i18n="winDigipetStepsTitle">Connect your PC</h3>
+        <h3 data-i18n="winDigipetStepsTitle">Step by step</h3>
         <ol>
-          <li data-i18n="winDigipetStep1">Connect your PC to the same network as the SRSEII.</li>
-          <li data-i18n="winDigipetStep2">Open Win-Digipet and add a new command station / interface.</li>
-          <li data-i18n="winDigipetStep3">Select the SRSEII as a CAN-based command station.</li>
-          <li><span data-i18n="winDigipetStep4">Enter the following SRSEII IP address:</span> <strong id="windigipet-guide-ip">-</strong></li>
+          <li data-i18n="winDigipetStep1">Start Win-Digipet.</li>
+          <li data-i18n="winDigipetStep2">Open the settings for the digital system.</li>
+          <li data-i18n="winDigipetStep3">Add a new digital system or edit the existing one.</li>
+          <li data-i18n="winDigipetStep4">Select "Märklin Central Station 2 (CS2)" as the digital system/command station.</li>
+          <li data-i18n="winDigipetStep5">Select "Network/LAN" as the connection type.</li>
+          <li><span data-i18n="winDigipetStep6">Enter the following SRSEII IP address:</span> <strong id="windigipet-guide-ip">-</strong></li>
+          <li data-i18n="winDigipetStep7">With older SRSEII installations, UDP may be required for Win-Digipet. In particular, older can2lan versions up to 2.26 used UDP for the special WDP communication.</li>
+          <li data-i18n="winDigipetStep8">Test the connection.</li>
         </ol>
       </section>
 
       <section class="guide-section guide-note">
-        <h3 data-i18n="winDigipetSyncTitle">Locomotive list synchronization</h3>
-        <p data-i18n="winDigipetSyncText">To synchronize the locomotive list, add the -g option to can2lan in /etc/init.d/can2lan, e.g.:</p>
+        <h3 data-i18n="winDigipetSyncTitle">Important: locomotive database / MFX</h3>
+        <p data-i18n="winDigipetSyncText1">If you want Win-Digipet to work with the locomotive database of the SRSEII, or synchronize the vehicle data, there is an additional setting on the SRSEII itself:</p>
+        <p data-i18n="winDigipetSyncText2">In /etc/init.d/can2lan, the option -g needs to be enabled, e.g.:</p>
         <pre><code>can2lan -mg -c /www/config -b br-lan</code></pre>
+        <p data-i18n="winDigipetSyncText3">This allows the SRSEII to be recognized correctly as a CS2 by Win-Digipet and enables synchronization of the locomotive database. This is not a normal Win-Digipet setting; it is a setting on the SRSEII itself.</p>
+        <p data-i18n="winDigipetSyncText4">With newer can2lan/can2udp versions from 2.27 onward, TCP can also be used for this data exchange.</p>
       </section>
     </div>
   </dialog>
@@ -431,18 +458,20 @@
       </div>
 
       <section class="guide-section">
-        <h3 data-i18n="rocrailStepsTitle">Connect Rocview</h3>
+        <h3 data-i18n="rocrailStepsTitle">Step by step</h3>
         <ol>
-          <li data-i18n="rocrailStep1">Connect your PC to the same network as the SRSEII.</li>
-          <li data-i18n="rocrailStep2">Open Rocview and add a new server connection.</li>
-          <li><span data-i18n="rocrailStep3">Enter the following SRSEII IP address:</span> <strong id="rocrail-guide-ip">-</strong></li>
-          <li data-i18n="rocrailStep4">Use the port configured for the Rocrail server (default 8051), unless it was changed.</li>
+          <li data-i18n="rocrailStep1">Open Rocrail.</li>
+          <li data-i18n="rocrailStep2">Open the Command Station / Central Properties.</li>
+          <li data-i18n="rocrailStep3">Create a new command station or edit the existing one.</li>
+          <li data-i18n="rocrailStep4">Select "Märklin CS2/CS3" or the corresponding "mbus" protocol.</li>
+          <li><span data-i18n="rocrailStep5">Enter the following SRSEII IP address as the Address/Hostname:</span> <strong id="rocrail-guide-ip">-</strong></li>
+          <li data-i18n="rocrailStep6">Use TCP as the connection type, provided your SRSEII version/configuration supports it.</li>
+          <li data-i18n="rocrailStep7">The CS2/CS3 port is typically 15731.</li>
+          <li data-i18n="rocrailStep8">Save the settings.</li>
+          <li data-i18n="rocrailStep9">Select this command station as the default command station in Rocrail.</li>
+          <li data-i18n="rocrailStep10">Restart Rocrail if necessary.</li>
+          <li data-i18n="rocrailStep11">Perform a simple test: press STOP/GO in Rocrail. If the connection is working, Rocrail should be able to switch the track power on and off. This is a good first test before configuring locomotives, turnouts and feedback sensors.</li>
         </ol>
-      </section>
-
-      <section class="guide-section guide-note">
-        <h3 data-i18n="rocrailNoteTitle">Note</h3>
-        <p data-i18n="rocrailNoteText">The Rocrail server runs directly on the SRSEII; use Rocview to connect to and configure it remotely.</p>
       </section>
     </div>
   </dialog>
@@ -478,6 +507,6 @@
     </div>
   </dialog>
 
-  <script src="/srseii-portal/app.js?v=0.5.12"></script>
+  <script src="/srseii-portal/app.js?v=0.5.13"></script>
 </body>
 </html>
