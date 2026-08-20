@@ -398,7 +398,7 @@ if [ "$railcontrol_pkg_rc" -eq 0 ] && [ "$railcontrol_service_rc" -eq 0 ]; then
 fi
 
 z21interface_ready_rc=1
-if [ "$z21interface_pkg_rc" -eq 0 ] && [ "$z21interface_service_rc" -eq 0 ]; then
+if [ "$z21interface_service_rc" -eq 0 ]; then
 	z21interface_ready_rc=0
 fi
 
