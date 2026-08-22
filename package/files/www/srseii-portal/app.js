@@ -1032,8 +1032,8 @@
 
     setModelRailwayNote("", false);
 
-    setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + ":6020/", "mswebapp");
-    setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + ":8082/", "railcontrol");
+    setFeatureLinkState(mswebappLink, mswebappReady, "http://" + host + "/mswebapp/", "mswebapp");
+    setFeatureLinkState(railcontrolLink, railcontrolReady, "http://" + host + "/railcontrol/", "railcontrol");
 
     setZ21GuideIp(network.ip);
     setCentralStationGuideIp(network.ip);
