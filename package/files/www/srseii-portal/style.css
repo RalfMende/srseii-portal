@@ -730,6 +730,12 @@ body {
   border-color: #f0d48a;
 }
 
+.pill.network-disconnected {
+  color: #4b5563;
+  background: #e5e7eb;
+  border-color: #c7cdd4;
+}
+
 .pill.pending {
   color: #39424f;
   background: #e7ecf2;

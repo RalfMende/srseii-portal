@@ -649,7 +649,7 @@
     }
 
     el.classList.remove("pending", "ok", "err", "warn");
-    el.classList.add("pill", isConnected ? "ok" : "warn");
+    el.classList.add("pill", isConnected ? "ok" : "network-disconnected");
     el.textContent = isConnected ? t("connected") : t("notConnected");
   }
 
