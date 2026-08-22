@@ -455,11 +455,18 @@ body {
   filter: grayscale(0.2);
 }
 
-.btn.feature-state-setup,
 .btn.feature-state-unavailable {
   color: #6b4a1a;
   background: #fdf1d6;
   border-color: #f0d48a;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.btn.feature-state-setup {
+  color: #4b5563;
+  background: #e5e7eb;
+  border-color: #c7cdd4;
   opacity: 1;
   cursor: not-allowed;
 }
