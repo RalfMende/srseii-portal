@@ -88,6 +88,27 @@ ensure_service_started() {
 	return 1
 }
 
+ensure_service_stopped() {
+	service_name="$1"
+
+	if [ -x "/etc/init.d/$service_name" ]; then
+		echo "Ensuring service is disabled and stopped: $service_name"
+		/etc/init.d/"$service_name" disable >/dev/null 2>&1 || true
+		/etc/init.d/"$service_name" stop >/dev/null 2>&1 || true
+		return 0
+	fi
+
+	if command -v service >/dev/null 2>&1; then
+		echo "Ensuring system service is disabled and stopped: $service_name"
+		service "$service_name" disable >/dev/null 2>&1 || true
+		service "$service_name" stop >/dev/null 2>&1 || true
+		return 0
+	fi
+
+	echo "Service script not found for $service_name; skipping stop step." >&2
+	return 1
+}
+
 get_usecase_pkgs() {
 	usecase_name="$1"
 
@@ -152,6 +173,22 @@ get_usecase_services() {
 	esac
 }
 
+get_usecase_forbidden_services() {
+	usecase_name="$1"
+
+	case "$usecase_name" in
+		mswebapp|railcontrol)
+			printf '%s\n' "ms2-loco-list"
+			;;
+		z21interface|cs2interface|itrain|windigipet|rocrail)
+			;;
+		*)
+			echo "Unknown use case: $usecase_name" >&2
+			return 1
+			;;
+	esac
+}
+
 get_usecase_requirements() {
 	usecase_name="$1"
 
@@ -207,6 +244,14 @@ verify_usecase_ready() {
 		return 1
 	done
 
+	for service_name in $(get_usecase_forbidden_services "$usecase_name"); do
+		if service_is_running "$service_name"; then
+			echo "Use case readiness check failed: service $service_name must not be running." >&2
+			return 1
+		fi
+		echo "Verified stopped service: $service_name"
+	done
+
 	return 0
 }
 
@@ -233,6 +278,10 @@ setup_usecase() {
 
 	for package_name in $pkgs; do
 		install_package "$package_name" || return 1
+	done
+
+	for service_name in $(get_usecase_forbidden_services "$usecase_name"); do
+		ensure_service_stopped "$service_name" || true
 	done
 
 	for service_name in $services; do

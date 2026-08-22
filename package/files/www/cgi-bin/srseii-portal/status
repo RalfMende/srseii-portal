@@ -393,12 +393,12 @@ if is_service_running rocrail; then
 fi
 
 mswebapp_ready_rc=1
-if [ "$mswebapp_pkg_rc" -eq 0 ] && [ "$mswebapp_service_rc" -eq 0 ]; then
+if [ "$mswebapp_pkg_rc" -eq 0 ] && [ "$mswebapp_service_rc" -eq 0 ] && [ "$ms2_loco_list_service_rc" -ne 0 ]; then
 	mswebapp_ready_rc=0
 fi
 
 railcontrol_ready_rc=1
-if [ "$railcontrol_pkg_rc" -eq 0 ] && [ "$railcontrol_service_rc" -eq 0 ]; then
+if [ "$railcontrol_pkg_rc" -eq 0 ] && [ "$railcontrol_service_rc" -eq 0 ] && [ "$ms2_loco_list_service_rc" -ne 0 ]; then
 	railcontrol_ready_rc=0
 fi
 
