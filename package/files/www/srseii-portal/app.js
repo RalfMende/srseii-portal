@@ -216,7 +216,7 @@
       locoListError: "Lokliste konnte nicht gelesen werden.",
       locoListErrorText: "Die vorhandene Lokliste konnte vom Portal nicht geladen werden.",
       locoListCount: "%s Loks auf dem SRSEII",
-      locoListUpdated: "Zuletzt aktualisiert: %s",
+      locoListUpdated: "Datei zuletzt aktualisiert: %s",
       locoListDownload: "Lokliste herunterladen",
       locoListAddress: "Adresse",
       locoListProtocol: "Protokoll",
@@ -443,7 +443,7 @@
       locoListError: "The locomotive list could not be read.",
       locoListErrorText: "The existing locomotive list could not be loaded by the portal.",
       locoListCount: "%s locomotives on the SRSEII",
-      locoListUpdated: "Last updated: %s",
+      locoListUpdated: "File last updated: %s",
       locoListDownload: "Download locomotive list",
       locoListAddress: "Address",
       locoListProtocol: "Protocol",
@@ -902,6 +902,10 @@
 
     if (data.status === "empty" || locomotives.length === 0) {
       status.textContent = t("locoListEmpty");
+      if (data.updatedAt) {
+        meta.textContent = t("locoListUpdated").replace("%s", formatLocoListDate(data.updatedAt));
+      }
+      details.classList.remove("is-hidden");
       return;
     }
 

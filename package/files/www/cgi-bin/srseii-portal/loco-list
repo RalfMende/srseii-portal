@@ -16,11 +16,15 @@ json_escape() {
 }
 
 file_updated_at() {
-	mtime="$(stat -c '%Y' "$1" 2>/dev/null || true)"
-	case "$mtime" in
-		''|*[!0-9]*) return 0 ;;
-	esac
-	date -u -d "@$mtime" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || true
+	if command -v stat >/dev/null 2>&1; then
+		mtime="$(stat -c '%Y' "$1" 2>/dev/null || true)"
+		case "$mtime" in
+			''|*[!0-9]*) ;;
+			*) date -u -d "@$mtime" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || true; return ;;
+		esac
+	fi
+
+	ls -l --full-time "$1" 2>/dev/null | awk '{print $6 "T" $7 $8}'
 }
 
 list_file=""

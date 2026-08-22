@@ -24,6 +24,8 @@ for required in [
     '.(name|typ)',
     'sort -n',
     'updatedAt',
+    'command -v stat',
+    'ls -l --full-time',
 ]:
     assert required in endpoint_text, f"Missing locomotive-list behavior: {required}"
 
@@ -48,6 +50,8 @@ for required in [
 ]:
     assert required in html, f"Missing locomotive-list UI: {required}"
 
+assert html.index('data-i18n="locoListIntro"') < html.index('id="loco-list-meta"') < html.index('id="loco-list-download"')
+
 for required in [
     'fetchLocoListData',
     'renderLocoList',
@@ -63,6 +67,8 @@ for required in [
 assert 'loco-list" type="button' not in html
 assert '<caption id="loco-list-count"' not in html
 assert 'locoListProtocol' in app_js
+assert 'if (data.updatedAt) {' in app_js
+assert 'details.classList.remove("is-hidden");\n      return;' in app_js
 download_text = download_endpoint.read_text(encoding="utf-8")
 for required in [
     'REQUEST_METHOD:-GET',
