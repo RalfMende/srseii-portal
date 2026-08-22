@@ -642,6 +642,23 @@
     }
   }
 
+  function setServicePill(id, isRunning) {
+    var el = document.getElementById(id);
+    if (!el) {
+      return;
+    }
+
+    el.classList.remove("pending", "ok", "err", "warn", "network-disconnected", "service-not-required", "service-inactive");
+    if (isRunning) {
+      el.classList.add("pill", "ok");
+      el.textContent = t("active");
+      return;
+    }
+
+    el.classList.add("pill", "service-inactive");
+    el.textContent = t("inactive");
+  }
+
   function setNetworkPill(id, isConnected) {
     var el = document.getElementById(id);
     if (!el) {
@@ -1024,14 +1041,14 @@
     setWinDigipetGuideIp(network.ip);
     setRocrailGuideIp(network.ip);
 
-    setPill("st-mswebapp-svc", mswebappService);
-    setPill("st-railcontrol-svc", railcontrolService);
-    setPill("st-z21emu", z21Service);
-    setPill("st-can2lan", can2lanService);
-    setPill("st-clone-ms2-loco", !!(data.services && data.services["clone-ms2-loco"]));
-    setPill("st-maecanserver", !!(data.services && data.services.maecanserver));
-    setPill("st-ms2-loco-list", !!(data.services && data.services["ms2-loco-list"]));
-    setPill("st-wake-up-links88", !!(data.services && data.services["wake-up-links88"]));
+    setServicePill("st-mswebapp-svc", mswebappService);
+    setServicePill("st-railcontrol-svc", railcontrolService);
+    setServicePill("st-z21emu", z21Service);
+    setServicePill("st-can2lan", can2lanService);
+    setServicePill("st-clone-ms2-loco", !!(data.services && data.services["clone-ms2-loco"]));
+    setServicePill("st-maecanserver", !!(data.services && data.services.maecanserver));
+    setServicePill("st-ms2-loco-list", !!(data.services && data.services["ms2-loco-list"]));
+    setServicePill("st-wake-up-links88", !!(data.services && data.services["wake-up-links88"]));
 
     return network;
   }
