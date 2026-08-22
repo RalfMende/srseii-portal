@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.5.15" />
+  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.9.2" />
 </head>
 <body>
   <main class="layout">
@@ -152,7 +152,6 @@
         </ul>
       </details>
 
-          <p class="status-note" id="st-note" data-i18n="statusLoading">Loading status...</p>
         </div>
       </details>
     </section>
@@ -249,6 +248,36 @@
           </div>
         </article>
           </div>
+
+      <div class="feature-group loco-list-group">
+        <h3 data-i18n="locoListTitle">LOCOMOTIVE LIST</h3>
+        <p class="loco-list-intro" data-i18n="locoListIntro">This is the locomotive list stored on the SRSEII. Locomotives must be synchronized from the Gleisbox/MS2 before the installed control apps can use them.</p>
+        <details class="loco-list-details" id="loco-list-details">
+          <summary class="loco-list-summary" data-i18n="locoListReady">Locomotive list on the SRSEII</summary>
+          <div class="loco-list-content">
+            <p class="loco-list-status" id="loco-list-status" data-i18n="locoListLoading">Loading locomotive list...</p>
+            <div class="loco-list-empty is-hidden" id="loco-list-empty">
+              <p data-i18n="locoListEmpty">No locomotive list is available on the SRSEII yet.</p>
+            </div>
+            <div class="loco-list-table-wrap is-hidden" id="loco-list-table-wrap">
+              <table class="loco-list-table">
+                <thead>
+                  <tr>
+                    <th scope="col" data-i18n="locoListAddress">Address</th>
+                    <th scope="col" data-i18n="locoListProtocol">Protocol</th>
+                    <th scope="col" data-i18n="locoListName">Name</th>
+                  </tr>
+                </thead>
+                <tbody id="loco-list-rows"></tbody>
+              </table>
+            </div>
+            <details class="status-details is-hidden" id="loco-list-error-details">
+              <summary data-i18n="locoListDetails">Details</summary>
+              <p id="loco-list-error-text"></p>
+            </details>
+          </div>
+        </details>
+      </div>
         </div>
 
         <p class="status-note feature-status-note is-hidden" id="model-railway-note"></p>
@@ -507,6 +536,6 @@
     </div>
   </dialog>
 
-  <script src="/srseii-portal/app.js?v=0.5.15"></script>
+  <script src="/srseii-portal/app.js?v=0.9.3"></script>
 </body>
 </html>

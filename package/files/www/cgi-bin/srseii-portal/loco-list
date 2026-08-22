@@ -1,0 +1,114 @@
+#!/bin/sh
+
+set -eu
+
+echo "Content-Type: application/json"
+echo "Cache-Control: no-store"
+echo ""
+
+if [ "${REQUEST_METHOD:-GET}" != "GET" ]; then
+	printf '{"status":"error","message":"Only read access is supported."}\n'
+	exit 0
+fi
+
+json_escape() {
+	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
+}
+
+list_file=""
+for candidate in \
+	/www/config/lokomotive.cs2 \
+	/var/lokomotive.cs2 \
+	/tmp/lokomotive.cs2; do
+	if [ -e "$candidate" ]; then
+		if [ ! -r "$candidate" ]; then
+			printf '{"status":"error","message":"The locomotive list could not be read."}\n'
+			exit 0
+		fi
+		list_file="$candidate"
+		break
+	fi
+done
+
+if [ -z "$list_file" ]; then
+	printf '{"status":"empty","count":0,"locomotives":[]}\n'
+	exit 0
+fi
+
+records="$(awk '
+function hex_value(value,    digits, pos, result, digit) {
+	if (value !~ /^0[xX][0-9a-fA-F]+$/) {
+		return value
+	}
+	digits = "0123456789abcdef"
+	result = 0
+	for (pos = 3; pos <= length(value); pos++) {
+		digit = index(digits, substr(tolower(value), pos, 1)) - 1
+		result = result * 16 + digit
+	}
+	return result
+}
+
+function emit_record() {
+	if (address != "" && name != "") {
+		print hex_value(address) "\t" name "\t" protocol
+	}
+	address = ""
+	name = ""
+	protocol = ""
+}
+
+/^[[:space:]]*lokomotive[[:space:]]*$/ {
+	emit_record()
+	in_record = 1
+	next
+}
+
+in_record && /^[[:space:]]\.(adresse|adr|addr|address)=/ {
+	value = $0
+	sub(/^[[:space:]]\.(adresse|adr|addr|address)=/, "", value)
+	address = value
+	next
+}
+
+in_record && /^[[:space:]]\.(name|typ)=/ {
+	value = $0
+	field = value
+	sub(/^[[:space:]]\.[^=]+=*/, "", value)
+	sub(/^"/, "", value)
+	sub(/"[[:space:]]*$/, "", value)
+	if (field ~ /^[[:space:]]\.name=/) {
+		name = value
+	} else {
+		protocol = value
+	}
+	next
+}
+
+END { emit_record() }
+' "$list_file" 2>/dev/null)" || {
+	printf '{"status":"error","message":"The locomotive list could not be read."}\n'
+	exit 0
+}
+
+if [ -z "$records" ]; then
+	printf '{"status":"empty","count":0,"locomotives":[]}\n'
+	exit 0
+fi
+
+sorted_records="$(printf '%s\n' "$records" | sort -n -k1,1)"
+count="$(printf '%s\n' "$sorted_records" | wc -l | tr -d ' ')"
+items=""
+while IFS="$(printf '\t')" read -r address name protocol; do
+	[ -n "$address" ] || continue
+	item="{\"address\":$address,\"name\":\"$(json_escape "$name")\",\"protocol\":\"$(json_escape "$protocol")\"}"
+	if [ -n "$items" ]; then
+		items="$items,$item"
+	else
+		items="$item"
+	fi
+done <<EOF
+$sorted_records
+EOF
+
+printf '{"status":"ready","count":%s,"locomotives":[%s]}\n' "$count" "$items"

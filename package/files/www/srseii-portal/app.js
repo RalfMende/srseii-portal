@@ -208,6 +208,17 @@
       modelRailwayFunctionsTitle: "Modellbahn-Funktionen",
       modelRailwayFunctionsIntro: "Wähle, wie du deine Modellbahn steuern möchtest.",
       modelRailwayStatusError: "Die Modellbahn-Funktionen konnten nicht geprüft werden:",
+      locoListTitle: "LOKLISTE",
+      locoListIntro: "Dies ist die auf dem SRSEII gespeicherte Lokliste. Die Loks müssen aus der Gleisbox/MS2 hierher synchronisiert werden, damit die installierten Steuerungs-Apps sie verwenden können.",
+      locoListLoading: "Lokliste wird geladen...",
+      locoListReady: "Lokliste auf dem SRSEII",
+      locoListEmpty: "Noch keine Lokliste vorhanden. Auf dem SRSEII wurde keine Lokliste gefunden.",
+      locoListError: "Lokliste konnte nicht gelesen werden.",
+      locoListErrorText: "Die vorhandene Lokliste konnte vom Portal nicht geladen werden.",
+      locoListAddress: "Adresse",
+      locoListProtocol: "Protokoll",
+      locoListName: "Name",
+      locoListDetails: "Details",
       browserDirectTitle: "DIREKT IM BROWSER",
       smartphoneTabletTitle: "MIT SMARTPHONE / TABLET",
       pcControlTitle: "MIT PC-STEUERUNG",
@@ -421,6 +432,17 @@
       modelRailwayFunctionsTitle: "Model railway functions",
       modelRailwayFunctionsIntro: "Pick how you'd like to take the controls.",
       modelRailwayStatusError: "The model railway functions could not be checked:",
+      locoListTitle: "LOCOMOTIVE LIST",
+      locoListIntro: "This is the locomotive list stored on the SRSEII. Locomotives must be synchronized from the Gleisbox/MS2 before the installed control apps can use them.",
+      locoListLoading: "Loading locomotive list...",
+      locoListReady: "Locomotive list on the SRSEII",
+      locoListEmpty: "No locomotive list is available yet. No locomotive list was found on the SRSEII.",
+      locoListError: "The locomotive list could not be read.",
+      locoListErrorText: "The existing locomotive list could not be loaded by the portal.",
+      locoListAddress: "Address",
+      locoListProtocol: "Protocol",
+      locoListName: "Name",
+      locoListDetails: "Details",
       browserDirectTitle: "DIRECTLY IN THE BROWSER",
       smartphoneTabletTitle: "WITH SMARTPHONE / TABLET",
       pcControlTitle: "WITH PC CONTROL",
@@ -487,8 +509,8 @@
       unknown: "unknown",
       notAvailable: "not available",
       hostHintPrefix: "RailControl target",
-      wifiAssistantTitle: "WLAN configuration",
-      wifiScan: "Scan WLAN",
+      wifiAssistantTitle: "Wifi configuration",
+      wifiScan: "Scan Wifi",
       wifiNetworkLabel: "Detected network",
       wifiNetworkPlaceholder: "Run a scan first",
       wifiSsidLabel: "SSID",
@@ -871,6 +893,75 @@
       item.innerHTML = '<span class="event-level">' + level + '</span><span class="event-message">' + message + '</span><span class="event-time">' + time + '</span>';
       list.appendChild(item);
     });
+  }
+
+  function renderLocoList(data) {
+    var status = document.getElementById("loco-list-status");
+    var empty = document.getElementById("loco-list-empty");
+    var tableWrap = document.getElementById("loco-list-table-wrap");
+    var rows = document.getElementById("loco-list-rows");
+    var errorDetails = document.getElementById("loco-list-error-details");
+    var errorText = document.getElementById("loco-list-error-text");
+    var locomotives = data && Array.isArray(data.locomotives) ? data.locomotives : [];
+
+    if (!status || !empty || !tableWrap || !rows || !errorDetails || !errorText) {
+      return;
+    }
+
+    empty.classList.add("is-hidden");
+    tableWrap.classList.add("is-hidden");
+    errorDetails.classList.add("is-hidden");
+    rows.textContent = "";
+
+    if (!data || data.status === "error") {
+      status.textContent = t("locoListError");
+      errorText.textContent = t("locoListErrorText");
+      if (data && data.message) {
+        errorText.textContent += " " + String(data.message);
+      }
+      errorDetails.classList.remove("is-hidden");
+      return;
+    }
+
+    if (data.status === "empty" || locomotives.length === 0) {
+      status.textContent = t("locoListEmpty");
+      empty.classList.remove("is-hidden");
+      return;
+    }
+
+    status.textContent = "";
+    locomotives.forEach(function (locomotive) {
+      var row = document.createElement("tr");
+      var addressCell = document.createElement("td");
+      var protocolCell = document.createElement("td");
+      var nameCell = document.createElement("td");
+      addressCell.textContent = locomotive && locomotive.address !== undefined ? String(locomotive.address) : "-";
+      protocolCell.textContent = locomotive && locomotive.protocol ? String(locomotive.protocol) : "-";
+      nameCell.textContent = locomotive && locomotive.name ? String(locomotive.name) : "-";
+      row.appendChild(addressCell);
+      row.appendChild(protocolCell);
+      row.appendChild(nameCell);
+      rows.appendChild(row);
+    });
+    tableWrap.classList.remove("is-hidden");
+  }
+
+  function fetchLocoListData() {
+    return fetch("/cgi-bin/srseii-portal/loco-list?ts=" + Date.now(), { cache: "no-store" })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+        return response.json();
+      });
+  }
+
+  function loadLocoList() {
+    fetchLocoListData()
+      .then(renderLocoList)
+      .catch(function () {
+        renderLocoList({ status: "error" });
+      });
   }
 
   function setNetworkNote(text) {
@@ -1427,6 +1518,7 @@
       });
 
     checkUpdates();
+    loadLocoList();
     return statusPromise;
   }
 

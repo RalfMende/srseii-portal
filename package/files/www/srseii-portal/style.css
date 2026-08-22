@@ -195,6 +195,72 @@ body {
   line-height: 1.45;
 }
 
+.loco-list-status {
+  margin: 0 0 0.65rem;
+  color: var(--muted);
+}
+
+.loco-list-intro {
+  margin: 0 0 0.75rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.loco-list-details {
+  border-top: 1px solid rgba(26, 32, 44, 0.12);
+  padding-top: 0.7rem;
+}
+
+.loco-list-details > summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.loco-list-details > summary:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.loco-list-content {
+  margin-top: 1rem;
+}
+
+.loco-list-table-wrap {
+  overflow-x: auto;
+}
+
+.loco-list-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.loco-list-table th,
+.loco-list-table td {
+  padding: 0.48rem 0.35rem;
+  border-bottom: 1px solid rgba(26, 32, 44, 0.08);
+  text-align: left;
+}
+
+.loco-list-table th:first-child,
+.loco-list-table td:first-child {
+  width: 6rem;
+}
+
+.loco-list-table th:nth-child(2),
+.loco-list-table td:nth-child(2) {
+  width: 8rem;
+}
+
+.loco-list-table th {
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .feature-actions {
   display: flex;
   align-items: center;
