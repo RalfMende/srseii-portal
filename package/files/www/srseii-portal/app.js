@@ -211,10 +211,13 @@
       locoListTitle: "LOKLISTE",
       locoListIntro: "Dies ist die auf dem SRSEII gespeicherte Lokliste. Die Loks müssen aus der Gleisbox/MS2 hierher synchronisiert werden, damit die installierten Steuerungs-Apps sie verwenden können.",
       locoListLoading: "Lokliste wird geladen...",
-      locoListReady: "Lokliste auf dem SRSEII",
-      locoListEmpty: "Noch keine Lokliste vorhanden. Auf dem SRSEII wurde keine Lokliste gefunden.",
+      locoListHeading: "Lokliste auf dem SRSEII",
+      locoListEmpty: "Keine Lokliste vorhanden unter /www/config/lokomotive.cs2.",
       locoListError: "Lokliste konnte nicht gelesen werden.",
       locoListErrorText: "Die vorhandene Lokliste konnte vom Portal nicht geladen werden.",
+      locoListCount: "%s Loks auf dem SRSEII",
+      locoListUpdated: "Zuletzt aktualisiert: %s",
+      locoListDownload: "Lokliste herunterladen",
       locoListAddress: "Adresse",
       locoListProtocol: "Protokoll",
       locoListName: "Name",
@@ -435,10 +438,13 @@
       locoListTitle: "LOCOMOTIVE LIST",
       locoListIntro: "This is the locomotive list stored on the SRSEII. Locomotives must be synchronized from the Gleisbox/MS2 before the installed control apps can use them.",
       locoListLoading: "Loading locomotive list...",
-      locoListReady: "Locomotive list on the SRSEII",
-      locoListEmpty: "No locomotive list is available yet. No locomotive list was found on the SRSEII.",
+      locoListHeading: "Locomotive list on the SRSEII",
+      locoListEmpty: "No locomotive list available under /www/config/lokomotive.cs2.",
       locoListError: "The locomotive list could not be read.",
       locoListErrorText: "The existing locomotive list could not be loaded by the portal.",
+      locoListCount: "%s locomotives on the SRSEII",
+      locoListUpdated: "Last updated: %s",
+      locoListDownload: "Download locomotive list",
       locoListAddress: "Address",
       locoListProtocol: "Protocol",
       locoListName: "Name",
@@ -865,16 +871,24 @@
     var rows = document.getElementById("loco-list-rows");
     var errorDetails = document.getElementById("loco-list-error-details");
     var errorText = document.getElementById("loco-list-error-text");
+    var meta = document.getElementById("loco-list-meta");
+    var download = document.getElementById("loco-list-download");
+    var details = document.getElementById("loco-list-details");
+    var summary = document.getElementById("loco-list-summary");
     var locomotives = data && Array.isArray(data.locomotives) ? data.locomotives : [];
 
-    if (!status || !empty || !tableWrap || !rows || !errorDetails || !errorText) {
+    if (!status || !empty || !tableWrap || !rows || !errorDetails || !errorText || !meta || !download || !details || !summary) {
       return;
     }
 
     empty.classList.add("is-hidden");
     tableWrap.classList.add("is-hidden");
     errorDetails.classList.add("is-hidden");
+    download.classList.add("is-hidden");
+    details.classList.add("is-hidden");
     rows.textContent = "";
+    meta.textContent = "";
+    summary.textContent = "";
 
     if (!data || data.status === "error") {
       status.textContent = t("locoListError");
@@ -888,11 +902,14 @@
 
     if (data.status === "empty" || locomotives.length === 0) {
       status.textContent = t("locoListEmpty");
-      empty.classList.remove("is-hidden");
       return;
     }
 
+    summary.textContent = t("locoListCount").replace("%s", String(data.count !== undefined ? data.count : locomotives.length));
     status.textContent = "";
+    if (data.updatedAt) {
+      meta.textContent = t("locoListUpdated").replace("%s", formatLocoListDate(data.updatedAt));
+    }
     locomotives.forEach(function (locomotive) {
       var row = document.createElement("tr");
       var addressCell = document.createElement("td");
@@ -907,6 +924,16 @@
       rows.appendChild(row);
     });
     tableWrap.classList.remove("is-hidden");
+    download.classList.remove("is-hidden");
+    details.classList.remove("is-hidden");
+  }
+
+  function formatLocoListDate(value) {
+    var parsed = new Date(value);
+    if (isNaN(parsed.getTime())) {
+      return String(value);
+    }
+    return parsed.toLocaleString();
   }
 
   function fetchLocoListData() {

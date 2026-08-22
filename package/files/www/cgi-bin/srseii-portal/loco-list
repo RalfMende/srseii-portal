@@ -15,12 +15,20 @@ json_escape() {
 	printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'
 }
 
+file_updated_at() {
+	mtime="$(stat -c '%Y' "$1" 2>/dev/null || true)"
+	case "$mtime" in
+		''|*[!0-9]*) return 0 ;;
+	esac
+	date -u -d "@$mtime" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || true
+}
+
 list_file=""
 for candidate in \
 	/www/config/lokomotive.cs2 \
 	/var/lokomotive.cs2 \
 	/tmp/lokomotive.cs2; do
-	if [ -e "$candidate" ]; then
+	if [ -f "$candidate" ]; then
 		if [ ! -r "$candidate" ]; then
 			printf '{"status":"error","message":"The locomotive list could not be read."}\n'
 			exit 0
@@ -34,6 +42,8 @@ if [ -z "$list_file" ]; then
 	printf '{"status":"empty","count":0,"locomotives":[]}\n'
 	exit 0
 fi
+
+updated_at="$(file_updated_at "$list_file")"
 
 records="$(awk '
 function hex_value(value,    digits, pos, result, digit) {
@@ -92,7 +102,11 @@ END { emit_record() }
 }
 
 if [ -z "$records" ]; then
-	printf '{"status":"empty","count":0,"locomotives":[]}\n'
+	if [ -n "$updated_at" ]; then
+		printf '{"status":"empty","count":0,"updatedAt":"%s","locomotives":[]}\n' "$updated_at"
+	else
+		printf '{"status":"empty","count":0,"locomotives":[]}\n'
+	fi
 	exit 0
 fi
 
@@ -111,4 +125,8 @@ done <<EOF
 $sorted_records
 EOF
 
-printf '{"status":"ready","count":%s,"locomotives":[%s]}\n' "$count" "$items"
+if [ -n "$updated_at" ]; then
+	printf '{"status":"ready","count":%s,"updatedAt":"%s","locomotives":[%s]}\n' "$count" "$updated_at" "$items"
+else
+	printf '{"status":"ready","count":%s,"locomotives":[%s]}\n' "$count" "$items"
+fi

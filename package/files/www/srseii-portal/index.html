@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.9.2" />
+  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.9.3" />
 </head>
 <body>
   <main class="layout">
@@ -247,17 +247,20 @@
             <button class="btn btn-secondary" id="rocrail-guide-button" type="button" data-i18n="setupButton">Set up</button>
           </div>
         </article>
-          </div>
+      </div>
 
       <div class="feature-group loco-list-group">
         <h3 data-i18n="locoListTitle">LOCOMOTIVE LIST</h3>
+        <h4 class="loco-list-heading" data-i18n="locoListHeading">Locomotive list on the SRSEII</h4>
         <p class="loco-list-intro" data-i18n="locoListIntro">This is the locomotive list stored on the SRSEII. Locomotives must be synchronized from the Gleisbox/MS2 before the installed control apps can use them.</p>
-        <details class="loco-list-details" id="loco-list-details">
-          <summary class="loco-list-summary" data-i18n="locoListReady">Locomotive list on the SRSEII</summary>
+        <a class="loco-list-download is-hidden" id="loco-list-download" href="/cgi-bin/srseii-portal/loco-list-download" download data-i18n="locoListDownload">Download locomotive list</a>
+        <details class="loco-list-details is-hidden" id="loco-list-details">
+          <summary class="loco-list-summary" id="loco-list-summary"></summary>
           <div class="loco-list-content">
             <p class="loco-list-status" id="loco-list-status" data-i18n="locoListLoading">Loading locomotive list...</p>
+            <p class="loco-list-meta" id="loco-list-meta"></p>
             <div class="loco-list-empty is-hidden" id="loco-list-empty">
-              <p data-i18n="locoListEmpty">No locomotive list is available on the SRSEII yet.</p>
+              <p data-i18n="locoListEmpty">No locomotive list is available under /www/config/lokomotive.cs2.</p>
             </div>
             <div class="loco-list-table-wrap is-hidden" id="loco-list-table-wrap">
               <table class="loco-list-table">
