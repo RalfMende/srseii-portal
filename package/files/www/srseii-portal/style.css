@@ -218,9 +218,9 @@ body {
   line-height: 1.45;
 }
 
-.loco-list-heading {
-  margin: 0 0 0.35rem;
-  font-size: 1rem;
+.loco-list-summary {
+  margin: 0 0 0.65rem;
+  font-weight: 600;
 }
 
 .loco-list-group > h3 {

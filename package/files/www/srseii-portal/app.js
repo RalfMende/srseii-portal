@@ -212,8 +212,8 @@
       modelRailwayStatusError: "Die Modellbahn-Funktionen konnten nicht geprüft werden:",
       locoListTitle: "LOKLISTE",
       locoListIntro: "Dies ist die auf dem SRSEII gespeicherte Lokliste. Die Loks müssen aus der Gleisbox/MS2 hierher synchronisiert werden, damit die installierten Steuerungs-Apps sie verwenden können.",
+      locoListShowButton: "Lokliste anzeigen",
       locoListLoading: "Lokliste wird geladen...",
-      locoListHeading: "Lokliste auf dem SRSEII",
       locoListEmpty: "Keine Lokliste vorhanden unter /www/config/lokomotive.cs2.",
       locoListError: "Lokliste konnte nicht gelesen werden.",
       locoListErrorText: "Die vorhandene Lokliste konnte vom Portal nicht geladen werden.",
@@ -442,8 +442,8 @@
       modelRailwayStatusError: "The model railway functions could not be checked:",
       locoListTitle: "LOCOMOTIVE LIST",
       locoListIntro: "This is the locomotive list stored on the SRSEII. Locomotives must be synchronized from the Gleisbox/MS2 before the installed control apps can use them.",
+      locoListShowButton: "Show locomotive list",
       locoListLoading: "Loading locomotive list...",
-      locoListHeading: "Locomotive list on the SRSEII",
       locoListEmpty: "No locomotive list available under /www/config/lokomotive.cs2.",
       locoListError: "The locomotive list could not be read.",
       locoListErrorText: "The existing locomotive list could not be loaded by the portal.",
@@ -878,11 +878,10 @@
     var errorText = document.getElementById("loco-list-error-text");
     var meta = document.getElementById("loco-list-meta");
     var download = document.getElementById("loco-list-download");
-    var details = document.getElementById("loco-list-details");
     var summary = document.getElementById("loco-list-summary");
     var locomotives = data && Array.isArray(data.locomotives) ? data.locomotives : [];
 
-    if (!status || !empty || !tableWrap || !rows || !errorDetails || !errorText || !meta || !download || !details || !summary) {
+    if (!status || !empty || !tableWrap || !rows || !errorDetails || !errorText || !meta || !download || !summary) {
       return;
     }
 
@@ -890,7 +889,6 @@
     tableWrap.classList.add("is-hidden");
     errorDetails.classList.add("is-hidden");
     download.classList.add("is-hidden");
-    details.classList.add("is-hidden");
     rows.textContent = "";
     meta.textContent = "";
     summary.textContent = "";
@@ -910,7 +908,6 @@
       if (data.updatedAt) {
         meta.textContent = t("locoListUpdated").replace("%s", formatLocoListDate(data.updatedAt));
       }
-      details.classList.remove("is-hidden");
       return;
     }
 
@@ -934,7 +931,6 @@
     });
     tableWrap.classList.remove("is-hidden");
     download.classList.remove("is-hidden");
-    details.classList.remove("is-hidden");
   }
 
   function formatLocoListDate(value) {
@@ -1533,7 +1529,6 @@
         setNetworkNote(t("statusLoadError") + " " + error.message);
       });
 
-    loadLocoList();
     return statusPromise;
   }
 
@@ -1705,6 +1700,17 @@
         return;
       }
       wifiAssistantDetails.dataset.userToggled = "true";
+    });
+  }
+
+  var locoListDetails = document.getElementById("loco-list-details");
+  var locoListLoaded = false;
+  if (locoListDetails) {
+    locoListDetails.addEventListener("toggle", function () {
+      if (locoListDetails.open && !locoListLoaded) {
+        locoListLoaded = true;
+        loadLocoList();
+      }
     });
   }
   applyTranslations();

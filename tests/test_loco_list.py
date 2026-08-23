@@ -34,7 +34,7 @@ assert '$(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/loco-list-download' in 
 for required in [
     'id="loco-list-status"',
     'id="loco-list-details"',
-    'data-i18n="locoListHeading"',
+    'data-i18n="locoListShowButton"',
     'data-i18n="locoListIntro"',
     'id="loco-list-empty"',
     'id="loco-list-table-wrap"',
@@ -45,12 +45,13 @@ for required in [
     'id="loco-list-meta"',
     'id="loco-list-download"',
     'data-i18n="locoListDownload"',
-    'class="loco-list-details is-hidden"',
+    'class="loco-list-details" id="loco-list-details"',
     'id="loco-list-summary"',
 ]:
     assert required in html, f"Missing locomotive-list UI: {required}"
 
-assert html.index('data-i18n="locoListIntro"') < html.index('id="loco-list-meta"') < html.index('id="loco-list-download"')
+assert 'class="loco-list-details is-hidden"' not in html, "loco-list-details must stay visible; it is the lazy-load trigger, not data-driven"
+assert html.index('data-i18n="locoListIntro"') < html.index('id="loco-list-download"') < html.index('id="loco-list-meta"') < html.index('id="loco-list-summary"') < html.index('id="loco-list-table-wrap"')
 
 for required in [
     'fetchLocoListData',
@@ -68,7 +69,13 @@ assert 'loco-list" type="button' not in html
 assert '<caption id="loco-list-count"' not in html
 assert 'locoListProtocol' in app_js
 assert 'if (data.updatedAt) {' in app_js
-assert 'details.classList.remove("is-hidden");\n      return;' in app_js
+
+# Loading the locomotive list must be decoupled from the page load and only triggered on first expand.
+assert 'loadLocoList();' not in app_js.split("function loadStatus")[1].split("function ", 1)[0]
+assert 'getElementById("loco-list-details")' in app_js
+assert 'locoListLoaded' in app_js
+assert "locoListDetails.addEventListener(\"toggle\"" in app_js
+
 download_text = download_endpoint.read_text(encoding="utf-8")
 for required in [
     'REQUEST_METHOD:-GET',
