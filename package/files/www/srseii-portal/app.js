@@ -44,7 +44,6 @@
   var wifiAssistantAutoToggle = false;
   var updateCheckPromise = null;
   var updateOperationInFlight = false;
-  var systemStatusReady = false;
   var portalVersion = getPortalVersion();
 
   // Derives the portal version from this script's own cache-busting "?v=" query param.
@@ -176,6 +175,9 @@
       readinessTitle: "Betriebsbereitschaft",
       statusIntro: "Der Kurzcheck: Ist dein SRSEII fit?",
       refresh: "Aktualisieren",
+      updatesTitle: "Updates",
+      updatesIdleNote: "Update-Status noch nicht geprüft.",
+      updateCheckButton: "Nach Updates suchen",
       updatesChecking: "Installierte Pakete werden geprüft...",
       updatesAvailable: "Update verfügbar",
       updatesAvailablePlural: "Updates verfügbar",
@@ -403,6 +405,9 @@
       readinessTitle: "Readiness",
       statusIntro: "A quick health check for your SRSEII.",
       refresh: "Refresh",
+      updatesTitle: "Updates",
+      updatesIdleNote: "Update status not checked yet.",
+      updateCheckButton: "Check for updates",
       updatesChecking: "Checking installed packages...",
       updatesAvailable: "Update available",
       updatesAvailablePlural: "Updates available",
@@ -1075,12 +1080,8 @@
     renderEventLog(Array.isArray(data.events) ? data.events : []);
 
     var overallReady = !!overall.ready;
-    systemStatusReady = overallReady;
     var overallLabel = getLocalizedStatusValue(overall, "label", "labelDe") || (overallReady ? t("overallReady") : t("overallAttention"));
-    setOverallAction(overallReady ? "ready" : "error", overallReady ? t("overallReady") : t("problem"), false);
-    if (!overallReady) {
-      setUpdatesNote(overallLabel, true);
-    }
+    setOverallStatusPill(overallReady, overallReady ? "" : overallLabel);
 
     // Always revealable; auto-expand only while WLAN is not yet configured.
     var wifiAssistant = document.getElementById("wifi-assistant");
@@ -1146,7 +1147,21 @@
     updatesNote.classList.toggle("err", !!isError);
   }
 
-  function setOverallAction(state, text, enabled) {
+  function setOverallStatusPill(ready, message) {
+    var pill = document.getElementById("st-overall-status");
+    if (pill) {
+      pill.classList.remove("pending", "ok", "err");
+      pill.classList.add("pill", ready ? "ok" : "err");
+      pill.textContent = ready ? t("overallReady") : t("overallAttention");
+    }
+    var note = document.getElementById("overall-status-note");
+    if (note) {
+      note.textContent = message || "";
+      note.classList.toggle("is-hidden", !message);
+    }
+  }
+
+  function setUpdateAction(state, text, enabled) {
     if (!updatePackagesButton) {
       return;
     }
@@ -1154,6 +1169,7 @@
     updatePackagesButton.classList.add("overall-action-" + state);
     updatePackagesButton.textContent = text;
     updatePackagesButton.disabled = !enabled;
+    updatePackagesButton.dataset.updateState = state;
   }
 
   function fetchUpdateData(method) {
@@ -1174,25 +1190,17 @@
     var isAvailable = data.status === "updates-available" || updateCount > 0;
 
     if (data.status === "busy") {
-      setOverallAction("pending", t("updateChecking"), false);
+      setUpdateAction("pending", t("updateChecking"), false);
       setUpdatesNote(data.message || t("updateChecking"), false);
     } else if (data.status === "up-to-date" || (!isAvailable && data.ok)) {
-      if (systemStatusReady) {
-        setOverallAction("ready", t("overallReady"), false);
-      } else {
-        setOverallAction("error", t("problem"), false);
-      }
+      setUpdateAction("ready", t("updateCheckButton"), true);
       setUpdatesNote(t("upToDate"), false);
     } else if (isAvailable) {
       var updateLabel = updateCount + " " + (updateCount === 1 ? t("updatesAvailable") : t("updatesAvailablePlural"));
-      if (systemStatusReady) {
-        setOverallAction("update", t("updatePackages"), true);
-      } else {
-        setOverallAction("error", t("problem"), false);
-      }
+      setUpdateAction("update", t("updatePackages"), true);
       setUpdatesNote(updateLabel, false);
     } else {
-      setOverallAction("error", t("problem"), false);
+      setUpdateAction("error", t("updateCheckButton"), true);
       setUpdatesNote(data.message || t("updateFailed"), true);
     }
     return isAvailable;
@@ -1206,7 +1214,7 @@
     if (updatePackagesButton) {
       updatePackagesButton.disabled = true;
     }
-    setOverallAction("pending", t("updateChecking"), false);
+    setUpdateAction("pending", t("updateChecking"), false);
     setUpdatesNote(t("updatesChecking"), false);
 
     updateCheckPromise = fetchUpdateData("GET")
@@ -1215,7 +1223,7 @@
         return data;
       })
       .catch(function (error) {
-        setOverallAction("error", t("problem"), false);
+        setUpdateAction("error", t("updateCheckButton"), true);
         setUpdatesNote(t("updateFailed") + " " + error.message, true);
         return null;
       })
@@ -1235,7 +1243,7 @@
     if (updatePackagesButton) {
       updatePackagesButton.disabled = true;
     }
-    setOverallAction("pending", t("updateRunning"), false);
+    setUpdateAction("pending", t("updateRunning"), false);
     setUpdatesNote(t("updateRunning"), false);
 
     fetchUpdateData("POST")
@@ -1245,14 +1253,28 @@
         }
         setUpdatesNote(t("updateDone"), false);
         updateOperationInFlight = false;
-        return loadStatus();
+        return loadStatus().then(function () {
+          return checkUpdates();
+        });
       })
       .catch(function (error) {
-        setOverallAction("error", t("problem"), false);
+        setUpdateAction("error", t("updateCheckButton"), true);
         setUpdatesNote(t("updateFailed") + " " + error.message, true);
         updateOperationInFlight = false;
         checkUpdates();
       });
+  }
+
+  function handleUpdateButtonClick() {
+    var state = updatePackagesButton ? updatePackagesButton.dataset.updateState : "";
+    if (state === "update") {
+      updatePackages();
+      return;
+    }
+    if (state === "pending") {
+      return;
+    }
+    checkUpdates();
   }
 
   function fetchStatusData() {
@@ -1498,7 +1520,7 @@
         setNetworkNote(getLocalizedStatusValue(network, "message", "messageDe") || t("statusLoaded"));
       })
       .catch(function (error) {
-        setOverallAction("error", t("problem"), false);
+        setOverallStatusPill(false, t("statusLoadError") + " " + error.message);
         setFeatureButtonState(mswebappLink, "error");
         setFeatureButtonState(railcontrolLink, "error");
         setFeatureButtonState(z21emuGuideButton, "error");
@@ -1511,7 +1533,6 @@
         setNetworkNote(t("statusLoadError") + " " + error.message);
       });
 
-    checkUpdates();
     loadLocoList();
     return statusPromise;
   }
@@ -1525,7 +1546,7 @@
   bindUseCaseAction(rocrailGuideButton, "rocrail");
 
   if (updatePackagesButton) {
-    updatePackagesButton.addEventListener("click", updatePackages);
+    updatePackagesButton.addEventListener("click", handleUpdateButtonClick);
   }
 
   if (z21emuGuideButton && z21emuGuideDialog) {

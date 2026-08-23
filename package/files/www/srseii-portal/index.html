@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <title>SRSEII Portal</title>
   <meta name="description" content="SRSEII Portal" />
-  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.9.4" />
+  <link rel="stylesheet" href="/srseii-portal/style.css?v=0.9.5" />
 </head>
 <body>
   <main class="layout">
@@ -110,10 +110,20 @@
         <article class="feature-card">
           <div class="feature-copy">
             <h4 data-i18n="overallStatus">Overall status</h4>
-            <p id="updates-note" data-i18n="updatesChecking">Checking installed packages...</p>
+            <p class="status-note is-hidden" id="overall-status-note"></p>
           </div>
           <div class="feature-actions">
-            <button class="btn overall-action" id="update-packages" type="button" disabled data-i18n="loading">loading</button>
+            <span id="st-overall-status" class="pill pending" data-i18n="loading">loading</span>
+          </div>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-copy">
+            <h4 data-i18n="updatesTitle">Updates</h4>
+            <p id="updates-note" data-i18n="updatesIdleNote">Update status not checked yet.</p>
+          </div>
+          <div class="feature-actions">
+            <button class="btn overall-action" id="update-packages" type="button" data-i18n="updateCheckButton">Check for updates</button>
           </div>
         </article>
 
@@ -539,6 +549,6 @@
     </div>
   </dialog>
 
-  <script src="/srseii-portal/app.js?v=0.9.4"></script>
+  <script src="/srseii-portal/app.js?v=0.9.5"></script>
 </body>
 </html>
