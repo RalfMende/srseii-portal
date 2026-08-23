@@ -26,9 +26,16 @@ if [ -f /usr/sbin/srseii-setup-usecase ]; then
 	unset SRSEII_SETUP_USECASE_SOURCED
 fi
 
-is_pkg_installed() {
-	opkg status "$1" 2>/dev/null | grep -q '^Status: .* installed$'
-}
+# Prefer the shared, TTL-cached lookup from srseii-setup-usecase (avoids one opkg spawn per package per request).
+if command -v pkg_is_installed >/dev/null 2>&1; then
+	is_pkg_installed() {
+		pkg_is_installed "$1"
+	}
+else
+	is_pkg_installed() {
+		opkg status "$1" 2>/dev/null | grep -q '^Status: .* installed$'
+	}
+fi
 
 service_process_running() {
 	service_name="$1"

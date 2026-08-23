@@ -51,7 +51,7 @@ for required in [
     assert required in html, f"Missing locomotive-list UI: {required}"
 
 assert 'class="loco-list-details is-hidden"' not in html, "loco-list-details must stay visible; it is the lazy-load trigger, not data-driven"
-assert html.index('data-i18n="locoListIntro"') < html.index('id="loco-list-download"') < html.index('id="loco-list-meta"') < html.index('id="loco-list-summary"') < html.index('id="loco-list-table-wrap"')
+assert html.index('data-i18n="locoListIntro"') < html.index('id="loco-list-meta"') < html.index('id="loco-list-download"') < html.index('id="loco-list-summary"') < html.index('id="loco-list-table-wrap"')
 
 for required in [
     'fetchLocoListData',

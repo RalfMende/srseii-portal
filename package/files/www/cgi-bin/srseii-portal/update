@@ -125,4 +125,7 @@ if [ "$upgrade_failed" = true ]; then
 	exit 0
 fi
 
+# Package set on disk changed; force status's cached package-installed lookups to refresh.
+rm -f /tmp/srseii-opkg-status-cache
+
 json_response true "updated" "All available package updates were installed." "Alle verfügbaren Paket-Updates wurden installiert." "$updates_json" "$output"
