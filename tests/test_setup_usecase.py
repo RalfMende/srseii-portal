@@ -1,7 +1,7 @@
 from pathlib import Path
 
-setup_script = Path("package/files/usr/sbin/srseii-setup-usecase").read_text(encoding="utf-8")
-app_js = Path("package/files/www/srseii-portal/app.js").read_text(encoding="utf-8")
+setup_script = Path("src/usr/sbin/srseii-setup-usecase").read_text(encoding="utf-8")
+app_js = Path("src/www/srseii-portal/app.js").read_text(encoding="utf-8")
 
 required = [
     "service_is_running",

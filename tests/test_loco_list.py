@@ -1,11 +1,11 @@
 import json
 from pathlib import Path
 
-endpoint = Path("package/files/www/cgi-bin/srseii-portal/loco-list")
-download_endpoint = Path("package/files/www/cgi-bin/srseii-portal/loco-list-download")
-html = Path("package/files/www/srseii-portal/index.html").read_text(encoding="utf-8")
-app_js = Path("package/files/www/srseii-portal/app.js").read_text(encoding="utf-8")
-makefile = Path("package/Makefile").read_text(encoding="utf-8")
+endpoint = Path("src/www/cgi-bin/srseii-portal/loco-list")
+download_endpoint = Path("src/www/cgi-bin/srseii-portal/loco-list-download")
+html = Path("src/www/srseii-portal/index.html").read_text(encoding="utf-8")
+app_js = Path("src/www/srseii-portal/app.js").read_text(encoding="utf-8")
+makefile = Path("packaging/openwrt/Makefile").read_text(encoding="utf-8")
 
 assert endpoint.exists()
 assert download_endpoint.exists()
@@ -29,8 +29,8 @@ for required in [
 ]:
     assert required in endpoint_text, f"Missing locomotive-list behavior: {required}"
 
-assert '$(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/loco-list' in makefile
-assert '$(INSTALL_BIN) ./files/www/cgi-bin/srseii-portal/loco-list-download' in makefile
+assert '$(INSTALL_BIN) $(SRSEII_SRC_DIR)/www/cgi-bin/srseii-portal/loco-list' in makefile
+assert '$(INSTALL_BIN) $(SRSEII_SRC_DIR)/www/cgi-bin/srseii-portal/loco-list-download' in makefile
 for required in [
     'id="loco-list-status"',
     'id="loco-list-details"',

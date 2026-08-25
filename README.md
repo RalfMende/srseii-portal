@@ -41,7 +41,9 @@ Die Umstellung der Root-URL auf das Portal wird bewusst separat und kontrolliert
 
 ## Repository-Struktur
 
-- `package/Makefile` OpenWrt-Paketdefinition
-- `package/files/www/srseii-portal/` Portal-Frontend
-- `package/files/usr/sbin/srseii-activate-root-portal` kontrollierte Aktivierung der Root-Startseite (kopiert die installierte Portalseite nach `/www/index.html`)
-- `package/files/usr/sbin/srseii-restore-root-luci` Wiederherstellung der vorherigen Root-Seite
+- `src/usr/sbin/` Shell-Skripte und Backend-Helfer zur Entwicklung
+- `src/www/` CGI-Endpunkte und Frontend-Dateien zur Entwicklung
+- `packaging/openwrt/Makefile` OpenWrt-Paketdefinition fuer den Feed
+- `packaging/openwrt/files/` nur Symlinks auf `src/usr` und `src/www` (keine Dateikopien)
+
+Die Paketierung greift direkt auf `src/` zu. So bleibt die Quelle eindeutig und es gibt keine duplizierten Dateien zwischen Entwicklungs- und Feed-Struktur.

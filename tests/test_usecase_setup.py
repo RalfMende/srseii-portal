@@ -1,8 +1,8 @@
 from pathlib import Path
 
-script = Path('package/files/usr/sbin/srseii-setup-usecase')
+script = Path('src/usr/sbin/srseii-setup-usecase')
 if not script.exists():
-    raise AssertionError('Missing use-case setup script: package/files/usr/sbin/srseii-setup-usecase')
+    raise AssertionError('Missing use-case setup script: src/usr/sbin/srseii-setup-usecase')
 
 text = script.read_text(encoding='utf-8')
 required = [

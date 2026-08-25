@@ -1,7 +1,7 @@
 from pathlib import Path
 
-script = Path('package/files/www/srseii-portal/app.js').read_text(encoding='utf-8')
-status_script = Path('package/files/www/cgi-bin/srseii-portal/status').read_text(encoding='utf-8')
+script = Path('src/www/srseii-portal/app.js').read_text(encoding='utf-8')
+status_script = Path('src/www/cgi-bin/srseii-portal/status').read_text(encoding='utf-8')
 required = [
     'runUseCaseSetup',
     'bindUseCaseAction',
