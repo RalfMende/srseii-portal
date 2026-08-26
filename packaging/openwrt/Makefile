@@ -1,15 +1,20 @@
+# Copyright (C) 2025 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=srseii-portal
 PKG_VERSION:=0.9.2
-PKG_RELEASE:=2
+PKG_RELEASE:=1
 SRSEII_SRC_DIR:=$(CURDIR)/../../src
 
 include $(INCLUDE_DIR)/package.mk
 
 define Package/srseii-portal
-  SECTION:=railroad
-  CATEGORY:=Railroad
+  SECTION:=utils
+  CATEGORY:=Utilities
   TITLE:=SRSEII portal frontend
   DEPENDS:=+uhttpd
 endef
