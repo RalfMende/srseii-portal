@@ -2,8 +2,8 @@
 set -eu
 
 ROOT_INDEX="/www/index.html"
-TEMPLATE="/www/srseii/index.html"
-BACKUP="/www/index.luci.backup.html"
+TEMPLATE="/www/srseiiportal/index.html"
+BACKUP="/www/index_luci_backup.html"
 
 if [ ! -f "$TEMPLATE" ]; then
   echo "Template not found: $TEMPLATE" >&2

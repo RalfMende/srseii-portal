@@ -5,10 +5,10 @@
   <title>RailControl</title>
 </head>
 <body>
-  <p>Weiterleitung zu RailControl …</p>
+  <p>Forwarding to RailControl …</p>
   <p><a id="fallback-link" href="#">Falls die Weiterleitung nicht funktioniert, hier klicken.</a></p>
   <script>
-    // Zielport von RailControl ist fest verdrahtet, Host wird zur Laufzeit ermittelt.
+    // Target port of RailControl is hardwired, host is determined at runtime.
     var target = "http://" + location.hostname + ":8082/";
     document.getElementById("fallback-link").href = target;
     location.replace(target);

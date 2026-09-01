@@ -20,7 +20,7 @@ define Package/$(PKG_NAME)
 endef
 
 define Package/$(PKG_NAME)/description
-  Lightweight SRSEII launcher portal.
+  Launcher Web Portal for Smallest Railroad Server Ever (SRSEII)
 endef
 
 define Build/Configure
@@ -35,6 +35,14 @@ define Package/$(PKG_NAME)/install
 
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(SRSEII_ROOT)/src/usr/sbin/* $(1)/usr/sbin/
+endef
+
+define Package/$(PKG_NAME)/postinst
+	#!/bin/sh
+	[ -n "$${IPKG_INSTROOT}" ] || {
+	    /usr/sbin/srseii-activate-root-portal
+	}
+	exit 0
 endef
 
 $(eval $(call BuildPackage,$(PKG_NAME)))

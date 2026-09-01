@@ -2,7 +2,7 @@
 set -eu
 
 ROOT_INDEX="/www/index.html"
-BACKUP="/www/index.luci.backup.html"
+BACKUP="/www/index_luci_backup.html"
 
 if [ ! -f "$BACKUP" ]; then
   echo "Backup not found: $BACKUP" >&2
