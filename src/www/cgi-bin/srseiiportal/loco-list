@@ -48,6 +48,7 @@ if [ -z "$list_file" ]; then
 fi
 
 updated_at="$(file_updated_at "$list_file")"
+file_size="$(wc -c < "$list_file" | tr -d '[:space:]')"
 
 records="$(awk '
 function hex_value(value,    digits, pos, result, digit) {
@@ -107,9 +108,9 @@ END { emit_record() }
 
 if [ -z "$records" ]; then
 	if [ -n "$updated_at" ]; then
-		printf '{"status":"empty","count":0,"updatedAt":"%s","locomotives":[]}\n' "$updated_at"
+		printf '{"status":"empty","count":0,"updatedAt":"%s","fileSize":%s,"locomotives":[]}\n' "$updated_at" "$file_size"
 	else
-		printf '{"status":"empty","count":0,"locomotives":[]}\n'
+		printf '{"status":"empty","count":0,"fileSize":%s,"locomotives":[]}\n' "$file_size"
 	fi
 	exit 0
 fi
@@ -130,7 +131,7 @@ $sorted_records
 EOF
 
 if [ -n "$updated_at" ]; then
-	printf '{"status":"ready","count":%s,"updatedAt":"%s","locomotives":[%s]}\n' "$count" "$updated_at" "$items"
+	printf '{"status":"ready","count":%s,"updatedAt":"%s","fileSize":%s,"locomotives":[%s]}\n' "$count" "$updated_at" "$file_size" "$items"
 else
-	printf '{"status":"ready","count":%s,"locomotives":[%s]}\n' "$count" "$items"
+	printf '{"status":"ready","count":%s,"fileSize":%s,"locomotives":[%s]}\n' "$count" "$file_size" "$items"
 fi

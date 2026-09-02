@@ -220,6 +220,13 @@
       locoListCount: "%s Loks auf dem SRSEII",
       locoListUpdated: "Datei zuletzt aktualisiert: %s",
       locoListDownload: "Lokliste herunterladen",
+      locoListUpdateButton: "Lokliste aktualisieren",
+      locoListResetButton: "Lokliste zurücksetzen",
+      locoListRefreshSending: "Befehl wird an das SRSEII gesendet...",
+      locoListSynchronizing: "Lokliste wird synchronisiert... (%s s)",
+      locoListRefreshDone: "Lokliste wurde aktualisiert.",
+      locoListRefreshTimeout: "Die Synchronisierung läuft noch. Die Liste wird nicht automatisch weiter aktualisiert.",
+      locoListRefreshError: "Fehler beim Senden: %s",
       locoListAddress: "Adresse",
       locoListProtocol: "Protokoll",
       locoListName: "Name",
@@ -450,6 +457,13 @@
       locoListCount: "%s locomotives on the SRSEII",
       locoListUpdated: "File last updated: %s",
       locoListDownload: "Download locomotive list",
+      locoListUpdateButton: "Update locomotive list",
+      locoListResetButton: "Reset locomotive list",
+      locoListRefreshSending: "Sending command to the SRSEII...",
+      locoListSynchronizing: "Synchronizing locomotive list... (%s s)",
+      locoListRefreshDone: "Locomotive list updated.",
+      locoListRefreshTimeout: "Synchronization is still running. The list will no longer update automatically.",
+      locoListRefreshError: "Error sending command: %s",
       locoListAddress: "Address",
       locoListProtocol: "Protocol",
       locoListName: "Name",
@@ -891,6 +905,7 @@
     download.classList.add("is-hidden");
     rows.textContent = "";
     meta.textContent = "";
+    meta.classList.remove("err");
     summary.textContent = "";
 
     if (!data || data.status === "error") {
@@ -956,6 +971,105 @@
       .then(renderLocoList)
       .catch(function () {
         renderLocoList({ status: "error" });
+      });
+  }
+
+  function setLocoListRefreshNote(text, isError) {
+    var meta = document.getElementById("loco-list-meta");
+    if (!meta) {
+      return;
+    }
+    meta.textContent = text || "";
+    meta.classList.toggle("err", !!isError);
+  }
+
+  function getLocoListRevision(data) {
+    if (!data || data.fileSize === undefined) {
+      return "";
+    }
+    return String(data.updatedAt || "") + ":" + String(data.fileSize);
+  }
+
+  function waitForLocoListChange(previousRevision) {
+    var pollIntervalMs = 3000;
+    var timeoutMs = 60000;
+    var startedAt = Date.now();
+
+    function poll() {
+      return fetchLocoListData().then(function (data) {
+        var revision = getLocoListRevision(data);
+        if (revision && revision !== previousRevision) {
+          return data;
+        }
+
+        var elapsedMs = Date.now() - startedAt;
+        if (elapsedMs >= timeoutMs) {
+          return null;
+        }
+
+        setLocoListRefreshNote(t("locoListSynchronizing").replace("%s", String(Math.floor(elapsedMs / 1000))), false);
+        return new Promise(function (resolve) {
+          setTimeout(function () {
+            resolve(poll());
+          }, pollIntervalMs);
+        });
+      });
+    }
+
+    return poll();
+  }
+
+  function sendLocoListRefresh(action) {
+    var updateButton = document.getElementById("loco-list-update-button");
+    var resetButton = document.getElementById("loco-list-reset-button");
+    if (updateButton) {
+      updateButton.disabled = true;
+    }
+    if (resetButton) {
+      resetButton.disabled = true;
+    }
+    setLocoListRefreshNote(t("locoListRefreshSending"), false);
+
+    fetchLocoListData()
+      .catch(function () {
+        return null;
+      })
+      .then(function (previousData) {
+        var previousRevision = getLocoListRevision(previousData);
+        return fetch("/cgi-bin/srseiiportal/loco-list-refresh?action=" + action, { cache: "no-store" })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("HTTP " + response.status);
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            if (data && data.ok) {
+              setLocoListRefreshNote(t("locoListSynchronizing").replace("%s", "0"), false);
+              return waitForLocoListChange(previousRevision);
+            }
+            throw new Error(getLocalizedStatusValue(data, "message", "messageDe") || t("locoListRefreshError").replace("%s", ""));
+          });
+      })
+      .then(function (updatedData) {
+        if (updatedData) {
+          renderLocoList(updatedData);
+          var updatedAt = updatedData.updatedAt ? " " + t("locoListUpdated").replace("%s", formatLocoListDate(updatedData.updatedAt)) : "";
+          setLocoListRefreshNote(t("locoListRefreshDone") + updatedAt, false);
+          return;
+        }
+        setLocoListRefreshNote(t("locoListRefreshTimeout"), false);
+      })
+      .catch(function (error) {
+        setLocoListRefreshNote(t("locoListRefreshError").replace("%s", error.message || String(error)), true);
+      })
+      .then(function () {
+        if (updateButton) {
+          updateButton.disabled = false;
+        }
+        if (resetButton) {
+          resetButton.disabled = false;
+        }
       });
   }
 
@@ -1711,6 +1825,19 @@
         locoListLoaded = true;
         loadLocoList();
       }
+    });
+  }
+
+  var locoListUpdateButton = document.getElementById("loco-list-update-button");
+  var locoListResetButton = document.getElementById("loco-list-reset-button");
+  if (locoListUpdateButton) {
+    locoListUpdateButton.addEventListener("click", function () {
+      sendLocoListRefresh("update");
+    });
+  }
+  if (locoListResetButton) {
+    locoListResetButton.addEventListener("click", function () {
+      sendLocoListRefresh("reset");
     });
   }
   applyTranslations();
